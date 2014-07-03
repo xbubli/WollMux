@@ -240,6 +240,18 @@ public class StandardPrint
   }
 
   /**
+   * Druckfunktion zum Aufruf des Seriendrucks über den OOo-MailMergeService.
+   * 
+   * @throws Exception
+   *           falls was schief geht.
+   * @author Jan Gerrit Möltgen
+   */
+  public static void oooMailMergeToPdfFile(final XPrintModel pmod) throws Exception
+  {
+    OOoBasedMailMerge.oooMailMerge(pmod, OOoBasedMailMerge.OutputType.toPDFFile);
+  }
+  
+  /**
    * Druckfunktion zum Abspeichern der durch den Seriendruck erzeugten Daten in
    * einzelnen Dateien.
    * 

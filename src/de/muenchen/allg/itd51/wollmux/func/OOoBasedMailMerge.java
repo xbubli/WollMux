@@ -30,6 +30,7 @@
  */
 package de.muenchen.allg.itd51.wollmux.func;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -125,6 +126,7 @@ public class OOoBasedMailMerge
    */
   public static void oooMailMerge(final XPrintModel pmod, OutputType type)
   {
+    
     PrintModels.setStage(pmod, L.m("Seriendruck vorbereiten"));
 
     File tmpDir = createMailMergeTempdir();
@@ -233,6 +235,30 @@ public class OOoBasedMailMerge
             UNO.getParsedUNOUrl(outputFile.toURI().toString()).Complete;
           Logger.debug(L.m("Öffne erzeugtes Gesamtdokument %1", unoURL));
           UNO.loadComponentFromURL(unoURL, true, false);
+        }
+        catch (Exception e)
+        {
+          Logger.error(e);
+        }
+      else
+      {
+        WollMuxSingleton.showInfoModal(L.m("WollMux-Seriendruck"),
+          L.m("Leider konnte kein Gesamtdokument erstellt werden."));
+        pmod.cancel();
+      }
+      outputFile.delete();
+    }
+    
+    if (type == OutputType.toPDFFile)
+    {
+      // Output-File als PDF öffnen und aufräumen
+      File outputFile = new File(tmpDir, "output0.pdf");
+      if (outputFile.exists())
+        try
+        {
+          //TODO Das ist relativ hässlich, ohne sleep ist die Datei schon gelöscht bevor der PDF-Reader gestartet ist
+          Desktop.getDesktop().open(outputFile);
+          Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -1246,6 +1272,7 @@ public class OOoBasedMailMerge
    */
   public static enum OutputType {
     toFile,
+    toPDFFile,
     toPrinter;
   }
 
@@ -1314,6 +1341,14 @@ public class OOoBasedMailMerge
       mmProps.add(new NamedValue("OutputType", MailMergeType.FILE));
       mmProps.add(new NamedValue("FileNameFromColumn", Boolean.FALSE));
       mmProps.add(new NamedValue("FileNamePrefix", "output"));
+    } 
+    else if (type == OutputType.toPDFFile)
+    {
+      mmProps.add(new NamedValue("SaveAsSingleFile", Boolean.TRUE));
+      mmProps.add(new NamedValue("OutputType", MailMergeType.FILE));
+      mmProps.add(new NamedValue("FileNameFromColumn", Boolean.FALSE));
+      mmProps.add(new NamedValue("FileNamePrefix", "output"));
+      mmProps.add(new NamedValue("SaveFilter", "writer_pdf_Export"));
     }
     else if (type == OutputType.toPrinter)
     {
