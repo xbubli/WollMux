@@ -1,0 +1,190 @@
+= Zweck des Artikels =
+
+Nachfolgender Artikel beschreibt die für die Briefkopfvorlagen im Wollmux verwendeten Formatvorlagen. Die hier vorgestellten Formatvorlagen können bzw. sollten auch in allen anderen Vorlagen verwendet werden. Die bis jetzt von uns zur Verfügung gestellten Vorlagen finden Sie [http://limux.tvc.muenchen.de/ablage/sonstiges/wollmux/vorlagen/WOL_Briefkopf-Absatzformate_v1_2005-11-22.ott hier] bzw. in der Ihrem Referat eingesetzten Version dieser Datei.
+Die Vorlagen stehen Ihnen in jedem beliebigen Dokument zur Verfügung. Sie müssen die Datei nur vorher über <pre> Einfügen -> Datei </pre> in das Dokument einfügen.
+
+'''Besonders für den Austausch von Dateien mit MS Office ist es sehr wichtig anstatt manueller Formatierung Formatvorlagen zu verwenden.''' Insbesondere bei mehrmaligen Austausch kann es ansonsten zu größeren Problemen kommen.
+
+<div style="background-color:#FF6347;border:1px solid #D3D3D3;margin:0.3em;padding:1em; color: black;">
+'''ACHTUNG! Die Formatvorlage "Standard" ist nicht eindeutig definierbar. Sie kann in verschiedenen Installation von OpenOffice abweichen. Daher darf die Formatvorlage "Standard", die in jedem Textdokument vorhanden ist, in Vorlagen nicht verwendet werden. Auch selbst definierte Formatvorlagen sollten niemals mit der Formatvorlage "Standard" verknüpft werden (Format->Formatvorlagen, dann entsprechende Formatvorlage mit der rechten Maustaste anklicken, dann Ändern.../Verwalten)'''
+</div>
+
+= Formatvorlagen =
+
+Die Schriftart ist Arial, ausser es ist in der Tabelle etwas anderes angegeben. Die Maße und Vorgaben sind dem [http://intranet.muenchen.de/?url=http://intranet.muenchen.de/basis/publ/erscheinungsbild/index.html Visuellen Erscheinungsbild] der LHM entnommen.
+
+{| {{Prettytable}}
+ | bgcolor="#87CEFA" | Bezeichung der Vorlage
+ | bgcolor="#87CEFA" | Schriftgröße
+ | bgcolor="#87CEFA" | Zeilenabstand
+ | bgcolor="#87CEFA" | Absatzformat
+ | bgcolor="#87CEFA" | Sonstige Einstellungen
+ | bgcolor="#87CEFA" | Verwendung (Beispiel)
+ |-
+ | valign = "top" |Adresse_Angaben
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Adresse Angaben.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |Adresse_Empfänger
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Adresse Empfänger.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |AnkerUndTabellenschutz
+ | valign = "top" |Standard 2pt
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |Wird in dem kleinen Bereich vor dem Seitentextbereich verwendet, um diesen Bereich möglichst klein zu halten. Z.B. werden dort die Rahmen verankert.
+ |-
+ | valign = "top" |Bezeichung_Formular
+ | valign = "top" |'''Fett''' 13pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Bezeichung Formular.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |Datum
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |Gilt nur für den Externen Briefkopf.
+ | valign = "top" |[[Bild:Formatvorlage Datum.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |Fax_Beschriftung
+ | valign = "top" |Standard 10pt
+ | valign = "top" |Fest 0,39 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Fax Beschriftung.jpg|thumb|none|200px|]]  
+ |-
+ | valign = "top" |Fensterzeile
+ | valign = "top" |Standard 6pt
+ | valign = "top" |Fest 0,25 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Fensterzeile.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |Fließtext
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,45 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |Die Schrift für den Bereich im Briefkopf, in dem der tatsächliche Inhalt, z.B Bescheid, Schreiben usw. geschrieben wird.
+ |-
+ | valign = "top" |Fußzeile_Wollmux
+ | valign = "top" |Standard 7pt
+ | valign = "top" |Fest 0,28 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Fußzeile Wollmux.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |Hauptabteilung_Fachbereich
+ | valign = "top" |'''Fett''' 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Hauptabteilung Fachbereich.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |kurzm_angaben
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,39 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Kurzm Angaben.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |LHM
+ | valign = "top" |Standard 13pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage LHM.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |Referat
+ | valign = "top" |'''Fett''' 13pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Referat.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |Sachleitende Verfügung<br>Sachleitende Verfügung dünn<br>Sachleitende Verfügung unterstrichen
+ | valign = "top" |
+ | valign = "top" |
+ | valign = "top" |
+ | valign = "top" |
+ | valign = "top" |Werden nicht mehr verwendet, da durch den WollMux Komfortdruck ersetzt.
+ |-
+ | valign = "top" |Schreiben
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Schreiben.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |Seite<br>Seitenzahl
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |Einzug vor Text: 12.20 cm
+ | valign = "top" |[[Bild:Formatvorlage Seite.jpg|thumb|none|200px|]]Vorlage für die Formatierung der Seitenzahl. Diese erscheint im internen oder externen Briefkopf ab der Seite 2 oben rechts.
+ |-
+ | valign = "top" |Verfasser
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Verfasser.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |Weisse_Schrift
+ | valign = "top" |irrelevant
+ | valign = "top" |irrelevant
+ | valign = "top" |0
+ | valign = "top" |Die Schriftfarbe ist weiss.
+ | valign = "top" |Das Konstrukt ist nötig, damit der Bereich hinter den Rahmen mit Absender, Empfängeradresse, usw. nicht beschriftet werden kann. Dieser "Workaround" stellt sicher, dass die Briefköpfe auch mit MS Office austauschbar bleiben und dort noch dem städtischen Erscheinungsbild entsprechen.[[Bild:Formatvorlage Weisse Schrift.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |WollMuxVerfuegungspunkt
+ | valign = "top" |'''Fett''' 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |Einzug Erste Zeile -0,7cm
+ | valign = "top" |[[Bild:Formatvorlage WollMuxVerfuegungspunkt.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |WollMuxVerfuegungspunktAbdruck
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |Einzug Erste Zeile -0,7cm
+ | valign = "top" |[[Bild:Formatvorlage WollMuxVerfuegungspunktAbdruck.jpg|thumb|none|200px|]]
+ |-
+ | valign = "top" |WollMuxZuleitungszeile
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |Unterstrichen
+ | valign = "top" |[[Bild:Formatvorlage WollMuxZuleitungszeile.jpg|thumb|none|200px|]]    
+ |-
+ | valign = "top" |Zeichen
+ | valign = "top" |Standard 9pt
+ | valign = "top" |Fest 0,35 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Zeichen.jpg|thumb|none|200px|]] 
+ |-
+ | valign = "top" |Zusatz_Referat
+ | valign = "top" |Standard 11pt
+ | valign = "top" |Fest 0,46 cm
+ | valign = "top" |0
+ | valign = "top" |0
+ | valign = "top" |[[Bild:Formatvorlage Zusatz Referat.jpg|thumb|none|200px|]] Formatvorlage für die Zusatzbezeichung rechts oben im externen Briefkopf, den manche Dienststellen verwenden, z.B. Tourismusamt.   
+ |} 
+
+
+[[Category:AG-Office]]
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]
+[[Kategorie:Office_Vorlagenumsteller_Handbuch]]

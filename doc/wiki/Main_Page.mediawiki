@@ -1,0 +1,52 @@
+[[Hauptseite | Deutsche Version]]
+
+__NOTOC__
+= [[Datei:Wollmux_logo_medium.gif]] - Munich's letterhead and form system =
+
+The Wollmux is an extension for [http://www.openoffice.org OpenOffice.org] / [http://www.documentfoundation.org LibreOffice] developed by the [http://www.muenchen.de/int/en City Administration of Munich]. WollMux adds functions to OpenOffice.org / LibreOffice, to make the handling of templates, forms and letterheads much easier. Because WollMux is OpenSource and available for everyone, it is also used by other public administrative bodies and corporations.
+
+To find out, what WollMux can do, look here:  '''[[Features|WollMux Features]]''' (in German only)
+
+<div style="background-color:#FFFD7A; border:1px dashed gray; padding: 2px 6px; margin-top:1.2em; margin-bottom:1.2em; margin-left:1px; margin-right:auto; font-size:smaller;">{{:News}}
+
+'''[[News|News...]]'''
+</div>
+
+<div style="background-color:#C4EFA1; border:1px dashed gray; width:34em; padding: 2px 6px; margin-top:1.2em; margin-bottom:1.2em; margin-left:1px; margin-right:auto">
+<span style="font-size:larger;font-weight:bold;color:#1D9101">Download WollMux</span>
+*'''[http://code.google.com/p/wollmux/downloads/detail?name=WollMux-11.10a-installer.exe WollMux 11.10a]''' ([[Datei:Windows-icon.png]] Windows, 3MB)
+*'''[http://code.google.com/p/wollmux/downloads/detail?name=wollmux-config-de-11.11a-installer.exe&can=2&q= WollMux-configuration 11.11a]''' ([[Datei:Windows-icon.png]] Windows, deutsch, 4MB)
+* [[Download|Linux/other OS & languages]]
+<span style="font-size:smaller; color:gray;"> In order to use WollMux you need a WollMux configuration!</span>
+
+</div>
+
+== Documentation ==
+
+'''[[:Kategorie:WollMux Handbook|WollMux Handbook]]''' - How-to manuals for WollMux and its configuration.
+
+'''[http://www.wollmux.net/wiki/images/8/8e/FormularMax_Handbuch.pdf FormularMax Handbook (PDF - German language)]''' - Handbook on how to create forms with WollMux (FM4000). English version available soon.
+
+'''[[Mailinglisten|Mailing lists]]''' - for further help use our mailing lists.
+
+== Source Code ==
+
+WollMux is an OpenSource-peoject (licensed under [http://joinup.ec.europa.eu/software/page/eupl European Union Public License]). The source code can be found in our '''[http://code.google.com/p/wollmux/ source code repository]'''.
+
+Instructions on how to check out the source code from the repository and how to compile WollMux can be found on the Wiki Page '''[[Repository]]'''.
+
+If you have further questions use our '''[[Mailinglisten | mailing lists.]]'''
+
+== Error messages ==
+Bugs in WollMux can be submitted using the public [http://code.google.com/p/wollmux/issues/list issue tracker] on Google Code.
+
+== Links==
+[[Datei:Limux_power.gif|right|link=http://www.muenchen.de/limux]]
+
+* http://code.google.com/p/wollmux/ - WollMux-repository on Google Code
+* http://www.muenchen.de/wollmux - WollMux-on muenchen.de
+* http://www.muenchen.de/limux - Informationen on the LiMux project
+* http://joinup.ec.europa.eu/software/wollmux/description - WollMux project on Joinup
+* http://wiki.stadt.freiburg.de/ooo/ - Freiburg's OpenOffice.org-Wiki Freiburg
+
+[[Category:WollMux English]]

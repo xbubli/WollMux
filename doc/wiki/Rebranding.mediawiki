@@ -1,0 +1,70 @@
+In bestimmten Anwendungszenarien kann ein "Rebranding" des [[WollMux]] erwünscht sein. Das heißt im Wesentlichen, dass der WollMux nicht unter dem Namen "WollMux" auf den Systemen der Anwender erscheinen soll, sondern unter einer anderen Anwendungsbezeichnung, und auch WollMux-Icons etc. ausgetauscht werden sollen. So ist z.B. bereits heute der WollMux in privaten Unternehmen unter anderem Namen im Einsatz.
+
+Das Rebranding des WollMux ist allerdings kein triviales Unterfangen, da insbesondere der WollMux-Programmcode nicht wirklich daraufhin ausgelegt ist, alle Vorkommen des Namens "WollMux" austauschbar zu machen und der Begriff "WollMux" an vielen Stellen hardcodiert ist. Mit ein wenig Mühe und unter Verwendung von Hilfsskripten, die zu diesem Zwecke entwickelt wurden, ist es allerdings trotzdem möglich weitestgehend alle Benutzer-sichtbaren Vorkommen des Namens "WollMux" zu ändern.
+
+Auf dieser Wiki-Seite wird dokumentiert, welche Schritte dafür auszuführen sind. Voraussetzung für die hier beschriebenen Anpassungen ist auf jeden Fall eine korrekt eingerichtete WollMux-Buildumgebung mit dem aus dem [[Repository]] ausgecheckten WollMux-Quelltext. Mehr dazu wie man eine WollMux-Buildumgebung aufsetzen kann, findet sich unter anderem auf der Seite "[[WollMux kompilieren]]".
+
+=== Anpassung der WollMux-Konfiguration ===
+
+Innerhalb der [[Konfigurationsdatei wollmux.conf]] (die in der Praxis meist mit Hilfe des [[Format_von_WollMux-Config-Dateien#.25include|%include-Mechanismus]] auf mehrere Dateien verteilt ist) gibt es diverse Einstellungen, die Auswirkungen auf Benutzer-sichtbare Meldungen oder Dialog-Fenster des WollMux haben. Innerhalb der in diesen Einstellungen definierten Strings kommt in der Default-Konfiguration häufiger auch der Name "WollMux" vor. Für ein Rebranding müssen Sie die Strings in der wollmux.conf so ändern, dass statt WollMux der von Ihnen gewünschte Name verwendet wird.
+
+Auf alle betroffenen Einstellungen innerhalb der wollmux.conf hier im Detail einzugehen würde zu weit führen. Von besonderem Interesse sind aber sicherlich die Abschnitte [[Konfigurationsdatei_wollmux.conf#Fenster|"Fenster"]] (insbesondere das Attribut "TITLE", das den Fenstertitel für die [[WollMuxBar]] festlegt) und [[Konfigurationsdatei_wollmux.conf#Dialoge|"Dialoge"]].
+
+Es empfiehlt sich einfach eine Suche über die gesamte wollmux.conf (und alle darin includierte Einzeldateien) durchzuführen und nach dem String "WollMux" zu suchen. Wichtig ist allerdings, dass dabei ausschließlich Vorkommen von "WollMux" innerhalb von Strings ersetzt werden! Ein Ersetzen des Namens des [[Konfigurationsdatei_wollmux.conf#WollMuxBar-Fenster|Abschnitts "WollMuxBar-Fenster"]] würde z.B. zu einem Fehler führen.
+
+=== Notwendige Anpassungen vor Kompilieren des WollMux ===
+
+Bevor der WollMux unter seinem neuen Namen kompiliert werden kann, müssen einige manuelle Anpassungen an diversen Dateien durchgeführt werden. Diese Anpassungen sind im Folgenden beschrieben.
+
+==== Anpassung von <code>misc/makeversion[.bat]</code> ====
+
+Die Datei <code>makeversion</code> (bzw. <code>makeversion.bat</code> wenn Sie den WollMux mit einem Windows-System bauen), die innerhalb des <code>misc/</code>-Unterordners des WollMux-Projekts liegt, dient einerseits dazu beim Kompilieren des WollMux die aktuelle Versionsnummer zu berechnen, andererseits generiert dieses Skript aber auch die Datei <code>description.xml</code>, die für die WollMux-Extension verwendet wird und u.a. den Namen festlegt, unter dem die WollMux-Extension im Extension Manager von OpenOffice.org/LibreOffice auftaucht. Wenn Sie diesen Namen ändern wollen, führen Sie folgende Änderungen innerhalb der <code>makeversion</code> bzw. <code>makeversion.bat</code>-Datei durch:
+
+* Im unteren Teil, wo im Skript die <code>description.xml</code> generiert wird, muss der Inhalt des <code><display-name></code>-Tags (sowie in der Regel der Inhalt des <code><publisher></code>-Tags) angepasst werden.
+* Ebenfalls in der <code>description.xml</code> sollte der <code><update-information></code>-Teil am besten ganz auskommentiert/gelöscht werden
+* Die <code>update.xml</code>-Datei, die ebenfalls vom <code>makeversion</code>-Skript erzeugt wird, enthält zwar auch Referenzen auf den Namen "WollMux", ist aber ohnehin uninteressant, weswegen eine Änderung daran überflüssig ist.
+
+==== Anpassung von <code>oxt/WriterWindowState.xcu</code> ====
+
+In dieser Datei einfach jedes Vorkommen von "WollMux" entsprechend durch den neuen Namen ersetzen. Aber Vorsicht: NICHT das kleingeschriebene "wollmux" in dieser Datei ersetzen!
+
+==== Anpassung von <code>oxt/help/component*.txt</code> ====
+
+In diesen Textdateien steht die (lokalisierte) Kurzbeschreibung der WollMux-Extension, die im Extension Manager von OpenOffice.org/LibreOffice angezeigt wird. Einfach die Dateien nach Bedarf anpassen.
+
+==== Anpassung von <code>oxt/META-INF/manifest.xml</code> ====
+
+In dieser Datei die Vorkommen von "WollMux.uno.jar" und "WollMux.rdb" entsprechend anpassen. Soll der WollMux nach dem Rebranding also z.B. "SuperOffice" heißen, dann entsprechend ein "SuperOffice.uno.jar" und "SuperOffice.rdb" daraus machen (wie immer hier sehr genau auf Groß-/Kleinschreibung achten!).
+
+ACHTUNG: Die Vorkommen von "basic/WollMux/" NICHT anpassen!
+
+==== Anpassung der WollMux-Icons ====
+
+Wenn die WollMux-Icons ersetzt werden sollen, dann müssen entsprechend vor dem Kompilieren die Icon-Dateien im <code>src/data</code>-Verzeichnis des WollMux-Projekts ausgetauscht werden.
+
+=== Kompilieren mit Hilfe von <code>rename_and_build.bat</code> (nur Windows!) ===
+
+Nachdem die oben beschriebenen manuellen Anpassungen durchgeführt wurden, gilt es nun vor allem noch die zahlreichen hardcodierten Ausgabestrings im Java-Quelltext des WollMux anzupassen und dann den WollMux zu kompilieren. Die Quelltext-Anpassungen manuell durchzuführen oder durch ein simples Suchen&Ersetzen zu probieren, ist allerdings relativ aussichtslos. Daher wurde (momentan nur für Windows!) ein Batch-Skript entwickelt, das diesen Vorgang mit Hilfe eines Java-Tools namens WollMuxStringReplacer (das theoretisch auch manuell unter Linux ausgeführt werden kann) automatisiert.
+
+Das Batch-Skript <code>rename_and_build.bat</code> befindet sich im <code>misc/</code>-Unterordner des WollMux-Projekts. Bei Ausführung des Skripts über die Kommandozeile wird dem Skript als Parameter der neue Name des WollMux sowie die Namen der für den WollMux-Build auszuführenden Ant-Targets übergeben (wobei das Ant-Target "wollmuxbar.exe" auf jeden Fall immer ausgeführt wird, damit eine entsprechend neu benannte WollMux-Executable generiert wird).
+
+Beispielausführung:
+ rename_and_build.bat SuperOffice all wininstaller
+
+Das Skript macht darauf eine Sicherungskopie des <code>src</code>-Ordners des WollMux-Projekts und ruft dann das Java-Tool <code>WollMuxStringReplacer</code> auf, welches die Vorkommen von "WollMux" in den Ausgabestrings des WollMux-Quelltextes ersetzt. Darauf wird <code>ant</code> mit den übergebenen Targets gestartet und nach Abschluss des Ant-Builds die Sicherungskopie des <code>src</code>-Ordners wieder hergestellt, so dass die Umbenennung keine permanenten "Schäden" am Zustand des WollMux Source Codes im Projektverzeichnis hinterlässt.
+
+Das Ergebnis des Ant-Builds befindet sich nach Ausführung des Skripts dann wie gewohnt im <code>dist</code>-Unterordner. Die erzeugten Dateien (Extension, Windows-Installer etc.) tragen den gewünschten neuen Namen.
+
+=== Offene Punkte ===
+
+Nach Durchführung der obigen Anweisungen hat man zwar einen umbenannten WollMux kompiliert, an einigen Stellen bleibt aber dennoch noch der Name "WollMux" bestehen. Diese Stellen sind allerdings relativ gut versteckt, weshalb sich der Aufwand einer Anpassung in der Regel nicht lohnt. Der Vollständigkeit halber seien sie aber hier aufgeführt:
+
+* Die WollMux-Uninstaller-Datei, die vom Windows-Installer des WollMux generiert wird, heißt auch nach der Umbenennung immer noch "wollmux_uninstall.exe".
+* Die Windows-Registrierungseinträge des WollMux werden immer noch unter einem Registrierungsschlüssel namens "WollMux" gespeichert.
+* Die WollMux-Makrobibliothek heißt immer noch "WollMux".
+* Der Name der Standardbenutzerin für neue Einträge in der Persönlichen Absenderliste ist immer noch "Tinchen WollMux". Um dies zu Ändern kann vor dem Compilieren leicht die Java-Klasse <code>de.muenchen.allg.itd51.wollmux.dialog.PersoenlicheAbsenderlisteVerwalten</code> angepasst werden.
+
+
+
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]

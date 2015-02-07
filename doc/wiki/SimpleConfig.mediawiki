@@ -1,0 +1,413 @@
+Mit Hilfe der SimpleConfig-Extension ist es möglich innerhalb von OOo-Makros Daten aus externen Konfigurationsdateien auslesen zu können (ab Version 1.3.0 können Daten auch geschrieben werden). Ziel der Extension ist es, Konstanten zukünftig nicht mehr im Makro-Code selbst pflegen zu müssen, sondern die Pflege über eine externe Konfigurationsdatei, welche die Werte der Konstanten enthält, vornehmen zu können.
+
+Die SimpleConfig-Extension stellt zu diesem Zweck einen UNO-Service zur Verfügung, über dessen Funktionen String-Werte aus einer Konfigurationsdatei, die dem [[Format von WollMux-Config-Dateien]] entspricht ([[Format_von_WollMux-Config-Dateien#Listen|Listen]] werden nicht unterstützt), ausgelesen werden können. Der Einsatz soll in Zukunft vorrangig aus Basic-Makros heraus erfolgen, der UNO-Service kann aber natürlich auch z.B. von BeanShell-Makros oder externen Java-Anwendungen verwendet werden.
+
+
+__TOC__
+
+
+== Download ==
+
+{| {{Prettytable}}
+ !Version
+ !Beschreibung
+ |-
+ ![http://www.wollmux.net/files/SimpleConfig.oxt 1.4.2]<br/>[http://www.wollmux.net/files/SimpleConfig_src.tar.gz (source)]
+ |
+Releasedatum: 23.04.2010<br>
+
+Änderungen seit dem letzten Release:
+* Konfigurationsdateien, die das Unicode-Zeichen U+00A0 (No-Break Space) enthalten, werden jetzt korrekt eingelesen.
+* Fehlerbehandlung in der Helper-Library verbessert.
+ |-
+ !1.4.1
+ |
+Releasedatum: 15.01.2010<br>
+
+Änderungen seit dem letzten Release:
+* Auch die Leseoperationen von SimpleConfig sind jetzt thread-sicher
+* ConfigThingy aktualisiert (enthält kleinere Verbesserungen bzgl. Speicherverbrauch und möglichen Problemen bei sehr großen Konfigurationsdateien)
+* Die Funktion getSimpleConfigVar der Basic-Hilfsbibliothek liefert nun verlässlich <code>Empty</code> zurück, wenn ein Fehler aufgetreten ist. In früheren SimpleConfig-Versionen konnte es vorkommen, dass stattdessen <code>null</code> zurückgeliefert wurde.
+ |-
+ !1.4.0
+ |
+Releasedatum: 15.10.2009<br>
+
+Änderungen seit dem letzten Release:
+* getElementType() liefert jetzt als Typ <code>void</code> zurück
+* getByName(<PFAD>) kann nun auch mit Teilpfaden aufgerufen werden (d.h. es muss nicht der komplette Pfad bis zum Blatt im Konfigurationsbaum angegeben werden, sondern nur ein Teil des Pfades von der Wurzel zum Blatt). In diesem Fall wird nicht ein String-Wert zurückgeliefert, sondern ein neues SimpleConfig-Objekt, mit dem in dem entsprechenden Teilbaum operiert werden kann (siehe [[#Erweiterte_Funktionalit.C3.A4t_von_getByName|Erweiterte Funktionalität von getByName]]).
+ |-
+ !1.3.0
+ |
+Releasedatum: 12.10.2009<br>
+
+Änderungen seit dem letzten Release:
+* Der SimpleConfig-Service bietet nun die Funktionen ''setElementValue(string aElementName, string aValue)'' und ''removeElement(string aElementName)'' zum Setzen/Entfernen von Werten an. Die Basic-Helper-Library wurde entsprechend um die Funktionen ''setSimpleConfigVar'' und ''removeSimpleConfigVar'' ergänzt, die die Initialisierung des SimpleConfig-Services übernehmen und mit denen man mehrere Werte auf einmal setzen/entfernen kann.
+* Der SimpleConfig-Service liest nun auch die optionale Konfigurationsdatei <code>.makro_user.conf</code> aus und fügt deren Inhalt automatisch an das Ende der Konfiguration ein. Diese Konfigurationsdatei wird für die neue Funktionalität des Speicherns von Werten verwendet und sollte nicht manuell angepasst werden.
+* Ein möglicher StackOverflowError, der bei extrem langen Strings in der Konfigurationsdatei auftreten konnte, wurde behoben.
+ |-
+ !1.2.0
+ |
+Releasedatum: 15.09.2009<br>
+
+Änderungen seit dem letzten Release:
+* Die SimpleConfig-Extension enthält nun eine Basic-Helper-Library, welche die Funktion <code>getSimpleConfigVar</code> zur Verfügung stellt, mit der mehrere Werte auf einmal ausgelesen werden können und die die Ausgabe von endbenutzerfreundlichen Fehlermeldungen übernimmt.
+* Der SimpleConfig-Service liest nun auch die optionale Konfigurationsdatei <code>.makro_test.conf</code> aus und fügt deren Inhalt automatisch an das Ende der Konfiguration ein. Dies erleichtert das schnelle Anpassen der Konfiguration zu Testzwecken.
+ |-
+ !1.1.0
+ |
+Releasedatum: 19.06.2009<br>
+
+Änderungen seit dem letzten Release:
+* Der SimpleConfig-Service liest nur noch einmal beim ersten Aufruf von <code>createUNOService</code> die .makro.conf ein. Dies hat eine Verbesserung der Performance zur Folge. Es bedeutet aber auch, dass sich Änderungen an der .makro.conf erst nach einem Neustart von OpenOffice auswirken.
+* Probleme, die beim gleichzeitigen Betrieb von SimpleConfig zusammen mit einer älteren WollMux-Version auftreten konnten, wurden behoben.
+ |-
+ !
+1.0.0
+ |
+Releasedatum: 16.06.2009<br>
+
+Erstes Release von SimpleConfig
+ |-
+|}
+
+== Installation ==
+
+Zur manuellen Installation der SimpleConfig-Extension muss die Datei <code>SimpleConfig.oxt</code> mittels Extension Manager oder Verwendung des "<code>unopkg add</code>"-Befehls bei OpenOffice.org registriert werden. Außerdem muss eine entsprechende <code>.makro.conf</code>-Konfigurationsdatei angelegt werden, siehe [[#Ort_und_Format_der_Konfigurationsdatei|Ort und Format der Konfigurationsdatei]].
+
+== Ort und Format der Konfigurationsdatei ==
+
+Intern existiert für den SimpleConfig-Service nur eine einzige Konfigurationsdatei. Diese setzt sich aber tatsächlich aus bis zu drei Dateien zusammen. Die Datei ''.makro.conf'' ist zwingend erforderlich, die Dateien ''.makro_user.conf'' und ''.makro_test.conf'' sind optional und für ganz bestimmte Zwecke vorgesehen.
+
+'''Allgemeiner Hinweis:''' Änderungen an der Konfigurationsdatei von SimpleConfig wirken sich in aller Regel erst nach einem kompletten Neustart von OpenOffice.org aus!
+
+=== .makro.conf ===
+
+Der SimpleConfig-Service liest die Daten aus der Konfigurationsdatei '''<code>$HOME/.makro.conf</code>''' (Punkt am Anfang des Dateinamens beachten!), wobei <code>$HOME</code> unter Windows 2000 das Profilverzeichnis "C:\Dokumente und Einstellungen\<code><Kürzel></code>" und unter Linux das normale Home-Verzeichnis bezeichnet. Sollte diese Datei nicht existieren, so wird als Fallback auf die Datei <code>/etc/simpleconfig/makro.conf</code> (unter Linux) oder <code>C:\Programme\simpleconfig\makro.conf</code> zurückgegriffen (man beachte, dass die Fallback-Dateien keinen Punkt am Anfang des Dateinamens haben!).
+
+Vom Aufbau her muss die Konfigurationsdatei der [[Format_von_WollMux-Config-Dateien|Syntax von WollMux-Konfigurationsdateien]] entsprechen, wobei [[Format_von_WollMux-Config-Dateien#Listen|Listen]] nicht unterstützt werden. Darüberhinaus gibt es keine Vorgaben und theoretisch kann jede beliebige WollMux-Konfigurationsdatei eingelesen werden. Für das Speichern von Makro-Konfigurationsdaten wird allerdings ein Aufbau wie in folgendem Beispiel empfohlen ("PFAD", "DIALOG1" und "KONSTANTE1" sind nur Beispiele für Schlüsselnamen - je nachdem sollten hier sinnvolle Bezeichner gewählt werden):
+
+<pre>
+MAK0815(
+
+    PFAD "C:\ablage\textbausteinvorlage1.odt" DIALOG1 "Mehrzeiliger%nAnzeigetext"
+
+)
+ 
+MAK0816(
+
+    PFAD "C:\ablage\textbausteinvorlage2.odt" KONSTANTE1 "Wert"
+
+)
+
+...
+</pre>
+
+Wie bei Konfigurationsdateien des WollMux kann auch die SimpleConfig-Konfigurationsdatei <code>%include</code>-Steuerbefehle enthalten, mit deren Hilfe man die Konfigurationsdaten auf mehrere Dateien verteilen kann. Für weitere Informationen zum include-Mechanismus siehe die [[Format_von_WollMux-Config-Dateien#.25include | entsprechende Dokumentation der WollMux-Config-Datei]].
+
+Generell gilt, dass die zuletzt in der Konfigurationsdatei angegebene Deklaration eines Wertes Vorrang vor früheren Deklarationen hat. Das heißt Werte können einfach überschrieben werden, was im Zusammenspiel mit dem include-Mechanismus dazu verwendet werden kann, um in der <code>.makro.conf</code> gewisse Default-Werte zu definieren, die dann optional von später in der Datei includierten Konfigurationsdateien überschrieben werden können.
+
+'''Beispiel:'''
+
+<pre>
+# Dies ist der Inhalt von .makro.conf
+
+MAK0815(
+
+    SCHLUESSEL1 "Wert1" SCHLUESSEL2 "Wert2"
+
+)
+
+%include ".makro2.conf"
+</pre>
+
+<pre>
+# Dies ist der Inhalt von .makro2.conf
+
+MAK0815(
+
+    SCHLUESSEL1 "Wert3"
+
+)
+</pre>
+
+Die Abfrage nach dem Wert von <code>MAK0815/SCHLUESSEL1</code> würde in diesem Fall "Wert3" zurückliefern. ''Beachte:'' Die Abfrage von <code>MAK0815/SCHLUESSEL2</code> liefert nach wie vor "Wert2" zurück, da dieser Wert von der includierten Datei nicht überschrieben wurde.
+
+=== .makro_user.conf ===
+
+Ab Version 1.3.0 wertet der SimpleConfig-Service zusätzlich zur [[#.makro.conf|Konfigurationsdatei .makro.conf]] (und [[#.makro_test.conf|makro_test.conf]]) auch die Konfigurationsdatei '''<code>$HOME/.makro_user.conf</code>''' aus, wobei <code>$HOME</code> unter Windows 2000 das Profilverzeichnis "C:\Dokumente und Einstellungen\<code><Kürzel></code>" und unter Linux das normale Home-Verzeichnis bezeichnet. Die Vorgaben an Aufbau und Format dieser Datei sind identisch zur normalen ''.makro.conf'', allerdings ist die ''.makro_user.conf'' optional.
+
+Sollte SimpleConfig die Datei ''<code>$HOME/.makro_user.conf</code>'' finden, so wird deren Inhalt automatisch an das Ende der eingelesenen Konfiguration eingefügt. Es gilt somit, dass Wertedeklarationen in der ''.makro_user.conf'' Vorrang vor den Deklarationen in der normalen ''.makro.conf'' haben, genau so als würde sich in der letzten Zeile der ''.makro_conf'' der Befehl <code>%include ".makro_user.conf"</code> befinden.<br/>
+'''Wichtig: Sind sowohl ''.makro_user.conf'' als auch ''.makro_test.conf'' vorhanden, so wird die ''.makro_user.conf'' noch hinter die ''.makro_test.conf'' gehängt. Die Wertdeklarationen in der ''.makro_user.conf'' haben also noch Vorrang vor den Deklarationen in der ''.makro_test.conf''.
+
+Die ''.makro_user.conf'' wird vom SimpleConfig-Service zum Schreiben von Daten mittels der ''setElementValue''-Funktion verwendet. Sollte beim Aufruf von ''setElementValue'' die Datei noch nicht existieren, so wird sie angelegt.
+
+'''Die Datei ''.makro_user.conf'' sollte in aller Regel nicht von Hand verändert werden! Insbesondere darf sie keine <code>%include</code>-Befehle enthalten!'''
+
+=== .makro_test.conf ===
+
+Um das Testen von Makro-Lösungen zu vereinfachen, wertet der SimpleConfig-Service ab Version 1.2.0 zusätzlich zur [[#.makro.conf|Konfigurationsdatei .makro.conf]] die Konfigurationsdatei '''<code>$HOME/.makro_test.conf</code>''' aus, wobei <code>$HOME</code> unter Windows 2000 das Profilverzeichnis "C:\Dokumente und Einstellungen\<code><Kürzel></code>" und unter Linux das normale Home-Verzeichnis bezeichnet. Die Vorgaben an Aufbau und Format dieser Datei sind identisch zur normalen ''.makro.conf'', allerdings ist die ''.makro_test.conf'' optional und sollte nur zu Testzwecken angelegt werden. Die Datei dient einzig dazu, um zu Testzwecken kurzfristig Konfigurationswerte festzulegen, ohne dass die Produktivkonfiguration dafür angepasst werden muss. Nach Ende der Tests kann die Datei dann einfach wieder gelöscht werden, so dass der Zustand vor den Tests wieder hergestellt ist.
+
+Sollte SimpleConfig die Datei ''<code>$HOME/.makro_test.conf</code>'' finden, so wird deren Inhalt automatisch an das Ende der eingelesenen Konfiguration eingefügt. Es gilt somit, dass Wertedeklarationen in der ''.makro_test.conf'' Vorrang vor den Deklarationen in der normalen ''.makro.conf'' haben, genau so als würde sich in der letzten Zeile der ''.makro_conf'' der Befehl <code>%include ".makro_test.conf"</code> befinden.<br/>
+'''Wichtig: Sind sowohl ''.makro_user.conf'' als auch ''.makro_test.conf'' vorhanden, so wird die ''.makro_user.conf'' noch hinter die ''.makro_test.conf'' gehängt. Die Wertdeklarationen in der ''.makro_user.conf'' haben also noch Vorrang vor den Deklarationen in der ''.makro_test.conf''.
+
+== Der UNO-Service de.muenchen.allg.itd51.config.simpleconfig.SimpleConfig ==
+
+Die SimpleConfig-Extension stellt einen zentralen UNO-Service zur Verfügung, der wie folgt erzeugt werden kann:
+
+In OpenOffice.org-Basic:
+ conf = createUNOService("de.muenchen.allg.itd51.config.simpleconfig.SimpleConfig")
+
+In Java:
+ XSimpleConfig conf = UnoRuntime.queryInterface(XSimpleConfig.class, UNO.createUNOService("de.muenchen.allg.itd51.config.simpleconfig.SimpleConfig");
+
+Weitere Informationen zur Verwendung des SimpleConfig-Services unter OpenOffice.org-Basic finden Sie im Abschnitt [[#Verwendung_(BASIC)|Verwendung (BASIC)]].
+
+Der SimpleConfig-Service implementiert das [http://api.openoffice.org/docs/common/ref/com/sun/star/container/XNameAccess.html XNameAccess]-Interface und erweitert dieses um zusätzliche Funktionen. Die vollständige Interface-Definition von XSimpleConfig sieht wie folgt aus:
+
+<pre>
+module de {  module muenchen {  module allg { module itd51 { module config { module simpleconfig {
+
+/**
+ * Dieses Interface beschreibt alle Methoden, die der SimpleConfig-Service exportiert.
+ * Das Interface erweitert das XNameAccess-Interface um weitere Methoden.
+ */
+interface XSimpleConfig: com::sun::star::container::XNameAccess
+{
+    /**
+     * Setzt den Wert des Elements mit dem Namen aElementName auf den Wert aValue.
+     * Wenn ein Element mit Namen aElementName noch nicht existiert, so wird es
+     * neu angelegt.
+     * Dabei ist der "Name" eines Elements im Konfigurationsbaum der Pfad zu einem
+     * Knoten und der "Wert" eines Elements ist das einzige Blatt, das sich direkt
+     * unterhalb dieses Knotens befindet.
+     * Der Pfad/"Elementname" muss in der Syntax "Knoten1/Knoten2/.../KnotenN"
+     * angegeben werden, wobei "KnotenN" der eigentliche Name des Knotens und
+     * "Knoten1" ein Knoten auf oberster Ebene im Konfigurationsbaum dieses
+     * SimpleConfig-Objekts ist.
+     * 
+     * @param aElementName
+     *          der Pfad im Konfigurationsbaum zum Knoten, dessen Wert
+     *          (= Blatt unterhalb des Knotens) geändert werden soll
+     * @param aValue
+     *          der neue Wert für das Element
+     * @return true, wenn das Setzen des Wertes erfolgreich war,
+     *         false sonst
+     * @throws IllegalArgumentException
+     *           wenn aElementName == null ist oder Länge 0 hat, oder
+     *           wenn aValue == null ist; außerdem wenn aElementName
+     *           unerlaubte Zeichen enthält (erlaubte Zeichen sind die Buchstaben
+     *           a-z und A-Z, sowie Ziffern und der Unterstrich, wobei das erste
+     *           Zeichen keine Ziffer sein darf)
+     */
+    boolean setElementValue([in] string aElementName, [in] string aValue)
+        raises (com::sun::star::lang::IllegalArgumentException);
+
+    /**
+     * Entfernt das Element mit Namen aElementName, sowie alle Elemente, die
+     * sich unter ihm im Konfigurationsbaum befinden.
+     * Dabei ist der "Name" eines Elements im Konfigurationsbaum der Pfad zu einem
+     * Knoten, der in der Syntax "Knoten1/Knoten2/.../KnotenN" angegeben werden
+     * muss, wobei "KnotenN" der eigentliche Name des Knotens und "Knoten1" ein
+     * Knoten auf oberster Ebene im Konfigurationsbaum dieses SimpleConfig-Objekts
+     * ist. 
+     * Diese Funktion funktioniert nur mit Knoten, die in einer schreibbaren
+     * Konfigurationsdatei festgelegt sind (.makro_user.conf). Wenn mehrere Knoten
+     * mit demselben "Namen" existieren, wird nur der zuletzt in der schreibbaren
+     * Konfigurationsdatei definierte entfernt.
+     * 
+     * @param aElementName
+     *          der Pfad im Konfigurationsbaum zum Knoten, der entfernt werden soll
+     * @return true wenn das Entfernen erfolgreich war,
+     *         false sonst
+     */ 
+    boolean removeElement([in] string aElementName);
+};
+
+}; }; }; }; }; };
+</pre>
+
+== Verwendung (BASIC) ==
+
+=== Verwendung des SimpleConfig-UNO-Services ===
+
+Bevor der UNO-Service von SimpleConfig in einem Basic-Makro verwendet werden kann, muss er zunächst initialisiert werden. Dies geschieht folgendermaßen:
+<pre>
+REM Instanziierung des UNO-Services - implementiert XNameAccess 
+conf = createUNOService("de.muenchen.allg.itd51.config.simpleconfig.SimpleConfig")
+</pre>
+
+==== Zugriff auf Wert mit getByName ====
+Der Zugriff auf die in der Konfigurationsdatei gespeicherten Werte geschieht in einem Basic-Makro mittels Aufruf der Funktion <code>getByName</code> wie im folgenden Beispiel illustriert:
+
+<pre>
+REM Auslesen eines Wertes in Basic
+myValue = conf.getByName("MAK0815/SCHLUESSEL1")
+</pre>
+
+Um einen Wert zu erhalten muss der Funktion <code>getByName</code> der komplette Pfad zum gewünschten Wert in der Konfigurationsdatei mitgegeben werden ([[#Erweiterte_Funktionalitäten_von_getByName|siehe auch unten]]). Die Teile des Pfades werden getrennt mit Slashes - ein Slash am Ende des Pfades ist unnötig, kann aber angegeben werden.
+
+'''Beispiel:'''
+<pre>
+# Eine Beispiel-Konfigurationsdatei
+
+MAK0815(
+
+    DIALOGE(
+
+        SUBDIALOGE1(
+
+            DIALOG1 "..."
+        )
+
+        SUBDIALOGE2(
+
+            DIALOG1 "..."
+
+            DIALOG2 "..."
+
+        )
+
+    )
+
+)
+</pre>
+
+Im Falle der obigen Beispiel-Konfigurationsdatei sind das folgende die ''einzigen'' Aufrufe von <code>getByName</code>, die einen String-Wert zurückliefern (Aufrufe mit Teilpfaden liefern ein SimpleConfig-Objekt zurück, [[#Erweiterte_Funktionalitäten_von_getByName|siehe unten]]):
+
+<pre>
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE1/DIALOG1")
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE2/DIALOG1")
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE2/DIALOG2")
+
+REM Slash am Ende optional - liefert dieselben Ergebnisse wie oben
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE1/DIALOG1/")
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE2/DIALOG1/")
+myDialog = conf.getByName("MAK0815/DIALOGE/SUBDIALOGE2/DIALOG2/")
+</pre>
+
+Existiert ein angegebener Pfad nicht, so wirft <code>getByName</code> eine <code>NoSuchElementException</code>.
+
+===== Erweiterte Funktionalität von getByName =====
+
+In der Regel sollte getByName wie oben beschrieben verwendet werden, d.h. dem Funktionsaufruf wird immer der komplette Pfad zum gewünschten Wert in der Konfigurationsdatei übergeben. Es ist allerdings seit SimpleConfig 1.4.0 auch möglich nur Teilpfade beim Aufruf anzugeben (nur hintere Teile des Pfades können weggelassen werden). In diesem Fall wird kein (String-)Wert zurückgeliefert, sondern ein neues SimpleConfig-Objekt, mit dem auf den durch den Pfad beschriebenen Teilbaum operiert werden kann.
+
+Gegeben sei dieselbe Beispiel-Konfigurationsdatei wie oben. Dann ist folgendes möglich:
+<pre>
+REM Folgender Aufruf mit einem Teilbaum liefert ein SimpleConfig-Objekt zurück
+sc = conf.getByName("MAK0815/DIALOGE")
+
+REM Mit Hilfe dieses Objekts kann nun auf dem Teilbaum operiert werden.
+elementNames = sc.getElementNames()
+
+REM elementNames hat nun den Wert
+REM ("SUBDIALOGE1/DIALOG1", "SUBDIALOGE2/DIALOG1", SUBDIALOGE2/DIALOG2")
+
+REM Entsprechend liefert z.B. folgender Aufruf True zurück:
+sc.hasByName("SUBDIALOGE1/DIALOG1")
+
+REM Und folgende Aufrufe liefern beide denselben Wert zurück
+conf.getByName("MAK0815/DIALOGE/SUBDIALOGE2/DIALOG1")
+sc.getByName("SUBDIALOGE2/DIALOG1")
+</pre>
+
+Diese Funktionalität ermöglicht es z.B. bei großen Konfigurationsdateien gezielt über Werte in Teilbäumen iterieren zu können.
+
+Die erweiterte Funktionalität wird momentan von der [[#Verwendung_der_Basic-Hilfsbibliothek|Basic-Hilfsbibliothek]] nicht unterstützt.
+
+==== Weitere Funktionen des SimpleConfig-Services ====
+Neben der Funktion <code>getByName</code> bietet der SimpleConfig-Service noch folgende Funktionen an:
+
+;hasByName("<PFAD>")
+:Liefert <code>true</code> zurück, wenn es ein Element unter dem angegeben Pfad in der Konfigurationsdatei gibt, ansonsten <code>false</code> (genau dann wenn getByName mit demselben Pfad eine NoSuchElementException werfen würde).
+
+;getElementNames()
+:Liefert eine Sequenz aller gültiger Elementpfade in der Konfigurationsdatei zurück, d.h. aller Pfade, für die <code>hasByName</code> <code>true</code> zurückliefern würde.<br>''Anmerkung:'' Sollte beim Einlesen der Konfigurationsdatei irgendein schwerwiegender Fehler aufgetreten sein, so liefert <code>getElementNames()</code> den Namen des aufgetretenen Fehlers zurück - z.B. "FileNotFoundException", wenn keine Konfigurationsdatei gefunden wurde. Über Aufruf von <code>getByName("<ExceptionName>")</code>, zum Beispiel <code>getByName("FileNotFoundException")</code>, können dann genauere Informationen zum aufgetrenen Fehler abgerufen werden.
+
+;setElementValue("<PFAD>", "<WERT>")
+: Ändert den Wert des Elements unter dem angebenen Pfad auf den übergebenen Wert (sollte das Element nicht existieren, wird es angelegt). '''Alle Änderungen, die durch diese Funktion ausgelöst werden, finden ausschließlich in der ''[[#.makro_user.conf|.makro_user.conf]]'' statt!''' Das heißt es kann auf diesem Wege nicht wirklich der Wert eines Elements, das in der ''.makro.conf'' definiert ist, verändert werden, sondern lediglich durch eine neue Definition in der ''.makro_user.conf'' überschrieben werden. Dies hat nach Außen letztlich denselben Effekt, nichtsdestotrotz ist es wichtig den Unterschied zu kennen.<br/>Die Funktion liefert <code>true</code> zurück, wenn das Setzen erfolgreich war, ansonsten <code>false</code>.
+
+;removeElement("<PFAD>")
+:: Entfernt das Element unter dem angegebenen Pfad. '''Alle Änderungen, die durch diese Funktion ausgelöst werden, finden ausschließlich in der ''[[#.makro_user.conf|.makro_user.conf]]'' statt!'''. Das heißt es kann auf diesem Wege nicht der Wert eines Elements entfernt werden, dass in der ''.makro.conf'' oder ''.makro_test.conf'' definiert ist. Die Funktion dient ausschließlich dazu mit <code>setElementValue</code> gesetzte Werte wieder zu löschen. Sollte in der ''.makro_user.conf'' ein Wert zweimal gesetzt sein (ein Zustand der nur entstehen kann, wenn manuell an der ''.makro_user.conf'' etwas geändert wurde, da mehrmaliges Aufrufen von <code>setElementValue</code> keine Werte mehrfach anlegt, sondern bereits vorhandene Werte überschreibt), so wird durch <code>removeElement</code> nur der zuletzt definierte Wert gelöscht.<br/>Die Funktion liefert <code>true</code> zurück, wenn das Entfernen erfolgreich war, ansonsten <code>false</code>.
+
+Ferner werden gemäß des XNameAccess-Interfaces noch die Funktionen '''<code>hasElements()</code>''' (Liefert <code>true</code> zurück, wenn die Konfigurationsdatei überhaupt Elemente enthält - Achtung, dies ist auch der Fall, wenn z.B. keine Konfigurationsdatei gefunden wurde, da sie dann die "FileNotFoundException" als Element enthält) und '''<code>getElementType()</code>''' (Liefert den Typ der Elemente zurück - in diesem Fall wird allerdings kein sinnvoller Typ zurückgeliefert, sondern immer "void") unterstützt, deren Anwendung aber nur in Ausnahmefällen sinnvoll sein dürfte.
+
+=== Verwendung der Basic-Hilfsbibliothek ===
+
+Die SimpleConfig-Extension enthält eine BASIC-Hilfsbibliothek (namens "SimpleConfig"), welche die Verwendung von SimpleConfig in Basic vereinfachen soll. Zu diesem Zweck stellt die Hilfsbibliothek mehrere Funktionen zur Verfügung, die jeweils das Initialisieren des SimpleConfig-Services übernehmen und endbenutzerfreundliche Fehlermeldungen zur Verfügung stellen, wenn beim Ausführen der Funktionen des SimpleConfig-Services irgendwelche Fehler aufgetreten sind.
+
+''In der Regel sollte das Verwenden der Hilfsbibliothek der direkten Verwendung des UNO-Services vorgezogen werden.''
+
+Bevor die Funktionen der Hilfsbibliothek verwendet werden können, muss zunächst sichergestellt werden, dass die Bibliothek auch geladen ist. Dies geschieht in Basic zum Beispiel folgendermaßen:
+<pre>
+If GlobalScope.BasicLibraries.hasByName("SimpleConfig") Then
+    GlobalScope.BasicLibraries.loadLibrary("SimpleConfig")
+End If
+</pre>
+Es empfiehlt sich unter Umständen an diese Stelle noch eine Fehlermeldung (z.B. "SimpleConfig-Extension nicht installiert!") einzubauen, wenn die SimpleConfig-Library nicht gefunden werden konnte.
+
+==== getSimpleConfigVar ====
+
+Mit Hilfe der Funktion "''getSimpleConfigVar''", die ein Array aus Schlüsselnamen als Parameter erwartet, können mehrere Werte aus der Konfigurationsdatei auf einmal eingelesen werden. Zudem gibt die Funktion optional endbenutzerfreundliche Fehlermeldungen aus, wenn der SimpleConfig-Service nicht initialisiert werden konnte, die Konfigurationsdatei nicht gefunden wurde oder einige der gesuchten Werte nicht gefunden werden konnten. Die Funktion liefert ''Empty'' zurück, wenn ein Fehler aufgetreten ist, so dass im Makro-Code einfach mit ''isEmpty(...)'' geprüft werden kann, ob es Fehler gab.
+
+Werden in einem Makro also mehrere Konstanten benötigt, die aus der SimpleConfig-Konfigurationsdatei ausgelesen werden, empfiehlt es sich gleich am Anfang des Makros mit der "''getSimpleConfigVar''"-Funktion alle Konstanten-Werte abzufragen und das Makro entsprechend abzubrechen, wenn von der Funktion ''Empty'' zurückgeliefert wurde. Das Erzeugen von benutzerverständlichen Fehlermeldungen nimmt einem die Funktion dabei ab.
+
+'''Verwendungsbeispiel:'''
+<pre>
+REM Alle benötigten Werte aus der SimpleConfig-Konfigurationsdatei auslesen
+keys = Array("MAK0815/SCHLUESSEL1", "MAK0815/SCHLUESSEL2", "MAK0815/SCHLUESSEL3")
+values = getSimpleConfigVar(keys, 2) ' 2 bedeutet, dass alle Fehlermeldungen ausgegeben werden
+
+REM Testen, ob es Fehler gab
+If isEmpty(values) Then
+    REM Hier eventuell Ausführung des Makros beenden oder sonstige sinnvolle Fehlerbehandlung
+End If
+
+REM Mit dem values-Array weiterarbeiten...
+</pre>
+
+Die Funktion und welche Parameter sie genau erwartet ist ausführlich im Quelltext der SimpleConfig-Library dokumentiert.
+
+==== setSimpleConfigVar ====
+
+Mit Hilfe der Funktion "''setSimpleConfigVar''", die ein Array aus PropertyValues (Schlüssel-Wert-Paare) als Parameter erwartet, können mehrere Werte (müssen Strings sein!) auf einmal in die Konfigurationsdatei ''[[#.makro_user.conf|.makro_user.conf]] geschrieben werden. Zudem gibt die Funktion optional endbenutzerfreundliche Fehlermeldungen aus, wenn der SimpleConfig-Service nicht initialisiert werden konnte oder das Schreiben einiger Wert nicht erfolgreich war. Die Funktion liefert ''False'' zurück, wenn ein Fehler aufgetreten ist und ''True'' wenn das Schreiben aller Werte erfolgreich war.
+
+'''Verwendungsbeispiel:'''
+<pre>
+REM Zu setzende Schlüssel-Wert-Paare definieren
+Dim keyValuePairs(2) As New com.sun.star.beans.PropertyValue
+keyValuePairs(0).Name = "MAKROS/MAK0815/SCHLUESSEL1"
+keyValuePairs(0).Value = "Mein Wert 1"
+keyValuePairs(1).Name = "MAKROS/MAK0815/SCHLUESSEL2"
+keyValuePairs(1).Value = "Mein Wert 2"
+keyValuePairs(2).Name = "MAKROS/MAK0815/SCHLUESSEL3"
+keyValuePairs(2).Value = "Mein Wert 3"
+
+settingSuccessful = setSimpleConfigVar(keyValuePairs, 1)
+
+If (settingSuccessful) Then
+    msgbox ("Setzen hat geklappt!")
+Else
+    msgbox ("Setzen hat nicht geklappt!")
+End If
+</pre>
+
+Die Funktion und welche Parameter sie genau erwartet ist ausführlich im Quelltext der SimpleConfig-Library dokumentiert.
+
+==== removeSimpleConfigVar ====
+
+Mit Hilfe der Funktion "''removeSimpleConfigVar''", die ein Array aus Schlüsselnamen als Parameter erwartet, können mehrere Werte auf einmal aus der Konfigurationsdatei ''[[#.makro_user.conf|.makro_user.conf]] entfernt werden. Zudem gibt die Funktion optional endbenutzerfreundliche Fehlermeldungen aus, wenn der SimpleConfig-Service nicht initialisiert werden konnte oder das Entfernen einiger Wert nicht erfolgreich war. Die Funktion liefert ''False'' zurück, wenn ein Fehler aufgetreten ist und ''True'' wenn das Entfernen aller Werte erfolgreich war.
+
+'''Verwendungsbeispiel:'''
+<pre>
+keys = Array("MAK0815/SCHLUESSEL1", "MAK0815/SCHLUESSEL2", "MAK0815/SCHLUESSEL3")
+removeSuccess = removeSimpleConfigVar(testKeys, 2) ' 2 bedeutet, dass alle Fehlermeldungen ausgegeben werden
+
+If (removeSuccess) Then
+    msgbox ("Entfernen hat geklappt!")
+Else
+    msgbox ("Entfernen hat nicht geklappt!")
+End If
+</pre>
+
+Die Funktion und welche Parameter sie genau erwartet ist ausführlich im Quelltext der SimpleConfig-Library dokumentiert.

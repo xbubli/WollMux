@@ -1,0 +1,55 @@
+= WollMux Code Repositories =
+
+Wer sich für den Quelltext des WollMux interessiert oder den WollMux selber kompilieren will (um z.B. derzeit in Entwicklung befindliche Features des WollMux auszuprobieren), findet die aktuellste Version des Source Codes stets in unserem öffentlichen Git Repository.
+
+Das Repository wird derzeit bei GitHub gehostet - die URL des zugehörigen WollMux-Projekts ist '''http://github.com/WollMux/WollMux'''.<br/>
+Über die Website des Projekts kann sehr einfach im Source Code gebrowst werden und es sind übersichtlich alle Commit Logs und die damit verbundenen Quelltextänderungen zu sehen.
+
+== Checkout des Quelltextes aus dem Repository ==
+
+Es gibt verschiedene Tools, mit denen Sie den Quelltext aus unserem Git Repository auschecken können. Diese Anleitung beschränkt sich auf das einfache Kommandozeilentool "git". Die folgenden Kommandos sollten sowohl unter Linux als auch unter Windows funktionieren. Voraussetzung ist natürlich, dass Git installiert und im Pfad ist (mehr zu Git erfahren Sie unter "[[#Git_-_Was_ist_das.3F|Git - Was ist das?]]").
+
+=== WollMux auschecken ===
+
+Wechseln Sie in der Kommandozeile zunächst in den Dateiordner, in den Sie den WollMux-Quelltext auschecken wollen. Dann rufen Sie folgendes Kommando auf:
+
+<pre>
+git clone https://github.com/WollMux/WollMux
+</pre>
+
+Durch dieses Kommando wird ein neuer Unterordner namens "WollMux" angelegt, in dem sich nach erfolgreichen Ausführen des Kommandos jetzt ein sogenannter Clone des WollMux-Repositories inkl. des aktuellen Stands des WollMux-Quelltextes befindet.
+
+Mehr ist im Prinzip nicht zu tun. Um den so ausgecheckten Quelltext auf den aktuellen Stand zu bringen, wechseln Sie einfach in den "WollMux"-Ordner und führen den folgenden Kommandozeilenbefehl aus:
+
+ git pull
+
+=== UNOHelper auschecken ===
+
+Um den WollMux selber kompilieren zu können, benötigen Sie noch ein zusätzliches Projekt namens UNOHelper. Den Quelltext dieses Projekts können Sie genauso wie den Quelltext des WollMux auschecken.
+
+Wechseln Sie in den Ordner, in dem sich auch ihr "WollMux"-Unterordner mit dem Clone des WollMux-Repositories befindet (es ist für den Build wichtig, dass "WollMux"-Ordner und "UNOHelper"-Ordner nebeneinander liegen) und führen Sie folgendes Kommando aus:
+
+<pre>
+git clone https://github.com/WollMux/UNOHelper
+</pre>
+
+Durch dieses Kommando wird ein neuer Unterordner namens "UNOHelper" angelegt (achten Sie auf die Kapitalisierung!), in dem sich jetzt ein Clone des UNOHelper-Repositories befindet. Um den UNOHelper-Clone auf den aktuellen Stand zu bringen, wechseln Sie einfach in den "UNOHelper"-Ordner und führen den folgenden Kommandozeilenbefehl aus:
+
+ git pull
+
+== Git - Was ist das? ==
+
+Als Versionsverwaltungssystem kommt beim WollMux-Projekt Git zum Einsatz. Für diejenigen, die nur CVS oder Subversion (SVN) kennen, enthält Git einige Fallstricke, da es sich um ein verteiltes Versionsverwaltungssystem handelt. Wer hingegen mit Mercurial vertraut ist, dürfte mit dem Prinzip von Git wenig Schwierigkeiten haben. Wir können an dieser Stelle allerdings keine umfassene Einführung in die Verwendung von Git geben, sondern verweisen an dieser Stelle einfach auf das umfangreiche Buch [http://git-scm.com/book/de Pro git], das alles enthält, was man zu Git wissen muss und komplett online lesbar ist.
+
+Um einfach nur den WollMux Source Code auszuchecken langt es allerdings, wenn Sie es schaffen Git auf ihrem System zu installieren und dann die Anweisungen im Unterabschnitt "[[#Checkout_des_Quelltextes_aus_dem_Repository|Checkout des Quelltext aus dem Repository]]" befolgen. Eine Anleitung wie Sie Git bei sich installieren, finden Sie ebenfalls im Buch unter http://git-scm.com/book/de/v1/Los-geht%E2%80%99s-Git-installieren.
+
+== WollMux selber kompilieren ==
+
+Wenn Sie den Quelltext von WollMux und UNOHelper ausgecheckt haben, können Sie theoretisch den WollMux selber bei sich bauen.<br/>
+Weitere Informationen hierzu finden Sie unter "[[WollMux kompilieren]]" sowie https://github.com/WollMux/WollMux/blob/master/doc/INSTALL (bei Problemen einfach auf der [[Mailinglisten|Mailingliste]] fragen).<br/>
+Die im INSTALL-File erwähnte Datei classes.tar.gz, die zum kompilieren des WollMux benötigt wird, finden Sie unter http://www.wollmux.net/files/classes.tar.gz.
+
+Nicht vergessen, dass der WollMux zum funktionieren auf jeden Fall auch noch eine Konfiguration benötigt. Eine Beispielkonfiguration befindet sich z.B. in unserem [[Download|Download-Bereich]].
+
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]

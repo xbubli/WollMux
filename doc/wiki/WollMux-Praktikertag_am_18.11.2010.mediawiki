@@ -1,0 +1,99 @@
+Willkommen zum 1. WollMux-Praktikertag
+
+=== Agenda ===
+
+
+{| {{Prettytable}} width="100%" border=1 cellpadding=6 cellspacing=0
+! width="300" style="background-color:#FFD700" | Zeit
+! width="600" style="background-color:#FFD700" | TOP
+! width="500" style="background-color:#FFD700"| Extras
+|-
+| 08.30 bis 09.00 Uhr
+| Eintreffen
+|
+|-
+| 09.00 bis 09.30 Uhr
+| Offizieller Beginn, Begrüßung, Allgemeine Informationen zum Projekt LiMux und zum WollMux; Vorstellung des Tagesablaufs<br>(Daniel Benkmann, LHM)
+|
+|-
+| 09.30 bis 10.00 Uhr
+| Demonstration des WollMux – Was kann er alles?<br>(Christoph Lutz, LHM)
+| 
+* [http://wollmux.forge.osor.eu/wollmux-config-10.8a/vorlagen/fragmente/beispiele/Abtretungserkl%C3%A4rung.ott Abtretungserklärung]
+* "Fachanwendung" für Vergabewesen (VOB)
+|-
+| 10.00 bis 10.30 Uhr
+| Vortrag "Technische und organisatorische Voraussetzungen"<br>(Harald Kagerer, DBI)
+|
+* [http://wollmux.forge.osor.eu/praktikertag/Vortrag_WollmuxPlanungSystemintegration_101118.pdf Vortrag]
+|-
+| 10.30 bis 10.50 Uhr
+| P-A-U-S-E
+|
+|-
+| 10.50 bis 11.50 Uhr
+| Installation: Demonstration und Praxis<br>(Andor Ertsey, LHM)
+| 
+* [http://wollmux.forge.osor.eu/praktikertag/wollmux_installation/wollmux_installieren.pdf Anleitung]
+* [http://wollmux.forge.osor.eu/praktikertag/wollmux_installation/WollMux%20Installation.odt Vorgehen]
+* [http://forge.osor.eu/frs/download.php/1218/WollMux.oxt WollMux.oxt]
+* [http://forge.osor.eu/frs/download.php/1221/WollMuxBar.jar WollMuxBar.jar]
+* [http://forge.osor.eu/frs/download.php/1286/wollmux-config-de-10.8a-installer.exe Konfig für WIN]
+* [http://forge.osor.eu/frs/download.php/1287/wollmux-config-de-utf8-10.8a.tar.gz Konfig für Linux]
+|-
+| 11.50 bis 12.00 Uhr
+| Aufteilung in Gruppen für Nachmittag<br>(Daniel Benkmann, LHM)
+|
+|-
+| 12.00 bis 13.00 Uhr
+| M-I-T-T-A-G-E-S-S-E-N
+| Wir gehen gemeinsam essen; Tisch ab 12 Uhr in "La Veccia Masseria" in der Mathildenstraße 3 bestellt
+|-
+| 13.00 bis 13.45 Uhr
+| Einführungsvortrag in WollMux-Konfiguration<br>(Christoph Lutz, LHM)
+| 
+* [http://wollmux.forge.osor.eu/praktikertag/wollmux.conf wollmux.conf --> Webserver]
+* [http://wollmux.forge.osor.eu/wollmux-config-10.8a/ wollmux-config-10.8a]
+* [http://wollmux.forge.osor.eu/praktikertag/Testvorlage.ott Testvorlage.ott] zum Einbinden
+|-
+| 13.45 bis 14.45 Uhr
+| Gruppenarbeit - Teil 1
+| siehe Themengruppen
+|-
+| 14.45 bis 15.00 Uhr
+| P-A-U-S-E
+|
+|-
+| 15.00 bis 16.00 Uhr
+| Gruppenarbeit - Teil 2
+| siehe Themengruppen
+|-
+| 16.00 bis 17.00 Uhr
+| Feedbackrunde<br>(Daniel Benkmann, LHM)
+|
+|-
+|}
+
+
+=== Mögliche Themengruppen ===
+{| {{Prettytable}} width="100%" border=1 cellpadding=6 cellspacing=0
+! width="600" style="background-color:#FFD700" | Thema
+! width="500" style="background-color:#FFD700"| Extras
+|-
+| Datenquellenanbindung<br>(Stefan Köhler, Harald Kagerer)
+| 
+|- 
+| Serienbrieffunktion, Sachleitende Verfügungen und Komfortdruckfunktionen<br>(Christoph Lutz, Günther Leichtl)
+|
+* [http://wollmux.forge.osor.eu/praktikertag/Baubeendigungsanzeige_Zuleitungszeilen.ott SLV-Beispiel] (Baubeendigung)
+|-
+| Vorlagen-/Formularerstellung mit dem WollMux<br>(Stefan Ströbl)
+| 
+* [http://wollmux.forge.osor.eu/praktikertag/formularerstellung/Praktikertag-Formulare-erstellen_Grobkonzept.odt Ablauf-Grobkonzept]
+* [http://wollmux.forge.osor.eu/praktikertag/formularerstellung/Hinweise.ott Hinweise.ott]
+* [http://wollmux.forge.osor.eu/praktikertag/formularerstellung/FormularMax-Uebung.ott FormularMax-Uebung.ott]
+|-
+| Buildumgebung für WollMux<br>(Andor Ertsey)
+|
+|-
+|}

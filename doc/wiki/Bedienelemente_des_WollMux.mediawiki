@@ -1,0 +1,166 @@
+= Symbolleisten =
+So zeigen Sie eine geschlossene Symbolleiste an:
+Wählen Sie in '''OpenOffice.org''' --> Menü '''Ansicht''' --> '''Symbolleisten''' und klicken Sie auf den Namen der Symbolleiste.
+== Symbolleiste "Sachleitende Verfügungen (WollMux)"==
+
+[[Bild:SachleitendeVerfügungen.png|thumb|none|800px|'''Symbolleiste Sachleitende Verfügungen''']]
+
+Die Symbolleiste "Sachleitende Verfügen" stellt Werkzeuge zur Bearbeitung von Sachleitenden Verfügungen zur Verfügung.
+
+[[Hilfen f%C3%BCr Sachleitende Verf%C3%BCgungen verwenden]]
+
+[[Sachleitende Verf%C3%BCgungen-Konzept]]
+
+===Aufruf:===
+Falls noch nicht angezeigt: '''OpenOffice.org''' --> Menü '''Ansicht''' --> '''Symbolleisten''' --> '''Sachleitende Verfügungen (WollMux)'''
+
+=== Die Schaltfläche "Ziffer einfügen"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Die_Schaltfl.C3.A4che_.22Ziffer_Einf.C3.BCgen.22| Hilfen für Sachleitende Verfügungen  verwenden - Ziffer einfügen]]
+
+=== Die Schaltfläche "Abdruck"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Die_Schaltfl.C3.A4che_.22Abdruck.22| Hilfen für Sachleitende Verfügungen verwenden - Abdruck]]
+
+=== Die Schaltfläche "Zuleitungszeile"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Die_Schaltfl.C3.A4che_.22Zuleitungszeile.22| Hilfen für Sachleitende Verfügungen verwenden - Zuleitungszeile]]
+
+=== Die Schaltfläche "Immer drucken"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Schaltfl.C3.A4che_.22Immer_drucken.22| Hilfen für Sachleitende Verfügungen verwenden - Immer drucken]]
+
+=== Die Schaltfläche "Nicht im Original"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Schaltfl.C3.A4che_.22Nicht_im_Original.22| Hilfen für Sachleitende Verfügungen verwenden - Nicht im Original]]
+
+=== Die Schaltfläche "Nur Original"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Schaltfl.C3.A4che_.22Nur_Original.22| Hilfen für Sachleitende Verfügungen verwenden - Nur Original]]
+
+=== Die Schaltfläche "Nur Entwurf"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Schaltfl.C3.A4che_.22Nur_Entwurf.22| Hilfen für Sachleitende Verfügungen verwenden - Nur Entwurf]]
+
+=== Die Schaltfläche "Nur Abdrucke"===
+[[Hilfen_f%C3%BCr_Sachleitende_Verf%C3%BCgungen_verwenden#Schaltfl.C3.A4che_.22Nur_Abdrucke.22| Hilfen für Sachleitende Verfügungen verwenden - Nur Abdrucke]]
+
+== Symbolleiste "Textbausteine (WollMux)"==
+[[Bild:Textbausteine.png|thumb|none|800px|'''Symbolleiste Textbausteine''']]
+
+Die Symbolleiste "Textbausteine" stellt Werkzeuge zum Arbeiten mit Textbausteinen zu Verfügung.
+
+[[Textbausteinsystem-Konzept]]
+
+[http://limux.tvc.muenchen.de/ablage/tp-client/ag-office/2006-06-28/OFF-Praesentation_Konzept_Textbausteine.pdf Die Präsentation zum Textbausteinsystem-Konzept als PDF]
+
+===Aufruf:===
+Falls noch nicht angezeigt: '''OpenOffice.org''' --> Menü '''Ansicht''' --> '''Symbolleisten''' --> '''Textbausteine (WollMux)'''
+
+===Die Schaltfläche "Textbaustein einfügen"===
+
+Nach Betätigen der Schaltfläche , wird vom Cursor ausgehend eine Rückwärts suche gestartet, die so lange läuft, bis in einem Absatz keine Textbausteine mehr gefunden werden. Alle dabei gefundenen Textbausteine werden entsprechend aufgelöst. In den einzelnen Textbausteinen können Platzhalter eingefügt werden (OpenOffice.org-->Menü "Einfügen"-->Feldbefehle-->Andere-->Reiter "Funktionen"-->Feldtyp "Platzhalter"-->Format "Text").  Nach dem Einfügen der Textbausteine steht der Cursor auf dem ersten eingefügten Platzhalter. Mit dem Textbaustein können auch Parameter angegeben werden, die automatisch in freie Platzhalter eingetragen werden z.B <Name des Textbaustein><[[Konfigurationsdatei_wollmux.conf#SEPARATOR_.3CSeparator.3E| definierter SEPARATOR]]><Einzufügender Text><[[Konfigurationsdatei_wollmux.conf#SEPARATOR_.3CSeparator.3E| definierter SEPARATOR]]><Einzufügender Text>
+
+Damit Textbausteine über die Schaltfläche einfügt werden können, müssen diese über die [[Konfigurationsdatei_wollmux.conf#Textbausteine| WollMux-Konfiguration]] eingebunden sein. In der WollMux-Konfiguration wird auch der Textbausteinname, der dann aufgerufen wird, konfiguriert. 
+Der Befehl "Textbaustein einfügen" kann auch über die WollMux-Konfiguration einem [[Konfigurationsdatei_wollmux.conf#Tastenkuerzel| Tastenkürzel]] zugeordnet werden.
+
+
+Weitere Informationen:
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:TextbausteinEinfuegen]]
+
+[[Konfigurationsdatei_wollmux.conf#Tastenkuerzel]]
+
+[[Konfigurationsdatei_wollmux.conf#Textbausteine]]
+
+[[Konfigurationsdatei_wollmux.conf#SEPARATOR_.3CSeparator.3E| Konfigurationsdatei_wollmux.conf#Textbausteine - SEPARATOR]]
+
+===Die Schaltfläche "Platzhalter anspringen"===
+Über die Schaltfläche "Platzhalter anspringen" kann nach dem Einfügen der Textbausteine, vom ersten angefangen (falls es welche gibt), die darauf folgenden Platzhaltern  angesprungen werden. Nach dem Anspringen können die Platzhalter durch Text überschrieben werden. Siehe auch [[Bedienelemente_des_WollMux#Die_Schaltfl.C3.A4che_.22Textbaustein_einf.C3.BCgen.22| Schaltfläche "Textbaustein einfügen"]]
+
+
+Weitere Informationen:
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:PlatzhalterAnspringen]]
+
+===Die Schaltfläche "Empfänger auswählen"===
+[[Bild:EmpfängerAuswählen.png|thumb|none|800px|'''Dialog "Empfänger auswählen"''']]
+
+Über die Schaltfläche '''Empfänger auswählen''' wird der Dialog '''Empfänger auswählen''' aufgerufen. Über den Reiter '''LHM intern''' kann eine städtische Person gesucht werden und deren Adresse in das Empfängerfeld, z.B des Externen Briefkopf oder der Kurzmitteilung, übernommen werden. Der Reiter '''Spielwarenläden''' dient als Beispiel für Referate für eine Anpassung des Dialogs.
+
+
+Weitere Informationen:
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:FunctionDialog]]
+
+[[Konfigurationsdatei_wollmux.conf#Funktionsdialoge]]
+
+[[Standardkonfiguration_des_WollMux#Adressauswahl-Dialog]]
+
+[[Fragen_rund_um_Datenquellen]]
+
+== Symbolleiste Werkzeuge für Vorlagenersteller (WollMux)==
+[[Bild:WerkzeugeFürVorlagenersteller.png|thumb|none|800px|'''Symbolleiste Textbausteine''']]
+
+Bei der Symbolleiste '''Werkzeuge für Vorlagenersteller''' handelt es sich um eine Ansammlung von speziellen Werkzeugen die hauptsächlich von Vorlagenerstellern benötigt werden.
+
+===Aufruf:===
+Falls noch nicht angezeigt: '''OpenOffice.org''' --> Menü '''Ansicht''' --> '''Symbolleisten''' --> '''Werkzeuge für Vorlagenersteller (WollMux)'''
+
+===Die Schaltfläche "FormularMax 4000"===
+Über die Schaltfläche '''FormularMax 4000''' wird der FormularMax 4000 gestartet. Der FormularMax 4000 ist eine integrierte Entwicklungsumgebung für die Erstellung und Pflege von WollMux-Formularen und Vorlagen.
+
+
+Weitere Informationen:
+
+[[FormularMax_4000]]
+
+===Die Schaltfläche "Textbausteinverweis einfügen"===
+
+Über die Schaltfläche '''Textbausteinverweis einfügen''' wird der Befehl '''Textbaustein einfügen''' nicht gleich ausgewertet, sondern erst nach dem Speichern als Vorlage und spätrigen öffnen. Es kann z.B bei der Vorlagenerstellung verwendet werden, wenn gewünscht wird das die Textbausteine erst beim Verwenden der Vorlage eingefügt werden sollen. Siehe auch [[Bedienelemente_des_WollMux#Die_Schaltfl.C3.A4che_.22Textbaustein_einf.C3.BCgen.22| Schaltfläche "Textbaustein einfügen"]]
+
+
+Weitere Informationen:
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:TextbausteinVerweisEinfuegen]]
+
+===Die Schaltfläche "Fehlerinfos erstellen"===
+[[Bild:dumpInfo.png|thumb|none|600px|'''Meldung nach Schaltfläche "Fehlerinfo erstellen"''']]
+
+Die Schaltfläche "Fehlerinfos erstellen" erzeugt eine Datei $HOME/.wollmux/dump<DatumUndZeit>, die wichtige Informationen für die Fehlersuche im Zusammenhang mit dem WollMux enthält. Die Schaltfläche "Fehlerinfos erstellen" ist vor allem für WollMux-Administratoren geeignet, die bei der Installation und Einrichtung des WollMux auf Fehler stoßen, für deren Lösung Unterstützung durch D-III-ITD 5.1 notwendig wird. In diesem Fall ist die über die Schaltfläche "Fehlerinfos erstellen" erzeugte dump-Datei an ein entsprechendes Vorfallticket anzuhängen.
+
+
+Weitere Informationen
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:DumpInfo]]
+
+
+= Menüeinträge =
+== Seriendruck (WollMux)==
+
+Mit dem Menü '''Seriendruck''' können Serienbriefe erstellt werden die auch WollMux Features, wie z.B. WollMux-Formulare, verwenden.
+
+
+Weitere Informationen:
+
+[[Seriendruck mit dem WollMux]]
+
+===Aufruf:===
+'''OpenOffice.org''' --> Menü '''Extras''' --> '''Seriendruck (WollMux)'''
+
+Damit der Menüpunkt in OOo erscheint, ist mindestens OOo 2.0.4 notwendig.
+
+== Info über Vorlagen und Formulare (WollMux)==
+[[Bild:WOL_AboutDialog.png|thumb|none|600px|'''Info über Vorlagen und Formulare''']]
+
+In dem Dialog '''Info über Vorlagen und Formulare''' wird der verwendete WollMux und die verwendete Konfiguration angezeigt. Damit der Menüpunkt in OOo erscheint, ist mindestens OOo 2.0.4 notwendig.
+
+
+
+Weitere Informationen:
+
+[[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:About]]
+
+===Aufruf:===
+'''OpenOffice.org''' --> Menü '''Hilfe''' --> '''Info über Vorlagen und Formulare (WollMux)'''
+
+
+
+[[Category:AG-Office]]
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]
+
+[[Category:Office_Endanwender_Handbuch]]

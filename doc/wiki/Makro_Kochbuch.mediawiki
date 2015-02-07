@@ -1,0 +1,19 @@
+<!-- 
+== Einführung ==
+
+Im Rahmen der Umstellung von Microsoft Office auf OpenOffice.org in der Landeshauptstadt München wurden auch zahlreiche Excel- und Word-Makros auf Calc und Writer portiert. Da der Funktionsumfang von OOo und MS Office nicht deckungsgleich sind und sich die Makrosprachen deutlich unterscheiden, wurde viel Zeit und Arbeit investiert, die Makros in ihrer neuen Umgebung zu realisieren. In den meisten Fällen lief dies auf eine komplette Neuentwicklung hinaus. 
+
+Im Laufe der Zeit wurde so ein Schatz von Erfahrungen aufgebaut, für die Entwicklung von kleinsten bis mittleren Geschäftsanwendungen unter OOo-Basic. Damit diese Erfahrungen nicht verloren gehen und einem breiteren Publikum zur Verfügung gestellt werden können, hat die LHM den Softwareentwickler und Autor Thomas Krumbein, der auch wesentlich an der Makromigration beteiligt war, beauftragt, diese in Form eines 250-seitigen Buches zusammenzuschreiben.
+
+Dieses 'Makro-Kochbuch' ist eine Sammlung von Best Practices, die bei der Migration oder Neuerstellung von Makros unterstützen sollen. Das Buch umfaßt Themen wie den allgemeinen Aufbau von Extensions, Umgang mit Dateien und Datenbanken und GUI-Programmierung und vieles mehr.
+
+== Downloads ==
+
+'''Downloads:''' [[Media:Makro_Kochbuch.pdf|pdf]] [[Media:Makro_Kochbuch.odt|odt]]
+
+Das Buch wird vom Autor in erweiterter Form auch als Druckausgabe angeboten.[http://www.amazon.de/Makro-Kochbuch-LibreOffice-OOo-Basic/dp/3943771024/ref=sr_1_11?ie=UTF8&qid=1350918344&sr=8-11]
+
+== Lizenz ==
+Dieses Werk bzw. Inhalt steht unter einer Creative Commons Namensnennung 3.0 Unported Lizenz.
+
+-->

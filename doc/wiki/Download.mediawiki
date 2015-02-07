@@ -1,0 +1,129 @@
+Auf dieser Seite finden Sie direkte Links zum Download des aktuellsten Releases.
+
+Eine detaillierte Installationsanleitung finden Sie auf der Seite "[[WollMux installieren]]".
+
+= Aktuelles Release =
+== Windows ==
+{|{{prettytable}}
+!width=250px colspan="2" | Download 
+!Beschreibung
+|-
+| colspan="2" | [[Datei:Windows-icon.png]] [http://www.wollmux.net/files/WollMux-11.10a-installer.exe wollmux-11.10a-installer.exe]
+| Der Windows Installer registriert automatisch die WollMux-Extension (.oxt) systemweit in OpenOffice.org, kopiert die [[WollMuxBar]] auf Ihr System und legt optional ein Desktop-Icon und einen Startmenü-Eintrag an. Sie benötigen Administratorrechte auf Ihrem Rechner, um den Installer ausführen zu können.<br/>
+''Anmerkung: Sie benötigen zusätzlich eine Konfiguration, damit der WollMux funktioniert.
+|-
+| rowspan="3" | WollMux-Konfiguration
+
+''(Wählen Sie eine der nebenstehenden Dateien aus)''
+| [[Datei:Windows-icon.png]] [http://www.wollmux.net/files/wollmux-config-de-11.11a-installer.exe wollmux-config-de-11.11a-installer.exe]
+| Windows Installer für die Deutschsprachige Beispielkonfiguration
+|-
+| [[Datei:Windows-icon.png]] [http://www.wollmux.net/files/wollmux-config-en-11.11a-installer.exe wollmux-config-en-11.11a-installer.exe]
+| Windows Installer für die Englischsprachige Beispielkonfiguration
+|-
+| [[Datei:Windows-icon.png]] [http://www.wollmux.net/files/wollmux-config-nl-11.11a-installer.exe wollmux-config-nl-11.11a-installer.exe]
+| Windows Installer für die Niederländische Beispielkonfiguration
+|-
+|}
+
+== Manuelle Installation (alle Systeme) ==
+{|{{prettytable}}
+!width=250px colspan="2" | Download 
+!colspan="2" | Beschreibung
+|-
+| colspan="2" rowspan="5" | [[Datei:Linux-icon.png]] [[Datei:Windows-icon.png]] [http://www.wollmux.net/files/wollmux-11.10a-manual_installation.zip wollmux-11.10a-manual_installation.zip]
+| colspan="2" | Paket zur manuellen Installation
+
+'''Inhalt:''' 
+|-
+| WollMux.oxt
+| Extension für OpenOffice.org. Für eine systemweite Installation rufen Sie als Administrator folgendes Kommando auf:
+
+<code>unopkg add --shared WollMux.oxt</code>
+
+Sie finden das Kommando <code>unopkg</code> im program-Verzeichnis ihres OpenOffice.org-Installationsverzeichnisses.
+
+Für eine Installation im Bereich Ihres Benutzers können Sie den Extensionmanager verwenden, den Sie über Extras->Extension Manager in OpenOffice.org starten können.
+
+''Anmerkung: Sie benötigen zusätzlich eine Konfiguration, damit der WollMux funktioniert. Diese können Sie weiter unten herunterladen.
+|-
+| WollMuxBar.jar
+| Enthält die Java-Klassen zum Starten der WollMux-Leiste. Kopieren Sie diese Datei in ein Programm-Verzeichnis Ihrer Wahl, z.B. nach /usr/share/java/ (für Linux) oder C:\Programme\wollmux (für Windows).
+
+Die WollMux-Leiste kann mit dem Befehl <code>java -jar WollMuxBar.jar</code> aufgerufen werden. Alternativ können Sie auch eines der beiden folgenden Starter-Skripte verwenden:
+|-
+| wollmuxbar (für Linux)
+| Verwenden Sie dieses einfache Unix Shell-Skript zum Starten der WollMuxBar.jar. Das Skript geht davon aus, dass WollMuxBar.jar in <code>/usr/share/java/</code> liegt.
+|-
+| wollmuxbar.exe (für Windows)
+| Verwenden Sie dieses Executable zum Starten der WollMuxBar.jar unter Windows. Das Programm muss im selben Verzeichnis liegen wie die Datei WollMuxBar.jar. 
+|-
+| rowspan="3" | WollMux-Konfiguration
+
+''(Wählen Sie eine der nebenstehenden Dateien aus)''
+| [[Datei:Linux-icon.png]] [http://www.wollmux.net/files/wollmux-config-de-utf8-11.11a.tar.gz wollmux-config-de-utf8-11.11a.tar.gz]
+| colspan="2" | Deutschsprachige Konfiguration für Linux-Systeme mit UTF-8 Dateikodierung.<br/>Extrahieren Sie dieses Archiv in <code>$HOME</code> damit dort das notwendige Verzeichnis <code>.wollmux/</code> erstellt wird.
+|-
+| [[Datei:Linux-icon.png]] [http://www.wollmux.net/files/wollmux-config-en-utf8-11.11a.tar.gz wollmux-config-en-utf8-11.11a.tar.gz]
+| colspan="2" | Englischsprachige Konfiguration für Linux-Systeme mit UTF-8 Dateikodierung.<br/>Extrahieren Sie dieses Archiv in <code>$HOME</code> damit dort das notwendige Verzeichnis <code>.wollmux/</code> erstellt wird.
+|-
+| [[Datei:Linux-icon.png]] [http://www.wollmux.net/files/wollmux-config-nl-utf8-11.11a.tar.gz wollmux-config-nl-utf8-11.11a.tar.gz]
+| colspan="2" | Niederländische Konfiguration für Linux-Systeme mit UTF-8 Dateikodierung.<br/>Extrahieren Sie dieses Archiv in <code>$HOME</code> damit dort das notwendige Verzeichnis <code>.wollmux/</code> erstellt wird.
+|-
+|}
+
+
+==Releasenotes==
+===WollMux 11.10a===
+* Bugfixes:
+** Verliert die WollMuxBar den Fokus, wird der Fokus von der Suchliste auf das nächste Steuerelement verschoben. Dadurch bleibt das Suchmenü geschlossen, wenn die WollMuxBar den Fokus zurückerhält. Voraussetzung ist, dass mindestens ein weiteres fokusierbares Steuerlement (z.B. ein Button) auf der WollMuxbar enthalten ist.
+** Im Fenstermodus "UpAndAway" der WollMuxBar hatte die minimierte WollMuxBar am oberen Bildschirmrand nicht die gewünschte Breite. Dieser Fehler ist nun behoben und die minimierte WollMuBar sollte dadurch im Allgemeinen wesentlich kleiner erscheinen.
+** In der Vorbelegung des Komfortdruckdialogs für Sachleitende Verfügungen werden jetzt unsichtbare Zuleitungszeilen nicht mehr mitgezählt (für den Zähler der angibt, wie viele Ausdrucke von einem Verfügungspunkt gemacht werden sollen).
+** Falsches Encoding in temporärer .csv-Datei unter Windows bei WollMux-Seriendruck behoben
+* Neue Features:
+** Überarbeiteter WollMux-Seriendruck:
+*** Der Seriendruckdialog des WollMux (aufzurufen über "Drucken" aus der WollMux-Seriendruckleiste) wurde komplett überarbeitet und zeigt neben neuen Optionen nun auch Informationen zur Funktionsweise und Vor- und Nachteile der einzelnen Druckoptionen an.
+*** Die Druckfunktionen zum Drucken in ein ODT-Gesamtdokument und zum Direktdruck auf einen Drucker wurden durch neue Druckfunktionen ersetzt, die im Hintergrund den in OpenOffice.org eingebauten Seriendruckmechanismus verwenden und dadurch deutlich schneller und robuster als bisher arbeiten. Beim Druck auf den Drucker wird jetzt nur noch ein einziger Druckjob erzeugt und nicht so wie früher für jeden Datensatz ein eigener. Dies wirkt sich vor allem auf gemeinsam genutzten Druckern positiv aus.
+*** Vorausgefüllte Dokumente per E-Mail verschicken: Über die neue Option "E-Mails verschicken" können Serienbriefe auch per E-Mail an verschiedene Empfänger verschickt werden. Diese sind dann automatisch mit den entsprechenden Daten aus den Seriendruck-Datensätzen vorbelegt und können von Empfängern mit WollMux ohne Einschränkungen weiter bearbeitet bzw. vervollständigt werden.
+*** Spezialfeld "Nächster Datensatz": Über das neue Spezialfeld "nächster Datensatz" können innerhalb einer Druckseite mehrere Datensätze gleichzeitig angezeigt werden. Dies ist z.B. für die Erstellung von Etiketten notwendig, die jetzt direkt in ein neues ODT-Gesamtdokument oder direkt auf den Drucker ausgedruckt werden können. Achtung: Das neue Spezialfeld wirkt sich nicht aus bei den Druckoptionen zum Drucken in ein PDF-Gesamtdokument, in Einzeldateien oder beim Verschicken von E-Mails. 
+*** Über die Property "STAGE" kann nun in Druckfunktionen auch der Anzeigetitel des Fortschrittsdialogs programmatisch geändert werden (siehe [[Schnittstellen_des_WollMux_f%C3%BCr_Experten#Anzeigen_des_Fortschrittsbalkens|Schnittstellen des WollMux für Experten]])
+** Im Wrapper-Shellskript des WollMux für Linux ist nun voreingestellt, dass die WollMuxBar nur einmal gestartet werden kann wenn die WollMuxBar mehrfach aufgerufen wird. Damit dies funktioniert wurde die WollMuxBar um zwei neue Schalter [[WollMuxBar#--fifo_und_--firstrun|--fifo und --firstrun]] erweitert.
+** Über die neue Konfigurationseinstellung [[Konfigurationsdatei_wollmux.conf#Der_PERSISTENT_DATA_MODE|PERSISTENT_DATA_MODE]] kann gesteuert werden, wie und wo der WollMux seine dokumentbezogenen Metadaten (wie z.B. die Formularbeschreibung) im Dokument ablegt. Der bisherige Mechanismus (''annotation''), Metadaten in versteckten Notizen im Dokument abzulegen, hat sich als fehleranfällig und störend erwiesen und kann so langfristig durch einen neuen Mechanismus (''rdfReadLegacy'') abgelöst werden, bei dem die Metadaten unabhängig von der Dokumentdarstellung in eine eigene XML-Datei namens "wollmux.rdf" im ODF-Paket abgelegt werden. Standardmäßig wird der WollMux in einer Übergangsphase nun im sog. ''transition''-Modus betrieben, der sowohl in die Notizen als auch in die RDF-Datei schreibt. Für den neuen RDF-Mechanismus wird OpenOffice.org 3.2.1 vorausgesetzt. Bei älteren OpenOffice.org-Versionen schreibt der WollMux wie früher ausschließlich in die Notizen.
+** Ab OpenOffice.org 3.2.x können über die Funktion "Platzhalter anspringen" des Textbausteinsystems des WollMux auch Platzhalter in Tabellen angesprungen werden. Dies war bisher nicht möglich.
+** Für die WollMuxBar kann nun optional auch ein Icon auf der System Tray (auch bekannt als "Notification Area" - gemeint ist der Bereich üblicherweise ganz rechts auf der Taskbar neben der Uhrzeitanzeige) angezeigt werden. Dieses Icon kann dazu verwendet werden, um die WollMuxBar beim Minimieren komplett darauf zu ikonifizieren (d.h. die WollMuxBar verschwindet komplett und auch kein Taskbar-Eintrag ist mehr für sie vorhanden; sie kann dann per Klick auf das Icon wieder hergestellt werden) und/oder um per Rechtklick auf das Icon ein Kontextmenü aufzurufen, das einen Schnellzugriff auf alle Elemente der Menüleiste der WollMuxBar erlaubt. Das Tray-Icon ist standardmäßig deaktiviert, kann aber über den neuen Parameter [[Konfigurationsdatei_wollmux.conf#TRAYICON|TRAYICON]] im [[Konfigurationsdatei_wollmux.conf#Fenster|Fenster-Abschnitt]] der [[Konfigurationsdatei_wollmux.conf|wollmux.conf]] aktiviert und konfiguriert werden.
+** Integration eines Patches von Jan Gerrit Möltgen zur Erweiterung des Konfigurationsabschnitts [[Konfigurationsdatei_wollmux.conf#Der_Abschnitt_SachleitendeVerfuegungen|SachleitendeVerfuegungen]] um die zusätzlichen Einstellungen ''NUMBERS'' und ''ABDRUCK_NAME''. Über diese Einstellungen lassen sich Sachleitende Verfügungen nun auch mit arabischen statt bisher mit römischen Ziffern darstellen und der Text "Abdruck" kann frei konfiguriert werden.** Möglichkeit zur Vorbelegung eines Dateinamens (siehe [http://www.wollmux.net/wiki/Dokumentkommandos_des_WollMux#FilenameGeneratorFunction FilenameGeneratorFunction])
+** '''Wird weiter verschoben:''' In der WollMuxBar steht eine neue [[Konfigurationsdatei_wollmux.conf#Das_Attribut_ACTION|ACTION]] "menuManager" zur Verfügung. Diese ruft den [[WollMuxBar#Men.C3.BC-Manager|Menü-Manager]] auf, ein interaktives Tool zur Bearbeitung der WollMuxBar-Menüstruktur. (Dieses Feature ist nur verfügbar, wenn der WollMux mit Java 6 ausgeführt wird!)
+** '''Wird weiter verschoben:''' Die WollMuxBar hat einen neuen Kommandozeilenschalter <tt>--mm</tt>. Dieser ruft direkt den [[WollMuxBar#Men.C3.BC-Manager|Menü-Manager]] auf. Dies ist nützlich zum Bootstrappen wenn es noch kein Menü gibt oder auch wenn der Menü-Manager nicht im WollMuxBar-Menü vorhanden ist. (Dieses Feature ist nur verfügbar, wenn der WollMux mit Java 6 ausgeführt wird!)
+
+===WollMux-Config 11.11a===
+* Damit die E-Mail-Adressen im internen Briefkopf nicht umgebrochen werden, muss der symbolische Link '''"Email_intern.ott"''' im Verzeichnis "vorlagen/standard/X.insertFrag/" zukünftig auf "../../fragmente/'''WOL_Briefkopf-Fragment-Email_intern.ott'''" zeigen
+* Wenn die Vorlage für Rundschreiben benötigt wird, muss in die jeweiligen Gruppen ein Symlink gelegt werden.
+* Einstellung für neue Tray-Icon-Funktion des WollMux ([[Konfigurationsdatei_wollmux.conf#TRAYICON|Variable TRAYICON]]) in die fenster.conf hinzugefügt. Die Default-Einstellung für das Tray-Icon ist "None", so dass sich durch diese Einstellung erstmal nichts am Verhalten des WollMux ändert.
+* Die Vorlagen Angaben_Beschlussvorlagen.ott, Beschlussvorlage_Formatorlagen.ott, Beschlussvorlage_Kopf.ott und Mischvorlage Beschlussvorlage.ott sind als Standardvorlagen für Beschlussvorlagen hinzugekommen. Diese Vorlagen sind Teil der vom eOS abgestimmten und umgestellten Beschlussvorlagen.
+* Im externen Briefkopf, Kurzmitteilung und Fax werden E-Mail-Adressen, die länger als 30 Zeichen sind, nach dem @-Zeichen umgebrochen.
+* Der "Absender verwalten" und "Absender auswählen" Dialog lassen sich jetzt auch mit leerer Liste schließen.
+* In der Abtretungserklärung wurde die Formatierung und die Optik der GUI angepasst, da sie als Best Practise Vorlage dienen soll.
+* Externe PDF-Viewer um die Adobe Reader Versionen 8-10 für 32- und 64-Bit Windowsversionen erweitert.
+* Optimierung des PDFMailMerge.
+* Hotkeys werden nun über ein spezielles Zeichen "~" angelegt, dabei wird der erste Zeichen des Labels nicht mehr automatisch auf Großschreibung geändert.
+* Es gibt nun eine email.conf, in der Einstellungen für den Emailversand aus dem WollMux Sereindruck festgelegt werden können.
+* Für den WollMux Seriendruck gibt es einen neuen Dialog, mit dem der Druck von Serienbriefen gesteuert werden kann.
+* Das Verzeichnis plugins muss aus der entpackten Standardkonfiguration in die Referatskonfiguration kopiert werden, damit alle Änderungen übernommen werden. '''Achtung: Vorher unbedingt überprüfen, ob eigene plugins enthalten sind!'''
+
+= Daily Builds =
+Die aktuelle Entwicklungsversion des WollMux wird bei Änderungen am Quelltext pünktlich zu Mitternacht neu gebaut. Diese Versionen bieten sich an, wenn Sie den WollMux testen wollen oder vorab bereits neue Features benötigen.
+
+Die Dateien befinden sich unter http://www.wollmux.net/daily/?C=M;O=D
+
+Für den Inhalt der Verzeichnisse und welche Dateien Sie benötigen siehe [[Download#Manuelle Installation (alle Systeme)]].
+
+= Alte Releases =
+Alte Releases finden sich im [http://code.google.com/p/wollmux/downloads/list?can=4 Downloadbereich von Google Code] (ab Version 11.2) bzw. [https://joinup.ec.europa.eu/software/wollmux/release/all Joinup-Downloadbereich des WollMux] (bis Version 11.2). Bitte beachten Sie, dass die Namen der dort angebotenen Dateien nicht den ursprünglich vergebenen Dateinamen entsprechen. Sie wurden bei der Migration der Vorgänger-Plattform OSOR nach Joinup nicht korrekt migriert.
+
+= Quelltext =
+Den Quelltext mit den neuesten Änderungen finden Sie immer in unserem [[Repository]].<br/>
+
+Die Quellen für das aktuelle WollMux-Release 11.10a finden Sie im Entwickler-Paket: [http://www.wollmux.net/files/wollmux-11.10a-developer.zip wollmux-11.10a-developer.zip]. Den Quelltext für ältere Releases finden Sie unter den im Punkt [[Download#Alte Releases]] angegeben Quellen.
+
+Informationen zum Kompilieren des WollMux finden Sie auf der Seite "[[WollMux kompilieren]]".<br/>
+Hinweis: Wenn Sie den WollMux selber kompilieren, brauchen Sie trotzdem noch eine WollMux-Konfiguration, damit der WollMux funktionieren kann (siehe oben).

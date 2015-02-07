@@ -1,0 +1,75 @@
+Das Projekt LiMux bietet folgende Schulungen zum WollMux für <span style="color:red">Dienstkräfte anderer Kommunen und öffentlicher Einrichtungen</span> an.
+
+= WollMux-Vorlagenerstellung - Grundlagen und einfache Vorlagen =
+== Termin ==
+September 2011 (1 Tag)<br>
+Bei entsprechender Nachfrage können weitere Termine angeboten werden.
+==Inhalte ==
+# Unterschiede Dokument, Vorlage und Formular
+# Prinzip der Mischvorlagen
+# Formatierung von Text
+# Verwendung von Platzhaltern vs. Eingabefelder
+# Sachleitende Verfügungen im WollMux
+# Verwendung von Datenbankfeldern oder Fragmenten
+==Voraussetzungen==
+# Sichere Anwendung des WollMux (z.B. Öffnen von Vorlagen aus der WollMuxleiste, Rollenkonzept)
+# Gefestigte Kenntnisse in der Textverarbeitung, vorzugsweise in OpenOfiice.org Writer
+==Zielgruppe==
+Anwender oder Anwenderinnen des WollMux, die einfache Vorlagen selbst erstellen wollen.
+
+= WollMux-Vorlagenerstellung - Vorlagen mit Formularelementen =
+== Termin ==
+September 2011 (2 Tage)<br>
+Bei entsprechender Nachfrage können weitere Termine angeboten werden.
+==Inhalte ==
+# Erstellung der Formular GUI mit dem FormularMax 4000
+## Einlesen und Löschen von Formularelementen
+## Aufbau des FM 4000
+## Optische Gestaltung der FormularGUI
+## Formatierung von Text in der FormularGUI mit Hilfe von html 
+# Verwendung von abhängigen Formularelementen
+# Gender-Funktion - geschlechtsabhängige Felder
+# Sichtbarkeiten - Text ein- oder ausblenden
+## mit Hilfe von Checkboxen und Bereichen
+## mit Hilfe von Comboboxen und Bereichen
+## von einzelnen Worten oder Sätzen
+# Plausibilitätsprüfung
+# Berechnungsfelder - gängige Formeln
+# Funktionstester
+# Trafos und Autofills
+# Einfache Anwendung der WollMux-Scriptsprache und von html-Befehlen
+==Voraussetzungen==
+# Besuch des Kurses WollMux-Vorlagenerstellung - Grundlagen und einfache Vorlagen
+# Gefestigte Kenntnisse in der Textverarbeitung, vorzugsweise in OpenOfiice.org Writer
+==Zielgruppe==
+Anwender oder Anwenderinnen des WollMux, die komplexere Vorlagen mit Formularelementen selbst erstellen wollen.
+
+= WollMux Standard-Konfiguration =
+== Termin ==
+September 2011 (2 Tage)<br>
+Bei entsprechender Nachfrage können weitere Termine angeboten werden.
+==Inhalte ==
+# Aufbau der WollMux-Konfiguration
+# Einbinden selbst erstellter Fragmente
+# Einfügen von Daten in die Fusszeile
+# Einbinden von eigenen Datenquellen
+# Updaten der eigenen Konfiguration
+# Erstellung von Gruppen mit eigener WollMux-Leiste
+# Anpassen von Konfigurationsdateien (v.a. in der referat.conf)
+# Skripte in der Konfiguration (z.B. automux)
+# Einfache Funktionen in der WollMux-Konfiguration
+==Voraussetzungen==
+# Besuch des Kurses WollMux-Vorlagenerstellung - Grundlagen und einfache Vorlagen
+# Grundkenntnisse in Linux-Betriebssystemen. Diese Schulung findet auf LiMuxclients statt.
+==Zielgruppe==
+Systemadministratoren, die eine WollMux-Konfiguration erstellen oder warten
+
+= Weitere Informationen=
+<span style="color:red">'''Die Kurse können wir nur für Mitarbeiterinnen und Mitarbeiter anderer Kommunen und öffentlicher Einrichtungen anbieten. '''</span>
+
+== Kosten ==
+Für eintägige Kurse 210,- Euro pro Person, für zweitägige 250,- Euro pro Person ohne Verpflegung und Unterkunft. 
+==Ort==
+Die Kurse finden im Fortbildungszentrum der Landeshauptstadt München (Ruppertstr. 11, 80337 München) oder direkt in den Räumlichkeiten des LiMux Projektes (Sonnenstr. 25, 80331 München) statt.
+==Kontakt==
+Bei Fragen zu den Kursen können Sie sich an das LiMux Team der Landeshauptstadt München wenden (limux@muenchen.de] oder direkt an Christian Siebels (christian.siebels@muenchen.de bzw. 089/233-82201).

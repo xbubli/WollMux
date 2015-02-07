@@ -1,0 +1,44 @@
+'''Abstimmung abgeschlossen'''
+
+=Worum geht es?=
+
+'''Änderung des Applikations/ Projektnamens''' 
+
+Folgende Optionen kommen in Betracht:
+
+==Beibehalten von "WollMux" + eindeutige Funktionsbeschreibung + neues Logo==
+
+Dafür sind:
+* Stefan Ströbl
+* Harald Kagerer
+* Oliver Rath
+* Daniel Benkmann
+* Ignaz Forster
+* Christian Siebels
+* Michael Stramm
+* Holger Krahé
+* Kirsten Böge (vorausgesetzt, neues Logo)
+* Jan Gerrit Möltgen
+* Christoph Lutz
+
+==Neuer Namen mit eindeutigen Funktionsbezug und größerer internationaler Kompatibilität + neues Logo==
+
+Dafür sind:
+* Joachim Schuler
+* Marcus Hoffmann
+* Ulrich Kitzinger
+* Jacqueline Rahemipour
+
+=Wie kommen wir zu einer Entscheidung?=
+
+==Wo wird diskutiert und die Meinungsbildung dokumentiert?==
+Im dem mit dieser Seite verbundenen [[:Diskussion:Neuer_Name_für_den_WollMux | Diskussionsbereich]]
+
+==Wer darf abstimmen?==
+Alle, die auf der Seite [[Community-Mitglieder_und_Ansprechpartner | Community-Mitglieder und AnsprechpartnerInnen]] als Committer/ Aktive Community-Mitglieder eingetragen sind.
+
+==Bis wann kann man abstimmen?==
+Für diese Abstimmung gilt der 10.08.2012 als Schlußtermin
+
+==Wie stimmt man ab?==
+Indem man seinen Namen unter der jeweiligen gewünschten Option schreibt

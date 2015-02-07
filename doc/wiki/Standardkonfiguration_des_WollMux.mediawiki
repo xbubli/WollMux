@@ -1,0 +1,478 @@
+Der WollMux erlaubt eine unzählige Vielfalt von Konfigurations- und Einstellungsmöglichkeiten. Um den Referaten eine Hilfestellung an die Hand zu geben und stadtweit einheitliche Vorgaben umzusetzen wurde die WollMux-Standardkonfiguration entwickelt. Die Standardkonfiguration bietet flexible Möglichkeiten zur Anpassung an die jeweiligen Bedürfnisse der Referate. Diese Seite gibt einen umfassenden Überblick über den Aufbau, die Installation, die Anpassung und die Pflege einer Standardkonfiguration.
+= Download =
+D-III-ITD-D101 stellt Basisarchive der Standardkonfiguration auf der Seite [[Standardkonfiguration des WollMux downloaden]] zur Verfügung.
+
+= Installation =
+Installation und Pflege einer Standardkonfiguration sind im Artikel [[Standardkonfiguration des WollMux installieren und pflegen]] erklärt.
+
+= Verzeichnisstruktur =
+Hier ist eine schematische Übersicht über die Verzeichnisstruktur der Standardkonfiguration. In den nachfolgenden Abschnitten sind die Bedeutungen der einzelnen Verzeichnisse kurz erläutert.
+ conf/ 
+ scripts/
+ plugins/
+ vorlagen/fragmente/
+ vorlagen/fragmente/beispiele
+ vorlagen/<Benutzergruppe 1>
+ vorlagen/<Benutzergruppe 2>
+ ...
+
+'''<tt>conf/</tt>'''
+
+Der WollMux hat konzeptuell nur eine einzige Konfigurationsdatei, die <tt>[[Konfigurationsdatei wollmux.conf|wollmux.conf]]</tt>. Zur besseren Wartbarkeit ist diese in der Standardkonfiguration auf mehrere Einzeldateien aufgeteilt. Mittels des <tt>[[Format_von_WollMux-Config-Dateien#.25include|%include-Mechanismus]]</tt> werden diese wieder zu einer einzigen Konfiguration vereinigt. All diese <tt>.conf</tt>-Dateien befinden sich im Verzeichnis <tt>conf/</tt>. Einige der Dateien in diesem Verzeichnis sind für die Anpassung durch die Referate vorgesehen, andere sollten durch die Referate nicht geändert werden. Zu welcher Gruppe eine Datei gehört ist jeweils in einem Kommentar am Anfang der Datei vermerkt.
+
+
+'''<tt>scripts/</tt>'''
+
+Dieses Verzeichnis enthält diverse Shell-Skripte zur Wartung und Pflege der Standardkonfiguration. Für die Referate sind nur die Skripte <tt>xupdate</tt> und <tt>run_automux</tt> interessant.
+
+
+'''<tt>plugins/</tt>'''
+
+Der WollMux lässt sich um referatseigene Java-Plugins erweitern. Diese können eine Vielzahl von Aufgaben übernehmen. Einige Anwendungsbeispiele:
+* Komplexe Plausibilitätsprüfungen von Formularen, die sich mit WollMux-Grundfunktionalitäten nicht realisieren lassen, z.B. die Prüfung ob ein eingegebenes Datum auf einen Werktag fällt
+* Komplexe Transformationen von aus Datenquellen eingefügten Daten, z.B. das Umwandeln eines Namens in Großbuchstaben
+* Einfügen von Daten aus vom WollMux nicht unterstützten Quellen, wie z.B. INI-Dateien.
+WollMux-Plugins werden in Java geschrieben. Die kompilierten <tt>.class</tt>-Dateien werden in entsprechende Unterverzeichnisse von <tt>plugins</tt> kopiert, wie z.B. <tt>de/muenchen/kvr</tt> als Verzeichnis für die Plugins des KVR. Die Verwendung entsprechender Plugins ist in der [[Konfigurationsdatei_wollmux.conf#Einbinden_referatseigener_Plugins.2FCLASSPATH|Dokumentation der wollmux.conf]] und der [[FormularMax_4000#Referatsspezifische_Plugins|Dokumentation des FormularMax 4000]] näher beschrieben.
+
+
+'''<tt>vorlagen/fragmente/</tt>'''
+
+Die in diesem Verzeichnis enthaltenen Dateien sind die Fragmente aus denen die Standardbriefköpfe dynamisch zusammengesetzt werden. Änderungen an den Standardbriefköpfen schlagen sich immer in Änderungen dieses Verzeichnisses nieder. Die Dateien im <tt>fragmente</tt> Verzeichnis werden ausschließlich zentral gepflegt. Die Referate sollten keine der in diesem Verzeichnis enthaltenen Dateien bearbeiten und auch keine eigenen Dateien in diesem Verzeichnis anlegen, ansonsten kann das <tt>xupdate</tt>-Skript zum automatisierten Update der Konfiguration nicht mehr verwendet werden.
+
+
+'''<tt>vorlagen/fragmente/beispiele</tt>'''
+
+Die Referate dürfen für ihre eigenen Fragmente beliebige Unterverzeichnisse im Verzeichnis <tt>vorlagen/fragmente/</tt> anlegen, solange die Namen dieser Unterverzeichnisse keine Dateierweiterung besitzen. Das Verzeichnis <tt>vorlagen/fragmente/beispiele</tt> ist ein Beispiel dafür, wie ein solches Unterverzeichnis verwendet werden kann, um dort Textbausteine zu hinterlegen.
+
+
+'''<tt>vorlagen/<nowiki><Benutzergruppe X></nowiki></tt>'''
+
+Es ist oft erforderlich, dass nicht alle Benutzer eines Referats die selbe WollMux-Konfiguration verwenden. Insbesondere was die angebotenen Menüs und Vorlagen in der WollMuxBar angeht, gibt es oft unterschiedliche Anforderungen. Zum Beispiel benötigen die Mitarbeiterinnen und Mitarbeiter der Abteilungen D-III-LiMux und D-III-ITD-D.10 das LiMux-Logo in der Fußzeile des externen Briefkopfs. Alle anderen Personen von D-III jedoch sollen dieses Logo nicht in der Fußzeile haben. Die Unterverzeichnisse von <tt>vorlagen/</tt> mit Ausnahme von <tt>vorlagen/fragmente/</tt> werden verwendet, um die Konfigurationen der einzelnen Benutzergruppen zu definieren.
+
+= Fußzeilenangaben =
+In der Fußzeile des externen Briefkopfes werden neben einem Logo, z.B. die URL einer Webseite, ÖPNV-Verbindungen und Bankverbindungen angegeben. Die entsprechenden Angaben werden typischerweise entweder von der Orga-Einheit (Bankverbindungen, Webseite) oder dem Dienstgebäude (ÖPNV-Verbindungen) abgeleitet. Entsprechende Fußzeilenvorbelegungen werden über die Dateien <tt>mapOrgaKurz.conf</tt> und <tt>mapDienstgebaeude.conf</tt> konfiguriert. Die Anpassung des Logos funktioniert anders und wird später beschrieben. 
+
+Alle <tt>map...</tt> Dateien haben den selben grundlegenden Aufbau, der hier am Beispiel der <tt>mapOrgaKurz.conf</tt> erläutert wird.
+ Schema("OrgaKurz" "FussSpalte1" "FussSpalte2" "FussSpalte3" "FussSpalte4")
+ Daten(
+  ("D-III-ITD-D10"
+     ""  
+     "" 
+     "Internet:%nhttp://www.muenchen.de/limux"
+     ""
+  )
+ 
+  ( <Datensatz 2> )
+ 
+  ( <Datensatz 3> )
+ 
+     ...
+ 
+ )#Daten
+
+Die Datei spezifiziert eine Tabelle mit mehreren Spalten. Die ''Schema''-Zeile gibt an, welche Spalten die Tabelle hat. Im ''Daten''-Abschnitt sind die entsprechenden Datensätze (d.h. die Zeilen der Tabelle) aufgeführt. Alle <tt>map...</tt> Dateien bilden einen Wert aus den Sachbearbeiterdaten, wie sie im städtischen Verzeichnis gespeichert sind auf Zusatzinformationen ab. Die erste Spalte ist immer der entsprechende Wert in den Sachbearbeiterdaten, im obigen Beispiel die ''OrgaKurz'' des Sachbearbeiters. Die anderen Spalten sind die Zusatzinformationen, die für alle Sachbearbeiter vorbelegt sein sollen, die in ihren Daten die entsprechende ''OrgaKurz'' haben. Im obigen Beispiel soll bei allen Mitarbeitern von D-III-ITD-D10 in der dritten Spalte der Fußzeile die Web-Adresse des LiMux-Projektes stehen. Die anderen 3 Spalten Fußzeile werden nicht belegt. Beachten Sie, dass dies nicht heißt, dass diese Spalten leer bleiben. Es heißt nur, dass sie nicht in Abhängigkeit von der ''OrgaKurz'' belegt werden.
+
+Wenn Sie in die Datei <tt>mapDienstgebaeude.conf</tt> schauen, sehen Sie dort den selben Aufbau, diesmal jedoch ist die erste Spalte ''Dienstgebaeude'' nicht ''OrgaKurz''. Wenn Sie genau hinsehen, werden Sie auch merken, dass Spalten mit den Zusatzinformationen alle eine "2" am Ende tragen. Statt ''FussSpalte1'' steht hier ''FussSpalte12''. Im externen Briefkopf wird sowohl der Text aus ''FussSpalte1'' als auch der aus ''FussSpalte12'' in der ersten Spalte der Fußzeile angezeigt. Wenn Sie die Beispielangaben in <tt>mapDienstgebaeude.conf</tt> ansehen, werden Sie feststellen, dass dort für die "Sonnenstr. 25" (dies ist das Dienstgebäude von D-III-ITD-D10) für ''FussSpalte12'' und ''FussSpalte22'' ÖPNV-Verbindungen eingetragen sind. Die 3. und 4. Spalte sind unbelegt. Da wie oben erwähnt sowohl ''FussSpalteX'' als auch ''FussSpalteX2'' im Briefkopf angezeigt werden, ergibt sich für einen Mitarbeiter von D-III-ITD-D10 folgendes Bild:
+* die 1. und 2. Spalte enthalten die ÖPNV-Angaben aus <tt>mapDienstgebaeude.conf</tt>
+* die 3. Spalte enthält die URL der Webseite des LiMux-Projekts aus <tt>mapOrgaKurz.conf</tt>
+
+Im Prinzip hätte man auch die ÖPNV-Verbindungen in der <tt>mapOrgaKurz.conf</tt> eintragen können. Dies stattdessen in der <tt>mapDienstgebaeude.conf</tt> zu tun, hat jedoch den Vorteil, dass die Angaben damit für die Mitglieder anderer Orga-Einheiten, die ebenfalls in der Sonnenstr. 25 ihren Sitz haben, mit gelten, wogegen bei einer Pflege in der <tt>mapOrgaKurz.conf</tt> alleine für jede weitere Orga-Einheit ein neuer Datensatz angelegt werden müsste.
+
+;Hinweis: Wann immer möglich, sollten Angaben vom Dienstgebäude abgeleitet werden, um den Wartungsaufwand zu reduzieren. Dies erfordert jedoch die Einigung auf ein gemeinsames Format der Fußzeile für alle Orga-Einheiten im selben Dienstgebäude. Wenn auch nur eine einzige Orga-Einheit in einem Dienstgebäude Sonderwünsche bzgl. ihrer Fußzeile hat, müssen meist ''alle'' Orga-Einheiten dieses Dienstgebäudes über die <tt>mapOrgaKurz.conf</tt> mit dem entsprechenden Zusatzaufwand gepflegt werden.
+
+= WollMux- und OpenOffice.org-Fenster =
+Der WollMux hat diverse Dialogfenster sowie die WollMuxBar selbst, deren grundlegende Eigenschaften justiert werden können. Zudem gibt es die Möglichkeit, auch das Verhalten von OpenOffice.org-Fenstern zu konfigurieren.
+
+Die Datei <tt>fenster.conf</tt> enthält die Vorkonfiguration, die nicht geändert werden sollte, da Änderungen nach einem Update mit <tt>xupdate</tt> verloren gehen. Nach Kopieren des entsprechenden Abschnitts in die <tt>referat.conf</tt> können dort die entsprechenden Anpassungen vorgenommen werden.
+
+Informationen zu den möglichen Fenster-Einstellungen finden Sie in [[Konfigurationsdatei_wollmux.conf#Fenster|der Dokumentation der <tt>wollmux.conf</tt>]].
+
+= OpenOffice.org-Einstellungen =
+Es gibt diverse Einstellungen, die in OpenOffice.org gesetzt sein müssen, um das korrekte Funktionieren des WollMux sicherzustellen. Diese werden in der Datei <tt>oooEinstellungen.conf</tt> gesetzt. Auch wenn es technisch möglich wäre, die ganze Vorkonfiguration von OpenOffice.org über diesen Mechanismus abzuwickeln ist dies nicht ratsam, da die so festgelegten Einstellungen bei jedem Start von OpenOffice.org neu gesetzt werden und dadurch entsprechende Benutzereinstellungen überschreiben. Der Benutzer hat also nicht mehr die Möglichkeit, persistent die entsprechenden Einstellungen zu ändern. Für die Vorkonfiguration sollte stattdessen das von D-III-ITD-D101 auf der Seite [[Konfiguration von OpenOffice]] zur Verfügung gestellte UNO-Paket verwendet werden.
+
+= Tastenkürzel =
+Der WollMux hat verschiedene für Endanwender interessante Funktionen, z.B. für das Einfügen von Textbausteinen. Es kann wünschenswert sein, für diese Funktionen Tastenkürzel anzulegen. Für diesen Zweck ist die Datei <tt>tastenkuerzel.conf</tt> vorgesehen. Nähere Informationen zum Inhalt dieser Datei finden Sie im [[Konfigurationsdatei_wollmux.conf#Tastenkuerzel|Abschnitt ''Tastenkuerzel'' der Dokumentation zur <tt>wollmux.conf</tt>]].
+
+= Funktionen =
+An verschiedenen Stellen in WollMux-Formularen und Vorlagen können Funktionen eingesetzt werden. Zum Beispiel wird die Formatierung der Telefonnummer gemäß DIN-Norm in den Standardbriefköpfen über sog. Trafo-Funktionen realisiert. Funktionen können aber auch in Formularen zur Prüfung der Benutzereingaben auf Korrektheit (Plausi) oder zum automatischen Vorausfüllen von Feldern anhand der Werte anderer Felder (Autofill) eingesetzt werden. Einfache und nur einmal verwendete Funktionen werden typischerweise direkt in die betreffenden Formulare integriert. Dies ist jedoch nicht immer möglich oder zweckmäßig. Soll zum Beispiel in einer Vorlage, die kein WollMux-Formular ist eine Trafo eingesetzt werden (wie dies z.B. beim normalen internen Briefkopf der Fall ist) gibt es keine Formularbeschreibung, in die man die Funktion integrieren könnte.
+
+In Fällen, in denen man eine Funktion nicht direkt in eine Vorlage einbetten kann oder möchte, wird diese Funktion über die WollMux-Konfiguration verfügbar gemacht. Die folgenden Abschnitte beschreiben, wie dies in einer Standardkonfiguration geschieht.
+
+== Standardfunktionen ==
+Die Datei <tt>funktionen.conf</tt> enthält die Standardfunktionen, die für [[FormularMax_4000#Reiter_.22AUTOFILL.22.2C_.22PLAUSI.22_und_.22TRAFO.22|Plausis, Trafos und Autofills]] verwendet werden können (Abschnitt ''Funktionen''), sowie Standardkomfortdruckfunktionen (Abschnitt ''Druckfunktionen''). Es handelt sich dabei nur um Deklarationen von im WollMux fest enthaltenen Funktionen. Der Programmcode der Funktion ist also nicht in der Standardkonfiguration enthalten, sondern im WollMux. Damit die entsprechende Funktion funktioniert, muss also eine WollMux-Version verwendet werden, die den Code tatsächlich enthält.
+;Hinweis: Änderungen an der <tt>funktionen.conf</tt> sind häufiger Auslöser für Inkompatibilitäten einer neuen Standardkonfiguration mit alten WollMux-Versionen. Diese äußern sich in Fehlermeldungen in der <tt>wollmux.log</tt>, die sich auf die entsprechende Funktion beziehen. Ob dies zu benutzersichtbaren Fehlern führt oder nicht hängt davon ab, ob die neue Funktion in den Standardbriefköpfen verwendet wird oder nicht. Falls sie nicht in den Standardbriefköpfen verwendet wird, kann der entsprechende Eintrag in der <tt>funktionen.conf</tt> einfach auskommentiert werden, um die Fehlermeldung zu beseitigen.
+;Achtung: Änderungen an den Deklarationen der Standardfunktionen sind zwar prinzipiell durch entsprechende eigene Einträge in der <tt>referat.conf</tt> möglich, sind jedoch mit Vorsicht zu genießen. Sollten Sie die Notwendigkeit sehen, die Standardfunktionen für Ihr Referat anzupassen, so erstellen Sie bitte ein Ticket, damit D-III-ITD-D101 Sie dabei unterstützen kann.
+
+== Referatseigene Plugins ==
+Die Referate können Ihre eigenen Java-Funktionen entwickeln bzw. entwickeln lassen, um dadurch beliebig komplexe Transformationen, Komfortdruckfunktionen etc. umzusetzen. Der WollMux bietet zu diesem Zweck eine Plugin-Schnittstelle, die in der [[Konfigurationsdatei_wollmux.conf#Einbinden_referatseigener_Plugins.2FCLASSPATH|Beschreibung der <tt>wollmux.conf</tt>]] erläutert ist. 
+=== Beispiel-Plugin-Funktion: ''Resturlaub'' ===
+Anhand der Funktion ''Resturlaub'' wird im Folgenden erklärt, wie das Einbinden eines Referatsplugins in der Standardkonfiguration umgesetzt wird. Die Funktion ''Resturlaub'' wird in einem Urlaubsantrag verwendet, um ein Formularfeld automatisch auszufüllen (Autofill). Dabei werden vom in einem Formularfeld einzugebenden Zahlenwert ''Urlaubsanspruch'' zwei Werte aus anderen Formularfeldern abgezogen, nämlich einerseits der bereits vorher beantragte Urlaub sowie der im neuen Urlaubsantrag beantragte Urlaub. Die Funktion ''Resturlaub'' ist also einfach
+ Resturlaub = Urlaubsanspruch - BereitsBeantragt - JetztBeantragt
+Diese Funktion wollen wir über ein referatsspezifisches Java-Plugin realisieren. In diesem Fall wird die Funktion in einer Vorlage des KVR eingesetzt.
+;Hinweis: Der WollMux unterstützt seit der Version 3.8.1 auch arithmetische [[Konfigurationsdatei_wollmux.conf#Grundfunktionen|Grundfunktionen]]. Im Fall einer simplen Berechnung wie im Falle des Resturlaubs stellen diese Funktionen eine einfachere Alternative zu externen Plugins dar. 
+
+Die Funktion ''Resturlaub'' wird wie folgt (als externes Plugin) eingebunden:
+* ''Erstellen der <tt>.class</tt>-Datei'': Zu allererst wird eine entsprechende <tt>.class</tt>-Datei erstellt. Da die Funktion vom KVR gepflegt wird, wird sie gemäß der Java-Namenskonventionen im Package <tt>de.muenchen.kvr</tt> angelegt. Als Klassennamen wählen wir <tt>FormularFunktionen</tt>. Die Java-Programmierung selbst würden den Rahmen dieser Dokumentation sprengen. Wenden Sie sich diesbezüglich bitte an die Schulungsabteilung.
+* ''Kopieren der <tt>.class</tt> Datei ins Verzeichnis <tt>plugins/</tt>'': Die Standardkonfiguration sieht vor, dass Referatsplugins im Verzeichnis <tt>plugins/</tt> abgelegt werden. Da die Funktion ''Resturlaub'' wie oben festgelegt im Package <tt>de.muenchen.kvr</tt> angesiedelt ist, muss sie demzufolge im Verzeichnis <tt>plugins/de/muenchen/kvr/</tt> abgelegt werden. Es ist empfehlenswert, zu Referenzzwecken die <tt>.java</tt>-Datei im selben Verzeichnis abzulegen. Wenn man die Java-Entwicklung innerhalb einer lokalen Kopie der Standardkonfiguration erledigt, ergibt sich das von selbst. <br>Wenn Sie in das Verzeichnis <tt>plugins/de/muenchen/kvr/</tt> der von D-III-ITD-D101 bereitgestellten Archive der Standardkonfiguration hineinschauen, dann finden Sie dort auch sowohl die Datei <tt>FormularFunktionen.class</tt> als auch den zugehörigen Quelltext <tt>FormularFunktionen.java</tt>. Wenn Sie die <tt>.class</tt> Datei selbst generieren wollen, so können Sie dies auf einem Basisclient auch einfach tun. Starten Sie eine Konsole, wechseln Sie in das Verzeichnis <tt>plugins/de/muenchen/kvr/</tt> und geben Sie folgenden Befehl ein<br><tt>javac FormularFunktionen.java</tt><br>(Löschen Sie vorher die Datei <tt>FormularFunktionen.class</tt>, um sich zu überzeugen, dass diese tatsächlich neu generiert wird.)
+* ''<tt>CLASSPATH</tt>-Eintrag für <tt>plugins/</tt>'': Damit externe Plugins überhaupt funktionieren, muss der folgende Eintrag in der <tt>referat.conf</tt> vorgenommen werden:<br><tt>CLASSPATH "plugins/"</tt><br>
+* ''Eintragen der EXTERN-Deklaration in <tt>conf/plugins-kvr.conf</tt>'': Die Standardkonfiguration sieht vor, dass Deklarationen referatseigener Plugins in Dateien nach dem Muster <tt>conf/plugins-<referat>.conf</tt> im Verzeichnis <tt>conf/</tt> eingetragen werden. Das von D-III-ITD-D101 bereitgestellte Archiv enthält auch bereits eine Datei <tt>plugins-kvr.conf</tt>, die dies demonstriert. '''Achtung:''' Funktionen müssen zur Verwendung nicht zwangsweise global deklariert werden und diese Deklaration hat durchaus ihre Nachteile. Lesen Sie hierzu die entsprechenden Hinweise in der [[FormularMax_4000#Referatsspezifische_Plugins|Dokumentation des FormularMax 4000]].
+* ''<tt>%include "plugins-kvr.conf"</tt>'': Damit die Deklaration der Funktion auch vom WollMux gesehen wird, muss die Datei <tt>plugins-kvr.conf</tt> über den <tt>[[Format_von_WollMux-Config-Dateien#.25include|%include-Mechanismus]]</tt> eingebunden werden. Dies erfolgt in der Datei <tt>referat.conf</tt>. Die von D-III-ITD-D101 bereitgestellten Archive demonstrieren dies bereits in der dort enthaltenen <tt>referat.conf</tt>
+
+= Adressauswahl-Dialog =
+WollMux-Formulare bieten typischerweise einen Button ''Adressauswahl'', über den der Sachbearbeiter aus Listen mit häufig verwendeten Adressen (z.B. andere Behörden) eine auswählen kann, die automatisch in das Empfängerfeld des Formulars eingetragen wird. Die Definition dieses Dialogs erfolgt im [[Konfigurationsdatei_wollmux.conf#Funktionsdialoge|Abschnitt ''Funktionsdialoge'', Unterabschnitt ''Empfaengerauswahl'']]. Da die häufig verwendeten Empfänger von Dienststelle zu Dienststelle unterschiedlich sind, ist dieser Abschnitt in der <tt>referat.conf</tt> zu finden. Allerdings befindet sich dort nur der Rahmen. Die Definition der verschiedenen Reiter, die der Dialog anbietet, ist ausgelagert in 2 Dateien, die durch den [[Format_von_WollMux-Config-Dateien#.25include|<tt>%include</tt>-Mechanismus]] eingebunden werden:
+* <tt>adressauswahl-referat.conf</tt>: Diese Datei ist dafür vorgesehen, dass die Referate dort die Reiter definieren, die referatsspezifische häufig verwendete Adressen bereitstellen. In den durch D-III-ITD-D101 verteilten Archiven ist dort  zur Demonstration ein Reiter "Spielwarenläden" enthalten. Dieser Reiter demonstriert auch, wie durch die Kombination aus der Angabe <tt>AUTOFILL ""</tt> beim Textfeld mit <tt>ID "suchanfrage"</tt> und der Angabe des leeren Suchmusters <tt>spielwarenlaeden()</tt> im Abschnitt ''Suchstrategie'' erreicht werden kann, dass alle Datensätze der Datenquelle gleich im Suchergebnisfenster erscheinen, ohne dass der Benutzer erst eine Suchanfrage absetzen muss. Dies ist natürlich nur bei Datenquellen möglich, die eine kleine Anzahl von Datensätzen enthalten.
+* <tt>adressauswahl-standard.conf</tt>: Diese Datei wird zentral durch D-III-ITD-D101 gepflegt und enthält die empfohlenen Reiter, die in allen Referaten von Bedeutung sind, z.B. für die Adressierung an Personen/Orga-Einheiten innerhalb der LHM. Möchte ein Referat diese Standardreiter seinen Benutzern nicht anbieten, kann es die entsprechende <tt>%include</tt>-Zeile in der <tt>referat.conf</tt> entfernen oder auskommentieren. Durch die Platzierung dieser <tt>%include</tt>-Zeile vor oder nach der <tt>%include</tt>-Zeile für die <tt>adressauswahl-referat.conf</tt> kann außerdem festgelegt werden, ob die Standard-Reiter zuerst oder zuletzt angezeigt werden sollen. Die Datei <tt>adressauswahl-standard.conf</tt> selbst soll durch die Referate nicht geändert werden.
+
+= Datenquellen =
+Der WollMux kann Informationen aus verschiedenen Datenquellen zusammenführen und für diverse Zwecke nutzen. Zum Beispiel können die Sachbearbeiterdaten aus dem städtischen X.500 Verzeichnis zur Befüllung der Briefköpfe verwendet werden. Ein anderes Anwendungsbeispiel von Datenquellen ist der [[Standardkonfiguration_des_WollMux#Adressauswahl-Dialog|Adressauswahl-Dialog]], in dem der Benutzer aus durch eine Datenquelle bereitgestellten häufig verwendeten Empfängeradressen auswählen und damit automatisch das Empfängerfeld befüllen lassen kann.
+
+Die Datei <tt>datenquellen.conf</tt> enthält zum einen die Definition der Datenquelle "personal", die die Sachbearbeiterdaten aus dem städtischen X.500-Verzeichnis bereitstellt und um zusätzliche Informationen ergänzt (wie z.B. die lange Dienstbezeichnung). Zum anderen sind in der <tt>datenquellen.conf</tt> diverse Voreinstellungen für das Verhalten des WollMux enthalten, die mit den Datenquellen in Verbindung stehen, wie z.B. der Timeout nach dem Suchanfragen abgebrochen werden. Das Ändern der Datenquelle "personal" ist schwierig und meist nicht ratsam. Wenn Sie das Bedürfnis haben, diese für ihr Referat anzupassen, eröffnen Sie bitte ein Ticket, damit D-III-ITD-D101 sie dabei unterstützen kann. Die oben erwähnten Voreinstellungen, wie z.B. der erwähnte Timeout, sind dagegen unproblematisch zu ändern. Da die Datei <tt>datenquellen.conf</tt> jedoch von <tt>xupdate</tt> überschrieben wird müssen entsprechende Änderungen in der <tt>referat.conf</tt> durchgeführt werden.
+
+= Dialoge =
+Fast alle wichtigen Dialoge des WollMux lassen sich flexibel konfigurieren. Die entsprechenden Dialogbeschreibungen sind in der Datei <tt>dialoge.conf</tt> zu finden. Im Sinne der Einheitlichkeit, vor allem auch in Hinblick auf die Schulungen, ist dringend davon abzuraten, Änderungen an den Dialogen vorzunehmen. Manche, von einigen Referaten gewünschte Benutzereinschränkungen lassen sich jedoch nur durch Änderung eines Dialogs bewerkstelligen. Um zum Beispiel den Sachbearbeitern die Möglichkeit zu nehmen, ihre Briefkopfdaten zu ändern, ist derzeit die einzige Möglichkeit den Button, der den Dialog zum Bearbeiten der Daten aufruft aus der Dialogbeschreibung zu entfernen.
+
+Generell ist das Anpassen der Dialogbeschreibung schwierig. Auch wird die Datei <tt>dialoge.conf</tt> von <tt>xupdate</tt> überschrieben. Wenn Sie die Notwendigkeit haben, für ihr Referat Anpassungen an den Dialogen vorzunehmen, eröffnen Sie bitte ein Ticket, damit D-III-ITD-D101 Sie dabei unterstützen und eventuelle Alternativen (zum Beispiel kurzfristig implementierbare neue WollMux-Features) prüfen kann.
+
+= WollMuxBar konfigurieren =
+Der WollMuxBar kommt eine besondere Rolle zu, da sie der Teil ist, bei dem am meisten referats- und auch benutzergruppenspezifische Anpassungen erforderlich sind. Die Referate und oft sogar die einzelnen Orga-Einheiten innerhalb der Referate unterscheiden sich stark darin, welche Vorlagen sie benötigen. In der Standardkonfiguration ist vorgesehen, dass für jede Benutzergruppe mit ihrer eigenen WollMuxBar eine Datei <tt>conf/wollmuxbar_<gruppe>.conf</tt> angelegt wird, in der die Konfiguration der WollMuxBar für die Benutzergruppe <gruppe> gespeichert ist. Die Benutzer bekommen dann in ihre persönliche <tt>wollmux.conf</tt> zwei [[Format_von_WollMux-Config-Dateien#.25include|<tt>%include</tt>-Zeilen]]. Die erste zieht die Datei <tt>conf/main.conf</tt> hinein, die für die referatsweiten Einstellungen verantwortlich ist. Die zweite zieht die passende <tt>conf/wollmuxbar_<gruppe>.conf</tt> hinein, die die gruppenspezifischen Anpassungen der WollMuxBar (und wie weiter unten erläutert wird auch der Textfragmente) enthält. Weitere Informationen dazu, wie dies benutzer- und gruppenspezifisch konfiguriert wird (insbes. auch mit GOsa) finden Sie im Artikel [[Standardkonfiguration des WollMux installieren und pflegen]].
+
+Die manuelle Pflege der <tt>wollmuxbar_<gruppe>.conf</tt> Dateien wäre sehr aufwändig, fehleranfällig und schwierig. Aus diesem Grunde wurde das Skript <tt>automux</tt> entwickelt, dessen Funktionsweise und Verwendung in den folgenden Abschnitten erklärt wird.
+
+== <tt>automux</tt>, <tt>run_automux</tt> ==
+Die Grundidee des <tt>automux</tt> Skripts ist es, die Struktur der WollMuxBar durch vertraute Konzepte, nämlich Verzeichnisse und Unterverzeichnisse auf der Festplatte, abzubilden. Auf diese Weise können zur Pflege die altbekannten Dateiverwaltungstools eingesetzt werden. Das Generieren der <tt>wollmuxbar_<gruppe>.conf</tt> wird vom Skript <tt>automux</tt> übernommen. Dieses Skript durchsucht rekursiv eine ganze Verzeichnisstruktur und erstellt daraus nach bestimmten Regeln (z.B. jedes Verzeichnis ergibt ein Menü gleichen Namens und jedes Unterverzeichnis ein entsprechendes Untermenü) die Beschreibung der WollMuxBar.
+
+Das Skript <tt>automux</tt> ist ein Kommandozeilenprogramm, das diverse Parameter erwartet. Um die Handhabung zu vereinfachen, wurde das Skript <tt>run_automux</tt> entwickelt. Dieses nimmt seinen eigenen Speicherort als Ausgangspunkt, um daraus zu bestimmen, welche Verzeichnisstruktur gescannt werden soll. So kann es die Parameter für <tt>automux</tt> automatisch bestimmen und es ohne weitere Benutzerinteraktion aufrufen. Solange man die normale Verzeichnisstruktur der Standardkonfiguration verwendet und darauf achtet, dass man, wenn man mehrere Kopien einer Standardkonfiguration auf der Festplatte hat, das richtige <tt>run_automux</tt> nimmt, braucht man sich nie mit dem <tt>automux</tt> Skript selbst auseinanderzusetzen. Man startet einfach (z.B. durch Doppelklick im Dateimanager) das Skript <tt>run_automux</tt> und der Rest geht von selbst. Im Folgenden werden <tt>automux</tt> und <tt>run_automux</tt> synonym verwendet.
+
+;Achtung: Sie sollten es sich zur Gewohnheit machen, nach jeder Änderung sofort <tt>run_automux</tt> zu starten. Es gibt Situationen (siehe später), in denen bei der Arbeit auf der lokalen Festplatte alles funktioniert, aber nach dem Kopieren auf den Server Dateien nicht mehr gefunden werden. Das <tt>automux</tt> Skript korrigiert dies automatisch, aber  nur, wenn es in der Umgebung aufgerufen wird, in der die Änderungen durchgeführt wurden (d.h. in der Umgebung, in der alles funktioniert). "Umgebung" schließt hier typischerweise den Benutzeraccount mit ein, der die Änderungen durchgeführt hat.<br><br>Andersherum ist es bei den meisten Änderungen so, dass diese schon auf der lokalen Festplatte erst dann Wirkung zeigen bzw. korrekt funktionieren, wenn <tt>automux</tt> ausgeführt wurde. Die einzige Situation, in der ein <tt>automux</tt>-Lauf nie erforderlich ist, ist nach dem Editieren einer <tt>.conf</tt>-Datei im Verzeichnis <tt>conf/</tt>.
+
+Den empfohlenen Workflow zum Durchführen von Änderungen an der Standardkonfiguration, inkl. des Aufrufs von <tt>run_automux</tt> finden Sie im Artikel [[Standardkonfiguration des WollMux installieren und pflegen]].
+
+== Symlinks zur besseren Wartbarkeit ==
+=== Was sind Symlinks ? ===
+Von Windows her ist das Prinzip der Verknüpfungen bekannt. Es wird typischerweise dazu verwendet, um Anwendungen und Ordner an verschiedenen Stellen verfügbar zu machen. Der typische Anwendungsfall ist es, sich Verknüpfungen zu häufig verwendeten Anwendungen und Ordnern auf den Desktop zu legen. Ein Symlink (= "symbolischer Link" = "symbolische Verknüpfung") unter Linux ist ähnlich zu einer Verknüpfung unter Windows, allerdings sind Symlinks enger in das Dateisystem eingebunden. 
+
+Wenn ein Programm sich nicht explizit darum bemüht, Symlinks zu erkennen, so sind diese für das Programm nicht von einer normalen Datei zu unterscheiden. Sie werden in Datei/Öffnen-Dialogen angeboten wie andere Dateien und Verzeichnisse auch, ohne explizit kenntlich gemacht zu sein, wogegen Verknüpfungen unter Windows immer mit einem kleinen Pfeil markiert sind. Symlinks auf Dateien lassen sich auch wie normale Dateien öffnen und bearbeiten. Dabei wird immer auf die verknüpfte Originaldatei zugegriffen. 
+
+Bei Verknüpfungen mit Ordnern sind die Unterschiede zwischen Windows und Linux besonders deutlich. Unter Windows leitet eine Verknüpfung immer zum Originalordner weiter. Wenn man unter Windows eine Verknüpfung mit dem Ordner <tt>Ziel</tt> anlegt und die Verknüpfung umbenennt in <tt>WollMux</tt> und dann in einem Dateiauswahldialog auf <tt>WollMux</tt> doppelklickt, wird ins  Verzeichnis <tt>Ziel</tt> gewechselt. Auch der oben im Dialog angezeigte Name des aktuellen Verzeichnisses ist dann <tt>Ziel</tt>, nicht <tt>WollMux</tt>. Unter Linux dagegen werden Verknüpfungen mit Verzeichnissen normalerweise so behandelt als wären es richtige Verzeichnisse. Wird unter Linux eine Verknüpfung mit dem Ordner <tt>Ziel</tt> angelegt, in <tt>WollMux</tt> umbenannt und dann in einem Dateiauswahldialog angewählt, so wird danach als aktuelles Verzeichnis tatsächlich <tt>WollMux</tt> angezeigt, so als gäbe es tatsächlich ein unabhängiges Verzeichnis dieses Namens und nicht nur einen Symlink  auf <tt>Ziel</tt>.
+
+Auch in Dateipfaden können Symlinks, anders als Windows-Verknüpfungen, ohne Einschränkung verwendet werden. Wird unter Windows auf <tt>C:\</tt> eine Verknüpfung mit <tt>C:\temp</tt> angelegt, der man den Namen <tt>temp<u>2</u></tt> gibt, dann funktioniert der Dateipfad <tt>C:\temp<u>2</u>\datei.txt</tt> trotzdem ''nicht''. Wenn man dagegen unter Linux einen Symlink  <tt>/home/benutzer/temp<u>2</u></tt> auf den Ordner <tt>/home/benutzer/temp</tt> anlegt, dann ist <tt>/home/benutzer/temp<u>2</u>/datei.txt</tt> sehr wohl ein funktionierender Dateipfad, der die selbe Datei öffnet wie <tt>/home/benutzer/temp/datei.txt</tt>.
+
+Eine Folge des Prinzips, Symlinks wie richtige Dateien zu behandeln ist es, dass anders als für Windows-Verknüpfungen für Symlinks keine von der Originaldatei abweichenden Eigenschaften (wie z.B. ein spezielles Icon) vergeben werden können.
+
+=== Warum sind Symlinks nützlich ? ===
+Wie weiter oben bereits erwähnt ist das Grundprinzip von <tt>automux</tt>, dass die Struktur der WollMuxBar 1:1 einer Verzeichnisstruktur auf der Festplatte entspricht. Dies hat zwei wichtige Konsequenzen:
+
+# Die Bezeichnung eines Menüeintrags für eine Vorlage entspricht dem Namen der Vorlagendatei im Dateisystem. (Dies ist vereinfacht dargestellt. Nähere Details zur Namensgebung werden weiter unten detailliert ausgeführt.)
+# Wenn die selbe Vorlage an mehreren Stellen (z.B. in verschiedenen Menüs) auftauchen soll, muss sie im Dateisystem mehrfach vorhanden sein.
+
+Würde man mit Kopien der Vorlagendateien arbeiten, hätte dies entsprechend zwei Probleme zur Folge:
+
+# Die Namen mit denen Vorlagendateien erstellt und gepflegt werden sind in den seltensten Fällen passende Menüeinträge. Zum Beispiel werden als Namensbestandteile von Dateinamen oft Datums- oder Versionsangaben verwendet, die dazu dienen neue Versionen von alten zu unterscheiden. In Menüeinträgen für Endbenutzer sind solche Angaben fehl am Platz.
+# Es ist durchaus üblich, Vorlagen an verschiedenen Stellen in der WollMuxBar anzubieten. Arbeitet man mit Kopien muss man peinlichst darauf achten, Buch über diese zu führen und bei einer Änderung einer Vorlage alle Kopien synchron zu halten. Ansonsten rufen manche Buttons/Menüeinträge noch eine alte Version auf.
+
+Symlinks lösen beide Probleme einfach und elegant. Statt mehrerer Kopien einer Datei gibt es nur einzige. Alles andere sind Symlinks auf diese. 
+;Empfehlung: Für die Standardkonfiguration wird empfohlen, alle Vorlagendateien im Verzeichnis <tt>vorlagen/fragmente/</tt> (zentral durch D-III-ITD-D101 gepflegte Standardvorlagen) bzw. Unterverzeichnissen davon (referatsspezifische Vorlagen) zu halten und ansonsten nur Symlinks zu verwenden, die auf diese Dateien verweisen.
+
+=== Wie erzeugt man Symlinks ? ===
+==== Dateimanager (Konqueror) ====
+Im Dateimanager (Konqueror) erzeugt man Symlinks einfach, indem man die Zieldatei mit der ''linken'' Maustaste (Achtung: Unterschied zu Windows! Dort wäre es die rechte.) packt, in das gewünschte Zielverzeichnis zieht und dort fallen lässt. Es erscheint dann ein Popup-Menü in dem man ''Hiermit verknüpfen'' wählt. 
+
+Anders als bei Windows-Verknüpfungen wird als Name für den Symlink nicht automatisch "Verknüpfung mit <Ziel>" gewählt, sondern der Originalname der Datei. Dementsprechend erhält man, wenn man versucht, im selben Verzeichnis in dem sich die Originaldatei befindet eine Verknüpfung zu ihr zu erstellen eine Warnung. Diese weist darauf hin, dass man versucht eine existierende Datei zu überschreiben und bietet ein Eingabefeld zur Wahl Eingabe eines anderen Namens an.
+
+Im Normalfall allerdings erstellt man Symlinks in anderen Verzeichnissen. Dann ist das Standardverhalten, den Originalnamen zu verwenden praktischer, als wenn wie unter Windows immer der Zusatz "Verknüpfung mit" eingefügt würde.
+
+;Tip 1: In den meisten Ansichten des Konqueror sind Symlinks durch ''kursive'' Schrift als Symlinks gekennzeichnet.
+;Tip 2: Zur Arbeit an einer Standardkonfiguration haben sich folgende Ansichtseinstellungen im Konqueror als nützlich erwiesen:
+:* ''Ansicht/Anzeigemodus/Detaillierte Ordneransicht''. 
+:* Den Spaltenkopf der Spalte ''Verknüpfung'' (unter Umständen muss man die Anzeige nach rechts scrollen, um sie zu finden) mit der linken Maustaste packen, nach links ziehen und direkt neben der Spalte ''Name'' fallen lassen. So hat man den Namen der Datei und das Verknüpfungsziel direkt nebeneinander.
+:* Die Spalten ''Name'' und ''Verknüpfung'' durch Ziehen mit der linken Maustaste an den Separatoren zwischen den Spaltenköpfen so Vergrößern/Verkleinern, dass man beide gut lesen kann.
+:* Hinweis: Symlinks sind in dieser Ansicht durch kleine Pfeile links unten am Icon der Datei gekennzeichnet. Und natürlich sind sie dadurch erkennbar, dass ihre ''Verknüpfung''-Spalte nicht leer ist.
+;Tip 3: Es ist oft günstig, zwei Konqueror-Fenster zu öffnen, vertikal auf die halbe Bildschirmgröße zu verkleinern und übereinander anzuordnen, so dass man beide gleichzeitig sieht. Im oberen Fenster kann man dann das <tt>vorlagen/fragmente/</tt> Verzeichnis anzeigen lassen und im unteren das entsprechende Verzeichnis in dem die Symlinks zu erstellen sind. So kann man bequem die gewünschten Dateien vom oberen ins untere Fenster ziehen.<br>Horizontal sollte immer die volle Bildschirmbreite ausgenutzt werden, um die Spalten ''Name'' und ''Verknüpfung'' vollständig darstellen zu können.
+
+==== Konsole ====
+Auf der Kommandozeile erstellt der Befehl
+ ln -sn "<Quelle>" "<Ziel>"
+einen Symlink. Beispiel
+ ln -sn "../../fragmente/Briefkopf-extern-ohne-Logo.ott"  "Externer Briefkopf ohne Logo.ott"
+;Achtung: Man muss darauf achten, den Parameter <tt>-sn</tt> nicht zu vergessen. Lässt man ihn weg, gibt es ''keine'' Fehlermeldung. Stattdessen wird ein sogenannter harter Link angelegt. Ein harter Link ist von der Originaldatei durch nichts zu unterscheiden (insbesondere gibt es keine ''Verknüpfung''-Angabe im Konqueror) und wegen dieser Intransparenz für die Verwendung in der Standardkonfiguration nicht geeignet.
+
+=== Probleme mit Symlinks ===
+Bei der Arbeit mit Symlinks können diverse Probleme auftreten. Diese Probleme lassen sich jedoch leicht vermeiden, wenn man sich ihrer bewusst ist.
+==== Absolute Symlinks ====
+Ein Symlink speichert den Dateipfad der verknüpften Datei. Wie jeder Dateipfad kann dieser Pfad absolut sein, d.h. er gibt die Position des Ziels vom Wurzelverzeichnis beginnend vollständig an, oder er kann relativ sein, d.h. er gibt die Position des Ziels relativ zum Ort des Symlinks an. Ein Beispiel für einen absoluten Pfad ist
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/fragmente/referat/vorlage.ott 
+Ein Beispiel für einen relativen Pfad ist
+ ../../fragmente/referat/vorlage.ott 
+Zu beachten ist hier, dass beim Kopieren, Verschieben oder Archivieren (zum Upload auf den Server) eines Symlinks die Zielangabe des Symlinks ''nicht'' verändert wird. Als Konsequenz daraus verhalten sich insbesondere absolute Symlinks oft nicht so wie erwartet und gewünscht. 
+
+Nehmen wir zur Illustration dieses Problems an, dass Herr Felix Wollmux in seinem Referat für die Pflege der WollMux-Konfiguration zuständig ist. Er hat eine lokale Kopie der Standardkonfiguration in seinem Home-Verzeichnis. Darin befinden sich auch ein relativer und ein absoluter Symlink mit den beiden Beispielpfaden weiter oben. Nach dem erfolgreichen lokalen Test soll die Konfiguration auf den Server hochgeladen werden. Felix Wollmux selbst hat keinen Zugriff auf den Server. Er erstellt ein <tt>.tar.gz</tt> Archiv der Konfiguration und gibt es dem Webmaster, um es auf den Server zu stellen. Nach dem Upload jedoch lässt sich <tt>vorlage.ott</tt> nicht öffnen, obwohl dies im lokalen Test einwandfrei geklappt hat.
+
+Was ist passiert?
+
+Der absolute Symlink verweist immer noch auf die Datei
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/fragmente/referat/vorlage.ott
+aber auf dem Webserver gibt es das Verzeichnis <tt>/home/felix.wollmux/</tt> gar nicht, da Felix Wollmux dort keinen Zugang hat. Und sogar wenn er dort Zugang hätte, wäre in seinem Home-Verzeichnis auf dem Server die Datei nicht zu finden, da diese nur auf der lokalen Festplatte seines Arbeitsplatzrechners liegt.
+
+Der relative Symlink 
+ ../../fragmente/referat/vorlage.ott
+dagegen funktioniert auch auf dem Server, da die ganze Verzeichnisstruktur kopiert wurde.
+
+;Hinweis:
+:Der Dateimanager Konqueror erzeugt standardmäßig absolute Symlinks, also die problematische Sorte. Diese werden jedoch von <tt>automux</tt> automatisch korrigiert. Dies funktioniert jedoch nur dann zuverlässig, wenn <tt>automux</tt> auf dem Rechner und von der Person aufgerufen wird, die die Symlinks gesetzt hat. Deswegen ist es wichtig, dass nach jeder Änderung, spätestens vor dem Archivieren, Hochladen oder sonstiger Weitergabe mindestens einmal <tt>run_automux</tt> aufgerufen wird.
+
+;ACHTUNG: Der Konqueror hat einen Bug, der dafür sorgt, dass manchmal die Verknüpfungsziele in der Ansicht nicht aktualisiert werden. Auch ''Ansicht/Erneut Laden (F5)'' hilft in diesem Fall nicht. Der Konqueror muss dann beendet und neu geöffnet werden, damit die Ansicht stimmt. Sollten also nach dem Aufruf von <tt>run_automux</tt> einige Symlinks trotzdem noch mit absoluten Zielen angezeigt werden, kann dieser Bug die Ursache sein. Dieses Problem betrifft aber nur die Anzeige und hat ansonsten keine schädlichen Auswirkungen.
+
+==== Relative Symlinks ====
+Relative Symlinks funktionieren nur solange, wie sich der Speicheort der Zieldatei relativ zum Symlink nicht ändert. Wird die Zieldatei an einen anderen Ort verschoben, so funktioniert der Symlink nicht mehr (wie eine Windows-Verknüpfung). Probleme gibt es jedoch auch, wenn der Symlink verschoben oder kopiert wird. Der im Symlink gespeicherte relative Pfad wird immer ausgehend vom Speicherort des Symlinks ausgewertet. Folgender Pfad
+ ../../fragmente/referat/vorlage.ott
+beginnt mit <tt>../../</tt> was das Elternverzeichnis des Elternverzeichnisses des Verzeichnisses bezeichnet, in dem der Symlink liegt. Befindet sich der Symlink im Verzeichnis
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/standard/Formulare
+so ist <tt>../../</tt> das Verzeichnis 
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/
+Wird der Symlink in das Verzeichnis
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/standard/Formulare/Bescheide
+verschoben, so hört er jedoch auf zu funktionieren, denn von dort aus gesehen bedeutet <tt>../../</tt> nämlich das Verzeichnis
+ /home/felix.wollmux/wollmux-standard-config/vorlagen/standard/
+
+;Hinweis:
+:Dieser Fehler passiert typischerweise, wenn man in der Menüstruktur nachträglich Untermenüs einrichten möchte und die alten Menüpunkte einfach nur in das Untermenü verschiebt. Auch in diesem Fall jedoch hilft <tt>run_automux</tt>. Es kann den Fehler zwar nicht korrigieren, meldet ihn jedoch gleich am Anfang seiner Ausgabe mit der Meldung
+ Ziel von <Speicherort des Symlinks> existiert nicht!
+:Achten Sie also genau auf die Ausgabe von <tt>run_automux</tt>. Der Konqueror markiert im übrigen nicht-funktionierende Symlinks mit einem kleinen Kästchen über dem Icon. Auch dort sind sie also leicht erkennbar. In der Konsole werden kaputte Symlinks von ls (bei Verwendung von Farbdarstellung) anders eingefärbt.
+
+==== Symlinks auf Netzlaufwerken ====
+Auf Netzlaufwerken werden Symlinks unter Umständen nicht unterstützt. Deswegen ist es oft nicht möglich, die Standardkonfiguration auf ein Netzlaufwerk zu kopieren ohne dabei die Symlinks zu verlieren. Ob Symlinks auf einem Netzlaufwerk funktionieren hängt sowohl vom eingesetzten Server als auch von den Mount-Optionen auf dem Client ab.
+
+==== Symlinks auf dem Webserver ====
+Webserver sind oft so konfiguriert, dass sie Symlinks nicht auflösen. Dies ist bei Webservern, auf denen Webspace an (nicht vertrauenswürdige) Kunden vermietet wird eine wichtige Sicherheitseinstellung, da es den Kunden daran hindert, durch das Anlegen von Symlinks Zugriff auf Dateien zu erhalten, die außerhalb seines gemieteten Bereichs des Webservers liegen. Da die Standardkonfiguration Symlinks verwendet, muss für das Verzeichnis, in dem sie sich befindet (und dessen Unterverzeichnisse), die Option zur Zulassung von Symlinks gesetzt werden (bei Apache: FollowSymlinks).
+
+== Buttonleiste ==
+Die Buttonleiste der WollMuxBar enthält in der Standardfassung eine Combobox zur Auswahl des Absenders, sowie 4 Buttons zum Schnellzugriff auf die Standardbriefköpfe. Dies lässt sich jedoch beliebig anpassen. Für die Konfiguration der Buttonleiste für Benutzergruppe <gruppe> sind in der Standardkonfiguration die Unterverzeichnisse <tt>?.buttons</tt> innerhalb des Verzeichnisses <tt>vorlagen/<gruppe></tt> verantwortlich. Dabei ist <tt>?</tt> ein beliebiges Zeichen, wobei typischerweise "X" verwendet wird (also <tt>X.buttons</tt>), damit das Verzeichnis im Dateimanager bei alphabetischer Sortierung nach Dateinamen am Ende der Liste angezeigt wird.
+
+Der Aufbau des <tt>?.buttons</tt> Verzeichnisses ist sehr einfach. Für jede Vorlagendatei (bzw.  jeden Symlink auf eine Vorlagendatei) innerhalb dieses Verzeichnisses wird ein entsprechender Button in der WollMux-Leiste angelegt. Spezielle Elemente, wie Separatoren (vertikale Trennstriche), Abstände oder die ComboBox zur Absenderauswahl können ebenfalls in die Buttonleiste eingebaut werden. Zum Anlegen dieser Elemente werden die selben Spezialdateien verwendet wie für die Konfiguration der Menüleiste. Auch das Festlegen der Buttonreihenfolge und der Hotkeys funktioniert analog zur Konfiguration der Menüleiste. Diese Dinge werden weiter unten genauer erklärt.
+
+== Menüs, Untermenüs, Menüeinträge ==
+Der Aufbau der Menüleiste der WollMuxBar für Benutzergruppe <gruppe> wird festgelegt durch die Verzeichnishierarchie unterhalb von <tt>vorlagen/<gruppe></tt>. Die Unterverzeichnisse, die direkt in diesem Verzeichnis liegen ergeben die Menüs, die in der WollMuxBar angeboten werden. Unterverzeichnisse dieser Verzeichnisse ergeben entsprechende Untermenüs. Unterunterverzeichnisse ergeben Unteruntermenüs und so weiter. Es gibt allerdings ein paar Ausnahmen von diesem Prinzip:
+* ''?.insertFrag'': Verzeichnisse, die nach diesem Muster benannt sind, werden für den Aufbau der Menüstruktur ignoriert. Sie werden zur Bestimmung der Textfragmente herangezogen (siehe weiter unten).
+* ''?.buttons'': Verzeichnisse, die nach diesem Muster benannt sind, werden für den Aufbau der Menüstruktur ignoriert. Sie bestimmen die Buttonleiste der WollMuxBar (siehe weiter oben).
+* ''*.multi'': Verzeichnisse nach diesem Muster werden zwar in die Menüstruktur eingebaut, allerdings ergeben sie keine Untermenüs, sondern spezielle Menüpunkte, die mehrere Formulare zum gleichzeitigen Ausfüllen öffnen. Diese Multi-Form-Funktionalität wird [[Standardkonfiguration_des_WollMux#Multi-Form:_zusammengeh.C3.B6rige_Formulare_gemeinsam_ausf.C3.BCllen|weiter unten]] beschrieben.
+
+In allen Verzeichnissen und Unterverzeichnissen können Vorlagendateien bzw. Symlinks darauf hinterlegt werden. Diese Dateien werden von <tt>automux</tt> umgesetzt in Menüpunkte, die die entsprechenden Vorlagen aufrufen. Dazu ist es auch möglich, externe Anwendungen (z.B. Acrobat Reader zum Ausfüllen von PDF-Formularen) oder Webseiten durch Menüeinträge aufrufen zu lassen. Dies wird in einem [[Standardkonfiguration_des_WollMux#Externe_Anwendungen_aus_der_WollMuxBar_starten|eigenen Abschnitt]] erläutert. Zusätzlich können auch noch eine Reihe spezieller Elemente in Menüs eingefügt werden, wie z.B. Separatoren (horizontale Linien zur Gruppierung). Auch dies wird einem [[Standardkonfiguration_des_WollMux#Besondere_Men.C3.BCelemente|späteren Abschnitt]] näher erklärt.
+
+== Tricks mit der Namensgebung ==
+Wie bereits erwähnt, lassen sich in den Unterverzeichnissen von <tt>vorlagen/<gruppe></tt> Vorlagendateien (bzw. Symlinks darauf) hinterlegen, die von <tt>automux</tt> in Buttons oder Menüeinträge umgesetzt werden, die die entsprechenden Vorlagen aufrufen. Im Folgenden erfahren Sie, wie genau diese Umsetzung funktioniert. 
+
+=== Buttonbeschriftung bzw. Menüeintrag ===
+Zu jeder Vorlagendatei wird ein entsprechender Button bzw. Menüeintrag erstellt, der die Vorlage aufruft. Die Beschriftung des Buttons bzw. der Menüeintrag wird dabei wie folgt aus dem  Namen der Vorlagendatei bestimmt:
+# Wenn der Name mit einem Klein- oder Großbuchstaben (nicht Umlaut) gefolgt von einem Punkt (z.B. "A." oder "b.") beginnt oder wenn der Name mit einer beliebig langen Ziffernfolge gefolgt von Punkt (z.B. "1." oder "09.") beginnt, so wird dieses Präfix abgeschnitten. <br>Beispiel: <tt>01.Vorlage.ott => Vorlage.ott</tt>
+# Die Dateierweiterung (d.h. alles ab dem letzten Punkt) wird abgeschnitten. <br>Beispiel: <tt>Vorlage.ott => Vorlage</tt>
+# Wenn der Name mindestens einen Großbuchstaben (nicht Umlaut) enthält, so wird der erste Großbuchstabe in einen Kleinbuchstaben umgewandelt. <br>Beispiel: <tt>Vorlage => vorlage</tt>
+# Wenn der erste Buchstabe ein Kleinbuchstabe (nicht Umlaut) ist, so wird er in einen Großbuchstaben umgewandelt: <br>Beispiel: <tt>vorlage => Vorlage</tt>
+
+=== Reihenfolge der Buttons bzw. Menüeinträge festlegen ===
+<tt>automux</tt> erstellt die Buttons bzw. Menüeinträge in alphabetischer Reihenfolge der Dateinamen, d.h. wenn sie im Dateimanager nach dem Dateinamen alphabetisch sortieren lassen, dann sehen Sie gleich, in welcher Reihenfolge die Menüs, Untermenüs, Menüeinträge und Buttons später in der WollMuxBar erscheinen werden.
+
+Um die Reihenfolge frei festlegen zu können, ohne die Bezeichnungen der Buttons oder Menüeinträge zu verändern, erlaubt der <tt>automux</tt> die Verwendung eines durch Punkt abgetrennten Präfix, das nicht in die Bezeichnung übernommen wird. Das Präfix kann entweder ein einzelner Buchstabe (kein Umlaut) oder eine beliebig lange Ziffernfolge sein.
+;Tip: Es ist empfehlenswert grundsätzlich 2-stellige oder (bei Menüs mit vielen Einträgen) gar 3-stellige Zahlen als Präfix zu verwenden und diese in 10er Schritten zu vergeben (also "10.Eintrag 1", "20.Eintrag 2",...). Dies erlaubt es, später neue Punkte zwischen existierenden Punkten einzufügen, ohne große Umbenennungsaktionen durchführen zu müssen.
+
+=== Hotkeys festlegen ===
+
+====  Großbuchstabe als Hotkey ====
+Wie allgemein üblich lassen sich auch in der WollMuxBar Menüs und Buttons durch Tastenkürzel direkt aufrufen, wenn entsprechende Hotkeys (kenntlich gemacht durch unterstrichene Buchstaben) gedrückt werden. <tt>automux</tt> nimmt den ersten Großbuchstaben (nicht Umlaut) im Dateinamen (hinter einem evtl. vorhandenen Sortierpräfix) als Hotkey. Handelt es sich bei dem Buchstaben nicht um den ersten Buchstaben, so wird er für die Beschriftung des Buttons bzw. Menüpunktes in einen Kleinbuchstaben umgewandelt (siehe [[Standardkonfiguration_des_WollMux#Buttonbeschriftung_bzw._Men.C3.BCeintrag|Beschreibung der Namenskonvertierung]] weiter oben). Zusammen mit dem Umwandlungsschritt, der den ersten Buchstaben nach dem Präfix in einen Großbuchstaben umwandelt, wenn es ein Kleinbuchstabe ist, erlaubt dies, auch Buchstaben in der Mitte von Wörtern als Hotkeys zu bestimmen. Es hat allerdings den Nachteil, dass manchmal ein Buchstabe zu einem Kleinbuchstaben gemacht wird, der eigentlich groß sein sollte. Dies ist aber meist weniger störend als Großbuchstaben innerhalb von Wörtern.
+
+==== Sonderzeichen zum Markieren von Hotkeys ====
+Ab der Version 11.x der Standardkonfiguration unterstützt <tt>automux</tt> auch das Festlegen eines Hotkeys über ein Sonderzeichen. Standardmäßig ist dies die Tilde (~). Wird das Sonderzeichen in einem Dateinamen verwendet, wird der Buchstabe oder die Zahl nach dem Zeichen als Hotkey verwendet.
+
+ 1.Externer ~Briefkopf.ott   # B wird als Hotkey festgelegt
+
+Das Sonderzeichen muss unmittelbar vor dem Hotkey ohne Leerzeichen stehen. Wird das Sonderzeichen mehrfach verwendet, wird nur das letzte verwendet. Wenn die Notwendigkeit besteht, die Tilde (~) in Dateinamen zu verwenden, kann das Sonderzeichen mit der Environment-Variable HKCHAR geändert werden.
+
+ HKCHAR="=" ./run_automux   # verwendet '=' als Sonderzeichen
+
+== Besondere Menüelemente ==
+Neben Menüpunkten und Buttons, die Vorlagen aufrufen, gibt es diverse andere spezielle Elemente, die sich in Menüs und die Buttonleiste einfügen lassen.
+=== Grundprinzip ===
+Spezielle Menüelemente sind Dateien mit besonderen Dateierweiterungen. Die Dateierweiterung entspricht dabei dem Attribut TYPE, wie es in der [[Konfigurationsdatei_wollmux.conf#Das_Attribut_TYPE|entsprechenden Dokumentation zur <tt>wollmux.conf</tt>]] beschrieben ist. Der Rest des Namens ist willkürlich und dient nur der Einordnung in die alphabetische Sortierung der Menüelemente.
+
+Wenn das Menüelement keine zusätzlichen Angaben erfordert (z.B. ein Separator), so ist die Datei leer. Ansonsten sind die zusätzlichen Angaben in der Datei gespeichert und werden von <tt>automux</tt> ohne weitere Verarbeitung direkt übernommen. Auf diese Weise können alle Menüelemente, die der WollMux unterstützt in die WollMuxBar eingebaut werden, auch wenn <tt>automux</tt> dafür keine spezielle Unterstützung bietet.
+
+Die folgenden Abschnitte gehen auf einige der möglichen speziellen Menüelemente näher ein.
+
+=== Abstände: glue ===
+Ein Glue ist ein Abstand der sich dynamisch so weit ausdehnt, wie er kann, ohne dass dazu das Fenster vergrößert werden muss. Glues werden dazu verwendet, Dinge links- bzw. rechtsbündig auszurichten. Die von D-III-ITD-D101 bereitgestellten Archive enthalten z.B. im Verzeichnis <tt>vorlagen/standard</tt> einen Glue. Dieser ist der vorletzte Eintrag vor dem "X" Button  (die entsprechende Datei <tt>90.X.button</tt> ist nicht zu verwechseln mit dem Verzeichis <tt>X.buttons</tt>). Durch seine dynamische Ausdehnung drückt der Glue den "X" Button an das rechte Ende der WollMuxBar-Menüleiste, also dorthin wo sich der "X" Button zum Schließen eines Fensters typischerweise befindet.
+
+=== Separatoren ===
+Ein Separator ist ein Strich, der der optischen Gruppierung von Buttons oder Menüpunkten dient. Ein Separator ist je nach Kontext automatisch horizontal oder vertikal.
+
+=== Spezialbuttons ===
+Die WollMuxLeiste bietet die Möglichkeit, diverse Zusatzfunktion aufzurufen. Diese sind im [[Konfigurationsdatei_wollmux.conf#Das_Attribut_ACTION|entsprechenden Abschnitt]] der Dokumentation der <tt>wollmux.conf</tt> vollständig aufgelistet. Wie weiter oben beschrieben, lassen sich mit Hilfe von Dateien nach dem Muster <tt>*.button</tt> sämtliche dieser Funktionen  über <tt>automux</tt> in die <tt>wollmuxbar_*.conf</tt> einbauen. Im Folgenden sind einige Beispiele für Spezialbuttons aufgeführt, die in den von D-III-ITD-D101 bereitgestellten Archiven der Standardkonfiguration zu finden sind:
+* ''X'': Dieser Button in der rechten oberen Ecke der WollMuxLeiste schließt die WollMuxLeiste. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/90.X.button</tt>.
+* ''Extras/Leiste Schließen'': Selbe Funktion wie der ''X'' Button. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/40.eXtras/70.leiste Schließen.button</tt>.
+* ''Extras/Absenderdaten'': Dieser Button ruft den Absenderauswahl-Dialog auf. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/40.eXtras/10.Absenderdaten.button</tt>.
+* ''Extras/Info'': Dieser Button ruft ein Fenster mit Versionsinformationen über WollMux und WollMuxBar auf. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/40.eXtras/60.Info über Vorlagen und Formulare.button</tt>.
+* ''Extras/Fehlerinfos'': Dieser Button exportiert für das Untersuchen eines WollMux-Problems nötige Informationen in eine Datei, die an ein entsprechendes Ticket angehängt werden kann, um die Bearbeitung zu beschleunigen. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/40.eXtras/30.Fehlerinfos erstellen.button</tt>.
+* ''Extras/KILL'': Dieser Button beendet WollMuxBar und OpenOffice ohne Sicherheitsabfragen. Die zugehörige <tt>.button</tt> Datei ist <br><tt>vorlagen/standard/40.eXtras/40.K I L L.button</tt>.
+(Anmerkung: Der obige Abschnitt wird nicht mit jedem Release aktualisiert. Abweichungen, insbesondere bzgl. der Sortierungspräfixe sind möglich. Wenn Ihnen eine solche Abweichung auffällt, dann teilen Sie uns dies bitte mit.)
+
+=== Absenderauswahl ===
+Die WollMuxBar bietet neben dem "Absender Auswählen" Dialog, der über einen Spezialbutton (siehe weiter oben) aufgerufen wird auch eine Schnellauswahl des Absenders. Diese kann sowohl in die Buttonleiste als auch in die Menüleiste eingebaut werden. In der Buttonleiste erscheint die Schnellauswahl als Combobox und erlaubt die Auswahl des Absenders über ein Pull-Down-Menü. Innerhalb eines Menüs wird die Schnellauswahl als Untermenü dargestellt. Um eine Schnellauswahl an einer Stelle einzubauen, muss nur im entsprechenden Verzeichnis eine leere Datei mit Erweiterung <tt>.senderbox</tt> angelegt werden. Das Verzeichnis <tt>vorlagen/standard/X.buttons</tt> enthält ein Beispiel für so eine Datei.
+
+=== Searchbox ===
+Die Searchbox ist ein Eingabefeld, das den Schnellzugriff auf Menü-Elemente der WollMuxBar erlaubt. Sie kann sowohl in die Buttonleiste als auch in die Menüleiste eingebaut werden. Um die Searchbox an einer Stelle einzubauen, muss nur im entsprechenden Verzeichnis eine leere Datei mit Erweiterung <tt>.searchbox</tt> angelegt werden.
+
+== Verschiedene Menüs für verschiedene Benutzergruppen ==
+Die Aufgabenbereiche der verschiedenen Abteilungen und Sachgebiete innerhalb eines Referats sind sehr verschieden. Deshalb gibt es auch viele Vorlagen, die nur von einem Teil der Sachbearbeiterinnen und Sachbearbeiter benötigt werden. Auch wenn es technisch möglich ist, alle Vorlagen des gesamten Referats in der Menüstruktur der WollMuxBar zu hinterlegen, führt dies doch unter Umständen zu einem sehr überfrachteten Menü und schlechter Usability. Viel günstiger ist es, sinnvolle Benutzergruppen zu bilden und für diese Benutzergruppen jeweils unterschiedliche WollMuxBar-Konfigurationen anzubieten. Bei  Verwendung von Symlinks erfordert dies auch keinen nennenswerten Mehraufwand.
+
+=== Beispiel: Bienchen und Blümchen - Standardmenüs für alle, dazu ein gruppenspezifisches Menü ===
+Die von D-III-ITD-D101 bereitgestellten Archive der Standardkonfiguration enthalten zur Demonstration zwei Benutzergruppen. Das eine ist die Gruppe "Bienchen". Diese stellt den Standardfall dar. Deswegen ist der technische Name dieser Gruppe "standard". Dementsprechend gibt es für diese Gruppe ein Verzeichnis <tt>vorlagen/standard/</tt>, dessen Inhalt den Aufbau und die verfügbaren Vorlagen für die WollMuxBar der Bienchen spezifiziert.
+
+Die zweite Gruppe ist die Gruppe "Blümchen". Diese Gruppe weicht in einigen Punkten vom Standard ab:
+* Die Blümchen verwenden in ihrer Fußzeile das "Total E-Quality" Logo.
+* Die Blümchen sind alle sehbehindert und benötigen daher extra große Schrift.
+* Die Blümchen benötigen spezielle Vorlagen, die die Bienchen nicht verwenden. Dafür benötigen sie die Vorlagen der Bienchen nicht (mit Ausnahme der Standardbriefköpfe).
+
+Wie die beiden ersten Abweichungen realisiert werden wird später erklärt. Hier geht es zunächst nur um den gruppenspezifischen Aufbau der WollMuxBar. Die Spezifikation der WollMuxBar für die Blümchen ist über die Verzeichnisstruktur unter <tt>vorlagen/blümchen</tt> gegeben. Man könnte natürlich die Verzeichnisstruktur von <tt>vorlagen/standard/</tt> einfach kopieren und die nötigen Änderungen in der Kopie durchführen. Dies würde jedoch den Pflegeaufwand unnötig erhöhen. Wenn zum Beispiel eine neue Vorlage in das Menü "Standard" aufgenommen werden soll, so muss dieses bei der Kopiermethode zweimal gemacht werden, einmal pro Gruppe. Neben dem Zusatzaufwand besteht immer die Gefahr, dass bei einer Änderung eine der beiden Gruppen vergessen wird, was dazu führt, dass Menüs, die eigentlich gruppenübergreifend gleich sein sollten (wie z.B. "Standard"), verschiedene Inhalte zeigen, abhängig von der Gruppe.
+
+Die bessere Lösung, für die Blümchen eine abweichende WollMuxBar zu realisieren sind Symlinks. Die von D-III-ITD-D101 bereitgestellten Archive demonstrieren dies. Wenn Sie in das Verzeichnis <tt>vorlagen/standard/</tt> schauen, sehen Sie für jedes Menü der WollMuxBar ein Verzeichnis. Wenn Sie dies mit dem Verzeichnis <tt>vorlagen/blümchen/</tt> vergleichen, dann sehen Sie, dass in letzterem nur für das Menü "Blümchen" ein richtiges Verzeichnis existiert. Für die anderen Menüs (mit Ausnahme des Menüs "Bienchen", das die Blümchen nicht benötigen) existieren stattdessen Symlinks auf die entsprechenden Verzeichnisse in <tt>vorlagen/standard/</tt>. So wird erreicht, dass Änderungen an einem der Standard-Menüs sich automatisch auf beide Gruppen auswirken. Zusätzlicher Wartungsaufwand für die zweite Gruppe wird dadurch fast vollständig vermieden. Nur wenn sich der Name eines Menüs ändert oder neue Menüs hinzukommen, die beide Gruppen haben sollen, sind Anpassungen der Symlinks in <tt>vorlagen/blümchen/</tt> erforderlich.
+
+== Externe Anwendungen aus der WollMuxBar starten ==
+Aus der WollMuxBar heraus können beliebige externe Anwendungen gestartet werden. Dies ist sehr nützlich, um den Benutzerinnen und Benutzern aus einer einheitlichen Oberfläche heraus Zugriff auf alle Ressourcen zu bieten, die sie für die tägliche Arbeit brauchen. Besonders nützlich in diesem Zusammenhang ist das Einbinden von Links auf Webseiten und PDF-Formulare, da einige der bisherigen MS Office Vorlagen im Zuge der Migration nicht mehr als Vorlagen, sondern als PDF-Formulare oder Webanwendungen umgesetzt werden. Die technischen Details zur Einbindung externer Anwendungen, sind in der [[Konfigurationsdatei_wollmux.conf#ExterneAnwendungen|Dokumentation der <tt>wollmux.conf</tt>]] beschrieben. Im Folgenden wird nur auf die Beispiele aus den von D-III-ITD-D101 bereitgestellten Archiven näher eingegangen.
+
+=== Beispiel: PDF-Formulare im Acrobat Reader starten ===
+Wenn Sie die WollMuxBar aufrufen für eine unangepasste Standardkonfiguration, so wie sie von D-III-ITD D.101 zur Verfügung gestellt wird, dann gibt es dort das Menü "Bienchen". In diesem findet sich der Menüpunkt "Arbeitsbienchen-Anforderung (PDF-Formular)". Wenn Sie diesen Menüpunkt auswählen, dann sollte der Acrobat Reader starten und das Formular "Arbeitsbienchen-Anforferung" zum Ausfüllen öffnen. Auf dem Basisclient funktioniert dies ohne weitere Maßnahmen. Ob es unter Windows gleich funktioniert, hängt davon ab, ob der Acrobat Reader installiert ist und wenn ja, in welchem Verzeichnis.
+
+Der Schlüssel zum erfolgreichen Start des Acrobat Reader findet sich in der <tt>referat.conf</tt>. Wenn Sie die Datei öffnen, dann sehen Sie darin den [[Konfigurationsdatei_wollmux.conf#ExterneAnwendungen|Abschnitt ''ExterneAnwendungen'']] und darin einen Eintrag der mit <tt>(EXT ("pdf","PDF")</tt> beginnt. Dieser Eintrag stellt die Verbindung her zwischen der Dateierweiterung ".pdf" (bzw. ".PDF", das extra aufgeführt ist, da hier zwischen Groß- und Kleinschrift unterschieden wird.) und der Anwendung Acrobat Reader. Der Abschnitt enthält eine Liste von möglichen Programmaufrufen, die der Reihe nach durchprobiert werden, bis einer davon zum Ziel führt. Aufrufe ohne vollständige Pfadangabe werden dabei wie üblich mit der Umgebungsvariable PATH aufgelöst.
+
+Wenn im Abschnitt ''ExterneAnwendungen'' ein korrekter Aufrufpfad für den Acrobat Reader enthalten ist, dann ist das Einbinden von PDF-Formularen in die WollMuxBar ein Kinderspiel. Es funktioniert genau wie das Einbinden von OpenOffice.org Vorlagen, indem einfach die <tt>.pdf</tt> Datei (oder ein Symlink darauf) in das entsprechende Verzeichnis kopiert und dann <tt>run_automux</tt> gestartet wird. Im konkreten Beispiel hier, befindet sich die Datei <tt>Arbeitsbienchen-Anforderung (PDF-Formular).pdf</tt> im Verzeichnis <tt>vorlagen/standard/30.Bienchen/</tt>, damit sie im Menü "Bienchen" erscheint.
+
+Mit der selben Methode können Sie auch für andere Dateierweiterungen externe Anwendungen definieren und dann entsprechende Dateien über die WollMuxBar verfügbar machen. Beachten Sie jedoch, dass dies nur für Dateierweiterungen funktioniert, für die <tt>automux</tt> nicht bereits eine Anwendung vorgesehen hat. Zum Beispiel ist es ''nicht'' möglich, über diesen Mechanismus <tt>.dot</tt> Dateien mit MS Word zu verknüpfen, da <tt>automux</tt> diesen Dateityp bereits mit OpenOffice.org assoziiert.
+
+=== Beispiel: URLs im Web-Browser aufrufen ===
+Das Aufrufen einer Webseite unterscheidet sich vom Aufruf von Office-Vorlagen und PDF-Dateien grundlegend. Im Falle einer Webseite wäre es normalerweise nicht sinnvoll, die HTML-Dateien (oder Symlinks darauf) direkt in die Verzeichnisstruktur der Standardkonfiguration zu legen, damit <tt>run_automux</tt> diese erfassen kann. Stattdessen wird eine <tt>.button</tt> Datei angelegt, wie im [[Standardkonfiguration_des_WollMux#Spezialbuttons|Abschnitt "Spezialbuttons"]] beschrieben. Diese <tt>.button</tt> Datei verwendet die [[Konfigurationsdatei_wollmux.conf#Das_Attribut_ACTION|ACTION "openExt"]], um den WollMux anzuweisen, dass eine externe Anwendung zu starten ist. Die <tt>.button</tt> Datei enthält auch die URL des Dokuments bzw. der Webseite, die mit der Anwendung geöffnet werden soll. Die von D-III-ITD-D101 bereitgestellten Archive enthalten zur Demonstration eine solche <tt>.button</tt> Datei, die einen Knopf ergibt, der das LiMux-Wiki aufruft. Die Datei ist zu finden unter dem Pfad
+ vorlagen/standard/35.LiMux/LiMux-Wiki.button 
+
+Der korrekte Aufruf des Webbrowsers wird über den [[Konfigurationsdatei_wollmux.conf#ExterneAnwendungen|Abschnitt ''ExterneAnwendungen'']] eingerichtet, der bereits im Zusammenhang mit dem Verfügbarmachen des Acrobat Reader zum [[Standardkonfiguration_des_WollMux#Beispiel:_PDF-Formulare_im_Acrobat_Reader_starten|Einbinden von PDFs in die WollMuxBar]] besprochen wurde. Wenn Sie sich den Beispiel-Eintrag in der <tt>referat.conf</tt> der von D-III-ITD-D101 bereitgestellten Archive ansehen, dann werden Ihnen 2 Unterschiede zum Eintrag für den Acrobat Reader auffallen:
+* Als EXT-Attribut ist "http:" angegeben. Da dies keine korrekte Dateierweiterung darstellt, werden auf diese Weise potentielle Überschneidungen mit externen Anwendungen vermieden, für die es eine Dateiendung gibt (wie z.B. PDF).
+* Das DOWNLOAD-Attribut hat den Wert "false". Dies sorgt dafür, dass die URL direkt an die externe Anwendung weitergegeben wird, anstatt sie herunterzuladen und als temporäre Datei zu speichern (wie dies bei PDF notwendig ist).
+
+Auf dem Basisclient funktioniert das Aufrufen von Webseiten aus der WollMuxBar mit den Angaben aus der Beispiel-<tt>referat.conf</tt> standardmäßig. Ob es unter Windows funktioniert, hängt davon ab, ob und in welchem Verzeichnis Firefox installiert ist. Um Firefox (oder einen  anderen Browser) verfügbar zu machen, ist es am einfachsten, eine Batch-Datei <tt>sensible-browser.bat</tt> in einem Verzeichnis anzulegen, das im PATH steht. In dieser Batch-Datei können dem Browser auch entsprechende Kommandozeilenparameter übergeben werden, die z.B. die URL in einem Tab anstatt in einem neuen Fenster öffnen.
+
+== Multi-Form: zusammengehörige Formulare gemeinsam ausfüllen ==
+Es gibt manchmal die Situation, dass zu einem Vorgang mehrere Formulare gehören, in denen teilweise die selben Daten benötigt werden. Es ist ein unnötiger Mehraufwand, wenn die Sachbearbeiterin bzw. der Sachbearbeiter die Daten mehrfach eingeben muss. Mit Multi-Forms kann dies zumindest dort vermieden werden, wo bekannt ist, welche Vorlagen oft gemeinsam ausgefüllt werden müssen und sich diese sinnvoll gruppieren lassen.
+
+=== Multi-Forms aus Benutzersicht ===
+Für den Endbenutzer stellt sich ein Multiform wie folgt dar
+* Es gibt ein Untermenü in der WollMuxBar, das typischerweise nach dem Vorgang benannt ist, zu dem es mehrere Formulare gibt, die man evtl. gemeinsam ausfüllen möchte.
+* In dem Untermenü befinden sich normale Menüeinträge für die einzelnen zu dem Vorgang gehörigen Formulare. Über diese lassen sich die entsprechenden Formulare ganz normal aufrufen.
+* Zusätzlich gibt es einen besonderen Menüpunkt, typischerweise mit einer Bezeichnung wie "Mehrere Ausfüllen" o.ä.
+* Wird der Menüpunkt "Mehrere Ausfüllen" angewählt, so öffnet sich ein Dialogfenster, in dem der Benutzer mittels Checkboxen die Formulare auswählen kann, die er gemeinsam ausfüllen möchte.
+* Nachdem der Benutzer die Formulare ausgewählt hat, werden die entsprechenden Vorlagen geöffnet. Anstatt einer eigenen Formular-GUI für jedes einzelne Formular wird jedoch nur eine Formular-GUI geöffnet, über die alle Formulare gleichzeitig ausgefüllt werden.
+
+Die von D-III-ITD-5.1 bereitgestellten Archive enthalten zur Demonstration ein Multi-Form "Abtretungserklärung", das sie im Menü "Formulare" finden. Dieses Multi-Form demonstriert, wie die altbekannte Abtretungserklärung (die weiterhin als "Abtretungserklärung (monolithisch)" verfügbar ist) als Multi-Form realisiert werden kann.
+
+=== Multi-Forms aus Administratorsicht ===
+Der wichtigste Schritt ist, die einzelnen Formulare, für die gemeinsames Ausfüllen möglich sein soll, entsprechend vorzubereiten. Die Anforderungen an die Einzelvorlagen eines Multi-Forms finden Sie in der Beschreibung des [[Schnittstellen_des_WollMux_f%C3%BCr_Experten#wollmux:Open|Dispatch-Kommandos  wollmux:Open]] in der Dokumentation der [[Schnittstellen des WollMux für Experten]].
+
+Das Aufnehmen von Multi-Forms in die WollMuxBar ist mit <tt>automux</tt> ganz einfach. Sie erstellen einfach ein Verzeichnis, dessen Namen die Erweiterung <tt>.multi</tt> hat. Aufbau und Inhalt des Verzeichnisses sind genau gleich wie bei den Verzeichnissen für WollMuxBar-Untermenüs, d.h. sie legen in dem Verzeichnis normalerweise Symlinks auf die entsprechenden Vorlagen ab. Allerdings erstellt <tt>automux</tt> aus so einem <tt>.multi</tt> Verzeichnis kein Untermenü, sondern einen Aufruf des Dialogs zur Auswahl der gemeinsam auszufüllenden Vorlagen.
+
+Die von D-III-ITD-5.1 bereitgestellten Archive enthalten im Verzeichnis <tt>vorlagen/standard/2.Formulare/50.Abtretungserklärung</tt> ein Verzeichnis mit dem Namen <tt>X.Mehrere&nbsp;Ausfüllen.multi</tt>, das dieses Prinzip demonstriert. Das "X." am Anfang des Namens ist dabei nur ein normales Sortierpräfix, das dafür sorgt, dass der Eintrag am Ende der Liste (insbes. hinter dem Separator mit Sortierpräfix "W.") erscheint. Dieses Beispiel zeigt auch deutlich, dass das <tt>.multi</tt> Verzeichnis nur für den "Mehrere Ausfüllen" Menüeintrag verantwortlich ist. Es führt nicht automatisch dazu, dass ein Untermenü mit den entsprechenden Vorlagen angelegt wird. Das heißt, wenn wie im Beispiel der Abtretungserklärung eine Vorlage auch einzeln aufrufbar sein soll, dann muss diese Vorlage im Verzeichnisbaum zweimal vorkommen. In diesem Beispiel ist die Vorlage "<tt>Abtretungserklärung bei Gewährung der Kaution als Darlehen.ott</tt>" einmal als normale Datei im Verzeichnis <tt>50.Abtretungserklärung</tt> zu finden und einmal als Symlink im Verzeichnis <tt>50.Abtretungserklärung/X.Mehrere&nbsp;Ausfüllen.multi</tt>.
+
+= Gruppenspezifische Konfigurationseinstellungen =
+Es ist manchmal notwendig, für bestimmte Benutzergruppen spezielle Konfigurationseinstellungen vorzunehmen. Die Standardkonfiguration sieht hierfür die Dateien <tt>conf/referat_<gruppe>.conf</tt> vor. In diesen Dateien werden die selben Einstellungen vorgenommen, die typischerweise in der <tt>referat.conf</tt> vorgenommen werden, allerdings werden diese Einstellungen nur für die Benutzergruppe <tt><gruppe></tt> verwendet. <tt><gruppe></tt> entspricht dabei dem Namen eines Unterverzeichnisses in <tt>vorlagen/</tt>, d.h. <tt>run_automux</tt> erstellt eine Datei <tt>wollmuxbar_<gruppe>.conf</tt>. In letztere fügt <tt>run_automux</tt> auch automatisch einen <tt>%include</tt>-Befehl für <tt>referat_<gruppe>.conf</tt> ein, jedoch nur, wenn diese Datei existiert. Anders als <tt>wollmuxbar_<gruppe>.conf</tt> wird die <tt>referat_<gruppe>.conf</tt> ''nicht'' automatisch angelegt.
+
+Die von D-III-ITD-D101 bereitgestellten Archive enthalten zur Illustration für die Gruppe "blümchen" eine Datei <tt>referat_blümchen.conf</tt>. Diese legt mittels <tt>FONT_ZOOM</tt> größere Schriftarten für die WollMux-Dialoge fest, wie man dies für eine Gruppe mit sehbehinderten Benutzern tun würde.
+
+= Textfragmente =
+Textfragmente, oft auch kurz nur als "Fragmente" bezeichnet, sind eine wesentliche Grundlage für die Flexibilität des Briefkopfsystems des WollMux. Früher wurden die Briefköpfe oft vollständig in den Vorlagen direkt hinterlegt. Die Anpassung kleiner Aspekte wie des Münchner Kindl Logos erfordert bei so einem System, dass ''alle'' Vorlagen bearbeitet werden. Der WollMux dagegen setzt seine Briefköpfe aus verschiedenen Einzeldateien zusammen. Diese Dateien sind die Textfragmente. Jedes Textfragment ist dabei eine eigene Vorlage im OpenDocument-Format und wird wie eine ganz normale Vorlage mit OpenOffice.org erstellt und einzeln gepflegt. Erst wenn eine WollMux-Vorlage geöffnet wird, fügt der WollMux die entsprechenden Textfragmente ein, wodurch der Briefkopf entsteht.
+
+Ein Vorteil dieses Systems ist es, dass Änderungen am Briefkopf vorgenommen werden können, ohne alle Vorlagen bearbeiten zu müssen. Um dies zu erreichen, würde es allerdings ausreichen, den Briefkopf als Ganzes in ein Fragment auszulagern. In der Standardkonfiguration dagegen sind die Briefköpfe weiter unterteilt in kleine Einzelfragmente. Zum Beispiel steht das Logo für die Fußzeile in einer eigenen Datei. Diese Aufteilung erlaubt es, einzelne Aspekte des Briefkopfes für verschiedene Benutzergruppen anders zu gestalten, während die gemeinsamen Aspekte weiterhin einheitlich gepflegt werden. Dies reduziert den Aufwand für die Wartung und Test und senkt das Fehlerrisiko.
+
+Eine detaillierte Erklärung des Prinzips "Textfragmente" finden Sie auf der Seite [[Textfragmente im WollMux]]. Im Folgenden wird beschrieben, wie die Liste der Textfragmente in einer Standardkonfiguration administriert wird und wie unterschiedliche Briefköpfe für verschiedene Benutzergruppen realisiert werden.
+
+== Das Verzeichnis <tt>vorlagen/fragmente</tt> ==
+Die im Verzeichnis <tt>vorlagen/fragmente</tt> enthaltenen Dateien sind die Fragmente aus denen die Standardbriefköpfe dynamisch zusammengesetzt werden. Änderungen an den Standardbriefköpfen schlagen sich immer in Änderungen dieses Verzeichnisses nieder. Die Dateien im Verzeichnis <tt>vorlagen/fragmente</tt> werden ausschließlich zentral gepflegt. Die Referate sollten keine der in diesem Verzeichnis enthaltenen Dateien bearbeiten und auch keine eigenen Dateien in diesem Verzeichnis anlegen. Ansonsten kann das Skript <tt>xupdate</tt> zum automatisierten Update der Konfiguration nicht mehr verwendet werden.
+
+Die Referate dürfen für ihre eigenen Fragmente beliebige Unterverzeichnisse im Verzeichnis <tt>vorlagen/fragmente</tt> anlegen, solange die Namen dieser Unterverzeichnisse keine Dateierweiterung besitzen. Das Verzeichnis <tt>vorlagen/fragmente/beispiele</tt> ist ein Beispiel dafür, wie ein solches Unterverzeichnis verwendet werden kann, um dort Textbausteine zu hinterlegen.
+
+Wie bereits im [[Standardkonfiguration_des_WollMux#Warum_sind_Symlinks_n.C3.BCtzlich_.3F|Abschnitt zur Nützlichkeit von Symlinks]] erwähnt, ist es empfehlenswert, Vorlagen die an mehreren Stellen in der Menüstruktur oder von mehreren Benutzergruppen verwendet werden, in einem Unterverzeichnis von <tt>vorlagen/fragmente/</tt> zu hinterlegen und an  den Stellen, wo die Vorlage verwendet wird entsprechende Symlinks anzulegen.
+
+== Die Bedeutung der ?.insertFrag Verzeichnisse ==
+Intern verwaltet der WollMux Fragmente nicht direkt als Dateipfade oder URLs sondern über abstrakte Bezeichner, die zur Laufzeit in den entsprechenden Pfad der Vorlage übersetzt werden. Nur so ist es möglich, eine Vorlage zu erstellen, die den  externen Briefkopf importiert, ohne dessen Pfad fest in der Vorlage zu hinterlegen.
+Zu jeder Benutzergruppe <tt><gruppe></tt> existiert ein Verzeichnis <tt>vorlagen/<gruppe>/</tt>. In diesem Verzeichnis sind immer ein oder mehrere Verzeichnisse nach dem Muster <tt>?.insertFrag</tt> (z.B. <tt>X.insertFrag</tt>), wobei ? ein beliebiges Zeichen ist. Anders als die Präfixe für Menü-Verzeichnisse dient dieses Zeichen ''nicht'' zur Sortierung und es ist auch tatsächlich nur genau ein Zeichen erlaubt, keine mehrstelligen Zahlenpräfixe. 
+
+Die <tt>?.insertFrag</tt>-Verzeichnisse enthalten Symlinks auf Dateien im Ordner <tt>vorlagen/fragmente</tt> bzw. im Falle referatseigener Fragmente auf Dateien in Unterordnern davon. Den Namen dieser Symlinks kommt besondere Bedeutung zu, denn sie werden (abzüglich der Endung <tt>.ott</tt>) als eben jene weiter oben erwähnten abstrakten Fragment-Bezeichner verwendet, über die WollMux-Vorlagen die entsprechenden Dateien referenzieren. Das Beispiel des externen Briefkopfs soll dies verdeutlichen:
+
+* Eine Mischvorlage ist eine Vorlage, die ihren Briefkopf nicht fest verdrahtet enthält, sondern ihn dynamisch einmischt. Alle Vorlagen sollten als Mischvorlagen realisiert werden, wenn nicht außergewöhnliche Gründe, die eine Abweichung vom städtischen Erscheinungsbild erfordern, dagegen sprechen.
+* Wenn man eine Mischvorlage mit externem Briefkopf zum Bearbeiten öffnet (auf dem Basisclient z.B. durch Rechts-Klick im Dateimanager und Auswahl von "Vorlage bearbeiten"; ansonsten in OpenOffice.org über ''Datei/Dokumentvorlage/Bearbeiten...''), dann sieht man in ihr keinen Briefkopf.
+* Wenn man jedoch in OpenOffice.org den Navigator öffnet (''Bearbeiten/Navigator'') und sich die Textmarken anschaut, findet man dort eine Textmarke mit der Bezeichnung<br><tt>WM(CMD 'insertFrag' FRAG_ID 'externerBriefkopf')</tt>.
+* Diese spezielle Textmarke weist den WollMux an, beim Öffnen dieser Mischvorlage das Textfragment mit dem abstrakten Bezeichner "externerBriefkopf" einzumischen.
+* Würde man die WollMux-Konfiguration von Hand schreiben, dann könnte man durch einen entsprechenden Eintrag diesen abstrakten Bezeichner auf eine beliebige URL verweisen lassen. Bei einer Standardkonfiguration, die mit <tt>automux</tt> gepflegt wird übernimmt jedoch <tt>automux</tt> das Anlegen der Einträge für die abstrakten Bezeichner.
+* <tt>automux</tt> legt für jeden Symlink in einem <tt>?.insertFrag</tt> Verzeichnis einen Eintrag an. Wenn Sie in die Verzeichnisse <tt>vorlagen/standard</tt> und <tt>vorlagen/blümchen</tt> der von D-III-ITD-D101 bereitgestellten Standardkonfigurationsarchive schauen, sehen Sie dort jeweils ein Verzeichnis <tt>X.insertFrag</tt>. Beide <tt>X.insertFrag</tt> Verzeichnisse (technisch gesehen, ist es nur ein Verzeichnis, da das <tt>X.insertFrag</tt> der Gruppe blümchen nur ein Symlink auf das <tt>X.insertFrag</tt> von standard ist) enthalten einen Symlink <tt>externerBriefkopf.ott</tt>. Aus diesem Symlink macht <tt>automux</tt> einen entsprechenden Konfigurationseintrag für den abstrakten Bezeichner "externerBriefkopf".
+* Zu beachten ist, dass diese Einträge in der <tt>wollmuxbar_<gruppe>.conf</tt> gespeichert werden, also gruppenspezifisch sind. Hätte die Gruppe Blümchen einen anderen Symlink <tt>externerBriefkopf.ott</tt>, dann würde ein Benutzer der Gruppe Blümchen beim Öffnen der ''selben'' Mischvorlage einen anderen Briefkopf eingemischt bekommen. Auf die Möglichkeiten, die sich dadurch ergeben wird weiter unten noch anhand von Praxisbeispielen eingegangen.
+* Wenn man das Fragment des externen Briefkopfs zum Bearbeiten öffnet (wahlweise über einen der <tt>externerBriefkopf.ott</tt> Symlinks oder die eigentliche Fragmentdatei <tt>fragmente/WOL_Briefkopf-extern_v1_2005-12-19.ott</tt>), dann sieht man, dass er einige Lücken enthält. Zum Beispiel steht in der Fußzeile nur der Platzhaltertext "<Fusszeile>".
+* Schaut man im Navigator wieder die Textmarken an, dann sieht man dort die Textmarke<br><tt>WM(CMD 'insertFrag' FRAG_ID 'Fusszeile')</tt>.
+* Diese Textmarke funktioniert genau so wie die weiter oben erklärte für den abstrakten Bezeichner "externerBriefkopf" und wieder gibt es im <tt>X.insertFrag</tt> Verzeichnis einen entsprechenden Symlink <tt>Fusszeile.ott</tt>.
+;Hinweis: Wenn der WollMux beim Öffnen einer Vorlage eine Popup-Meldung "Fehler bei der Dokumentbearbeitung" bringt, dann kann ein fehlendes Fragment die Ursache sein. Sehen Sie entweder in der <tt>wollmux.log</tt> nach oder schauen Sie im Dokument nach einem "<FEHLER:>" Marker und lassen Sie die Maus über dem zugehörigen Kommentarfeld schweben. Dort erfahren Sie näheres darüber, um welches Fragment es geht. Vergessen Sie auch nicht, nach dem Ändern eines der <tt>?.insertFrag</tt> Verzeichnisse immer <tt>run_automux</tt> laufen zu lassen.
+;Achtung: Die Verwaltung der Fragmente liegt in der WollMux-Komponente von OpenOffice.org, ''nicht'' in der WollMuxBar. Die WollMuxBar zu schließen reicht also ''nicht'' aus (und ist sogar gar nicht notwendig), damit eine geänderte Konfiguration der Fragmente Wirkung zeigt. Es müssen ''alle'' OpenOffice.org Prozesse (Prozessname <tt>soffice.bin</tt>) beendet werden, bevor die neue Konfiguration effektiv wird. Beachten Sie, dass auch nach Schließen aller OOo Fenster noch unsichtbare <tt>soffice.bin</tt> Prozesse aktiv sein können. Das Verwenden des Taskmanagers ist also ratsam.
+
+=== Beispiel: Eine Benutzergruppe soll ein anderes Logo in der Fußzeile haben ===
+Ein häufiger Anwendungsfall ist, dass verschiedene Benutzergruppen verschiedene Logos in der Fußzeile benötigen. Für dieses Beispiel gehen wir davon aus, dass die Gruppe Blümchen in ihren Briefköpfen das Total E-Quality Logo verwenden möchte, während der Standard weiterhin das WollMux-Logo ist. Das Prinzip der Aufteilung des Briefkopfs in viele Einzelfragmente kombiniert mit der Möglichkeit, mehrere <tt>?.insertFrag</tt> Verzeichnisse zu haben, erlaubt es, diese Anforderung mit minimalem Wartungsaufwand umzusetzen. Im Folgenden sind die notwendigen Schritte dafür aufgezeigt. In den von D-III-ITD-D101 bereitgestellten Archiven sind diese bereits umgesetzt, so dass bei Verwendung von <tt>wollmuxbar_blümchen.conf</tt> das Endergebnis bereits betrachtet werden kann.
+
+* Der erste Schritt ist die Identifizierung des entsprechenden Fragments. Wenn dies nicht anhand der Dateinamen offensichtlich ist, kann es durch Nachverfolgen der <tt>insertFrag</tt> Textmarken mit dem Navigator, ausgehend vom externen Briefkopf, bestimmt werden. In diesem Fall ist das betroffene Fragment bereits am Namen deutlich erkennbar: <tt>Logo.ott</tt>.
+* Als nächstes müssen die Voraussetzungen dafür geschaffen werden, dass beide Benutzergruppen unterschiedliche Logo-Fragmente verwenden. 
+** Um den Wartungsaufwand gering zu halten und um Fehlern vorzubeugen, ist es ratsam, mit Hilfe von Symlinks ganze Verzeichnisse der Standard-Benutzergruppe für andere Benutzergruppen zu übernehmen. Im Fall der Gruppe Blümchen ist zum Beispiel <tt>vorlagen/blümchen/X.insertFrag</tt> ein Symlink auf <tt>vorlagen/standard/X.insertFrag</tt>, so dass die Gruppe Blümchen automatisch die Fragmente der Standard-Gruppe Bienchen übernimmt, ohne dass zusätzlicher Pflegeaufwand anfällt.
+** Im Falle des Logo-Fragments benötigen wir jedoch eine Ausnahme, denn dieses soll die Gruppe Bienchen eben gerade nicht von der Standard-Gruppe übernehmen. Deswegen darf <tt>Logo.ott</tt> ''nicht'' im gemeinsamen Verzeichnis <tt>X.insertFrag</tt> stehen. 
+** Zum Glück ist es möglich, mehrere Verzeichnisse nach dem Muster <tt>?.insertFrag</tt> zu haben. Deswegen erstellen wir einfach ein Verzeichnis <tt>vorlagen/standard/Y.insertFrag/</tt> und ein Verzeichnis <tt>vorlagen/blümchen/Y.insertFrag/</tt>. Dieses Mal verwenden wir anders als bei <tt>X.insertFrag</tt> tatsächlich unabhängige Verzeichnisse. 
+** Diese Konstruktion erlaubt es uns, gemeinsam genutzte Fragmente weiterhin in dem gemeinsam genutzten Verzeichnis <tt>X.insertFrag</tt> zu halten und dadurch weiterhin den Vorteil des niedrigeren Wartungsaufands zu haben. Gleichzeitig können wir Fragmente, die sich zwischen den beiden Gruppen unterscheiden in den <tt>Y.insertFrag</tt> Verzeichnissen halten.
+* Im Verzeichnis <tt>standard/Y.insertFrag/</tt> erstellen wir nun einen Symlink auf <tt>vorlagen/fragmente/Logo.ott</tt>, im Verzeichnis <tt>blümchen/Y.insertFrag/</tt> dagegen verlinken wir <tt>vorlagen/fragmente/Logo_total_equality.ott</tt>. Dabei nicht vergessen, die entsprechenden Symlinks im Verzeichnis <tt>X.insertFrag</tt> zu löschen.
+* Damit das Ganze funktioniert, muss der Symlink wieder den ursprünglichen Namen haben. Deshalb muss der Symlink <tt>Logo_total_equality.ott</tt> in <tt>Logo.ott</tt> umbenannt werden, da die entsprechende FRAG_ID immer noch auf diesen Namen lautet.
+* Am Ende wird noch <tt>run_automux</tt> aufgerufen, damit die Änderungen in die <tt>wollmuxbar_<gruppe>.conf</tt> Dateien  geschrieben werden.
+* Nach dem Beenden und Neustart von OpenOffice.org haben nun Benutzer der <tt>wollmuxbar_blümchen.conf</tt> beim Aufruf des externen Briefkopfes das Total-E-Quality Logo.
+;Achtung: Die Verwaltung der Fragmente liegt in der WollMux-Komponente von OpenOffice.org, ''nicht'' in der WollMuxBar. Die WollMuxBar zu schließen reicht also ''nicht'' aus (und ist sogar gar nicht notwendig), damit eine geänderte Konfiguration der Fragmente Wirkung zeigt. Es müssen ''alle'' OpenOffice.org Prozesse (Prozessname <tt>soffice.bin</tt>) beendet werden, bevor die neue Konfiguration effektiv wird. Beachten Sie, dass auch nach Schließen aller OOo Fenster noch unsichtbare <tt>soffice.bin</tt> Prozesse aktiv sein können. Das Verwenden des Taskmanagers ist also ratsam.
+
+=== Beispiel: Eine Benutzergruppe soll nur die Orga-E-Mail-Adresse im Briefkopf haben ===
+In diesem Anwendungsfall ist es erforderlich, dass eine Benutzergruppe im externen Briefkopf nur die E-Mail-Adresse der Orga-Einheit und nicht die persönliche hat.
+
+Eine Möglichkeit dies zu realisieren, die gleichzeitig die Flexibilität bietet, dies auf Fallbasis zu tun, wäre die Verwendung von ''Rollen''. Wird über die WollMuxBar ''Extras/Absenderdaten/Bearbeiten...'' der Dialog zur Bearbeitung der persönlichen Absenderliste aufgerufen, so kann dort über den Button "Kopieren" eine Kopie des eigenen Eintrags angelegt werden. Dieser erhält automatisch die Rolle "Kopie". Die Rolle kann im über den ''Bearbeiten..'' Button aufgerufenen Dialog auf eine bessere Bezeichnung geändert werden. Im ''Bearbeiten...'' kann auch die persönliche Mailadresse so geändert werden, dass sie der der Orga-Einheit entspricht. Verwendet die Sachbearbeiterin oder der Sachbearbeiter den Absendereintrag mit der neuen Rolle, so wird in aufgerufenen Briefköpfen statt der persönlichen E-Mail-Adresse die der Orga-Einheit eingefügt.
+
+Obige Lösung ist mit Aufwand für die Einzelbenutzer verbunden und birgt die Gefahr, dass die Rollen durcheinandergebracht werden. Möchte man bei einer Benutzergruppe grundsätzlich für den externen Briefkopf immer die Orga-E-Mail statt der persönlichen verwenden, dann lässt sich dies auch über den schon im vorigen Beispiel beschriebenen <tt>?.insertFrag</tt> Mechanismus realisieren. Die notwendigen Schritte sind die selben wie im [[Standardkonfiguration_des_WollMux#Beispiel:_Eine_Benutzergruppe_soll_ein_anderes_Logo_in_der_Fu.C3.9Fzeile_haben|Beispiel des benutzergruppenspezifischen Logos]] und werden hier deshalb nur noch sehr kurz umrissen. In den von D-III-ITD-D101 bereitgestellten Archiven ist dieses Beispiel nicht umgesetzt.
+
+* Identifikation der betroffenen Fragmente: Für die E-Mail-Adresse gibt es mehrere Fragmente, die von verschiedenen Vorlagen verwendet werden. Zum Beispiel verwendet die Kurzmitteilung das Fragment mit Bezeichner "Email_kurzm". Der externe Briefkopf verwendet das Fragment mit Bezeichner "Email".
+* Aus <tt>X.insertFrag</tt> entfernen: Wenn wie im Beispiel von den Bienchen und den Blümchen das Verzeichnis <tt>X.insertFrag</tt> gemeinsam genutzt wird, dann müssen die entsprechenden im vorigen Schritt identifizierten Symlinks aus <tt>X.insertFrag</tt> entfernt werden.
+* In <tt>Y.insertFrag</tt> anlegen: Für die im vorigen Schritt entfernten Symlinks müssen neue Symlinks (mit den gleichen, ursprünglichen Namen) in den <tt>Y.insertFrag</tt> Verzeichnissen angelegt werden (davon ausgehend, dass <tt>Y.insertFrag</tt> unabhängige Verzeichnisse sind, wie bei den Bienchen und Blümchen). Standardmäßig verweisen alle Email-Fragmente auf die Datei <tt>vorlagen/fragmente/WOL_Briefkopf-Fragment-Email_2006-02-21.ott</tt>. Diese Datei enthält einen WollMux-Befehl zum Einfügen der persönlichen E-Mail-Adresse. Daneben gibt es noch das Fragment <tt>vorlagen/fragmente/OrgaEMail.ott</tt>. Dieses fügt die Orga-E-Mail-Adresse ein. Werden in <tt>Y.insertFrag</tt> entsprechende Symlinks auf diese Fragmentdatei eingerichtet, dann erscheint in den betroffenen Briefköpfen die Orga-E-Mail anstatt der persönlichen.
+
+=== Beispiel: Neue Mischvorlage erstellen ===
+Dieses Beispiel hat nicht direkt mit der Standardkonfiguration zu tun, sondern dient nur dazu, zu demonstrieren, wie einfach sich Vorlagen erstellen lassen, die einen der Standardbriefköpfe enthalten. Um eine Vorlage zu erstellen, die dynamisch den externen Briefkopf in der jeweils aktuellen Form einfügt und automatisch mit den Sachbearbeiterdaten befüllt gehen Sie wie folgt for:
+* Starten Sie die WollMuxBar
+* Rufen Sie ''Standard/Mischvorlagen/Mischvorlage externer Briefkopf'' auf.
+* Es öffnet sich eine "Vorlage für Vorlagen". Lesen Sie den Erklärungstext in dieser Vorlage.
+* Fügen Sie den gewünschten Text für die neue Vorlage ein. Beachten Sie dabei den [[:Category:Leitfaden zum Dokumentenaustausch zwischen MSO und OOo|Leitfaden zum Dokumentenaustausch zwischen MSO und OOo]].
+* Speichern Sie die Vorlage als "OpenDocument Textdokumentvorlage" mit der Dateierweiterung <tt>.ott</tt>.
+* Fertig. Wenn Sie diese Vorlage öffnen (z.B. durch Doppelklick im Dateimanager), wird der externe Briefkopf automatisch eingemischt und mit den korrekten Sachbearbeiterdaten befüllt.
+;Achtung: Um eine Mischvorlage zu bearbeiten, ''muss'' diese korrekt als Vorlage geöffnet werden. Verwenden Sie dafür entweder auf dem Basisclient im Dateimanager ''Rechts-Klick/Vorlage bearbeiten'' oder in OpenOffice.org den Menüpunkt ''Datei/Dokumentvorlage/Bearbeiten...''<br>Es gibt eine ganz einfache Merkregel: Wenn in dem OpenOffice.org Fenster, das Sie vor sich haben ein Briefkopf angezeigt wird, dann dürfen Sie es ''unter keinen Umständen'' als Vorlage speichern. Es verliert sonst dauerhaft die Fähigkeit den Briefkopf dynamisch einzumischen und mit Sachbearbeiterdaten zu befüllen. Sehen Sie dagegen statt eines Briefkopfs einen Platzhalter, wie z.B. "<externer Briefkopf>", dann können Sie getrost als Vorlage speichern.
+
+= Textbausteine =
+Textbausteine sind ein schon lange eingesetztes Mittel, um das Erstellen von Dokumenten, die immer wiederkehrende Elemente enthalten zu vereinfachen. Typischerweise gibt es ein Texthandbuch, aus dem die Sachbearbeiterinnen und Sachbearbeiter die Textbausteine heraussuchen und dann über einen Mechanismus, z.B. die Eingabe eines im Handbuch abgedruckten Codes gefolgt von einem Tastenkürzel zum Aufruf eines Makros, in ihr Dokument einfügen können. Für viele der klassischen Anwendungsfälle von Textbausteinen gibt es im WollMux komfortablere Lösungen. Gerade die Ein- und Ausblendungen, die von WollMux-Formularen zur Verfügung gestellt werden, können oft Anwendungsfälle von Textbausteinen ersetzen. Da diese alternativen Mechanismen jedoch nicht alle Anwendungsfälle von Textbausteinen abdecken können und vor allem auch, da eine Umsetzung der umfangreichen Sammlung existierender Textbausteine mancher Referate über andere WollMux-Mittel eine langfristige Sache ist, bietet der WollMux auch ein Textbausteinsystem an.
+
+In der Standardkonfiguration wird das Textbausteinsystem durch die Datei <tt>conf/textbausteine.conf</tt> konfiguriert. Diese Datei ist in den von D-III-ITD-D101 bereitgestellten Archiven nur als Beispiel enthalten. Sie liegt vollständig im Einflussbereich der Referate und wird von <tt>xupdate</tt> nicht überschrieben. Neben dieser Konfigurationsdatei ist auch noch die <tt>conf/tastenkuerzel.conf</tt> erwähnenswert. Diese hat zwar nicht direkt etwas mit dem Textbausteinsystem zu tun, jedoch wird typischerweise für das Einfügen eines Textbausteins ein Tastenkürzel vergeben und dies erfolgt in der Standardkonfiguration über die Datei <tt>tastenkuerzel.conf</tt>.
+
+Neben der Konfigurationsdatei <tt>textbausteine.conf</tt>, deren Hauptaufgabe es ist, die Codes festzulegen, mit denen sich die Textbausteine aufrufen lassen, sind natürlich auch noch die Textbausteine selbst erforderlich. Im WollMux ist jeder Textbaustein repräsentiert durch ein entsprechendes Textfragment. Wie bereits erwähnt sieht die Standardkonfiguration Unterverzeichnisse von <tt>vorlagen/fragmente/</tt> als Speicherort für referatseigene Textfragmente vor. Z.B. könnte <tt>vorlagen/fragmente/textbausteine/</tt> als Speicherort für Textbausteine verwendet werden. Die von D-III-ITD-D101 bereitgestellten Archive enthalten ein Verzeichnis <tt>vorlagen/fragmente/beispiele/</tt>, in dem einige Textbausteine enthalten sind.
+
+Der Weg vom Code, den der Benutzer eingibt, bis zum Einfügen einer konkreten Datei ist mehrstufig und erfolgt nach folgendem Schema
+ Benutzereingegebener Code
+      ''Übersetzung anhand des Kuerzel-Abschnitts''
+ Fragment-ID
+      ''Übersetzung anhand des Textfragmente-Abschnitts''
+ URL der einzufügenden Datei
+
+Der [[Konfigurationsdatei_wollmux.conf#Kuerzel|''Kuerzel''-Abschnitt]], der für die Übersetzung des benutzereingegebenen Codes in eine Fragment-ID verantwortlich ist, wird in der  Datei <tt>textbausteine.conf</tt> von Hand gepflegt. Der [[Konfigurationsdatei_wollmux.conf#Textfragmente|''Textfragmente''-Abschnitt]], der für die Übersetzung einer Fragment-ID in die URL der einzufügenden Datei verantwortlich ist, besteht aus einem automatisch generierten und einem händisch gepflegten Teil. 
+
+Der automatisch durch <tt>automux</tt> generierte Teil steht in der <tt>wollmuxbar_<gruppe>.conf</tt>. Dabei handelt es sich um nichts anderes als um die durch die weiter oben beschriebenen [[Standardkonfiguration_des_WollMux#Die_Bedeutung_der_.3F.insertFrag_Verzeichnisse|<tt>?.insertFrag</tt> Verzeichnisse]] definierten abstrakten Bezeichner. Diese können nicht nur in <tt>WM(CMD&nbsp;'insertFrag'&nbsp;FRAG_ID&nbsp;"...")</tt> Textmarken verwendet werden, sondern stehen uneingeschränkt auch für das Textbausteinsystem zur Verfügung.
+
+Die Möglichkeit, über <tt>?.insertFrag</tt> Verzeichnisse Textfragmente zu definieren ist insofern eingeschränkt als jede Fragment-ID durch einen eigenen entsprechend benannten Symlink repräsentiert werden muss. Bei großen Mengen an Textbausteinen ist dies unpraktisch, insbesondere wenn die Textbausteine alle einem einheitlichen Namensschema folgen (z.B. BST1020, BST1030, BST2020,...). In so einem Fall ist es meist günstiger von Hand eine intelligente Textfragment-Definition zu erstellen, die mit Hilfe von regulären Ausdrücken auf einen Schlag viele Pfade abdeckt. Für solche Regeln ist in der Standardkonfiguration der ''Textfragmente''-Abschnitt in der Datei <tt>textfragmente.conf</tt> vorgesehen. Die von D-III-ITD-5.1 bereitgestellten Archive enthalten in der <tt>textfragmente.conf</tt> bereits so ein Beispiel, mit dem über eine einzige Regel alle Textbausteine nach dem Muster <tt>Abt*.ott</tt> im Verzeichnis <tt>vorlagen/fragmente/beispiele/</tt> verfügbar gemacht werden.
+
+= Beispielvorlagen für Endanwenderschulungen =
+Einige der in den von D-III-ITD-D101 bereitgestellten Archiven der Standardkonfiguration enthaltenen Vorlagen dienen als [[Beispielvorlagen für Endanwenderschulungen]]. Mehr über diese Vorlagen erfahren Sie im entsprechenden Artikel.
+
+
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]

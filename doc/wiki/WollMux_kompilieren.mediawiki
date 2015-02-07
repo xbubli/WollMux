@@ -1,0 +1,69 @@
+Diese Seite gibt Ihnen Hilfestellung dabei, den Quelltext des WollMux selbst zu kompilieren.
+
+== Systemvoraussetzungen für das Kompilieren==
+
+Bevor Sie den WollMux kompilieren können, müssen auf Ihrem System gewisse Programme bzw. Programmbibliotheken installiert sein:
+
+* '''[http://www.libreoffice.org/download/libreoffice-fresh LibreOffice]''' <br/>Beim Kompilieren des WollMux wird auf einige JAR-Dateien im Installationsverzeichnis von LibreOffice (kurz: LO) zugegriffen. Der WollMux wurde unter LO ab Verion 4.1 getestet. Es wird daher empfohlen eine dieser Versionen beim Kompilieren zu verwenden.<br/><div style="padding:0.3em; border:solid 1px #AAAAAA; background-color:#FFF2C0;">''Windows:'' Stellen Sie nach der Installation von LO sicher, dass die PATH-Umgebungsvariable die Ordner ''<LO-Installationsordner>\program'' und ''<LO-Installationsordner>\URE\bin'' enthält. Dabei bezeichnet ''<LO-Installationsordner>'' den Pfad zu dem Ordner, in den Sie LibreOffice installiert haben, also z.B. ''C:\Program Files (x86)\LibreOffice 4''.</div>
+
+* '''[http://www.libreoffice.org/download/libreoffice-fresh LibreOffice SDK]''' <br/>Das Buildskript (Skript zum automatischen Kompilieren) des WollMux verwendet Dateien und Programme aus dem LO SDK. LibreOffice (siehe voriger Punkt) und LibreOffice SDK sollten auf dem System in derselben Version vorliegen.<br/><div style="padding:0.3em; border:solid 1px #AAAAAA; background-color:#FFF2C0;">''Windows:'' Stellen Sie nach der Installation des LO SDK sicher, dass die PATH-Umgebungsvariable den Ordner ''<LO SDK-Installationsordner>\bin'' enthält. Dabei bezeichnet ''<LO SDK-Installationsordner>'' den Pfad zu dem Ordner, in den Sie das LO SDK installiert haben, also z.B. ''C:\Program Files (x86)\LibreOffice 4\sdk''.
+
+* Alternativ: '''[http://download.openoffice.org/other.html#tested-full OpenOffice.org]''' und '''[http://download.openoffice.org/other.html#tested-sdk OpenOffice.org_SDK]'''
+
+* '''[http://www.oracle.com/technetwork/java/javase/downloads/index.html JAVA JDK]''' (Version 7 oder höher)
+
+* '''[http://ant.apache.org/bindownload.cgi Apache Ant]'''<br/><div style="padding:0.3em; border:solid 1px #AAAAAA; background-color:#FFF2C0;">''Windows:'' Die PATH-Umgebungsvariable muss den Ordner ''<Ant>\bin'' enthalten. Dabei bezeichnet ''<Ant>'' den Pfad zu dem Ordner, in dem Sie Ant installiert haben.</div>
+
+* '''[http://git-scm.com/downloads/ Git]'''<br/>Git ist ein Sourcecodeverwaltungssystem und wird benötigt, um die Sourcen des WollMux von GitHub herunterzuladen (siehe auch [[Repository]]).<br/><div style="padding:0.3em; border:solid 1px #AAAAAA; background-color:#FFF2C0;">Für die Arbeit mit [http://www.eclipse.org Eclipse] kann das [http://eclipse.org/egit/ EGit-Plugin] verwendet werden.</div>
+
+* '''[http://etree.org/cgi-bin/counter.cgi/software/md5sum.exe#!md5!eb574b236133e60c989c6f472f07827b md5sum.exe]''' (Optional; nur relevant für Windows!)<br/>Da unter Windows normalerweise kein md5sum-Tool installiert ist, schlägt das md5sum-Target im WollMux-Build dort normalerweise fehl. Über obigen Link kann man sich aber eine md5sum.exe herunterladen, die man unter Windows verwenden kann. Die PATH-Umgebungsvariable muss dann so angepasst werden, dass sie den Ordner enthält, in dem sich <tt>md5sum.exe</tt> befindet.
+
+* '''[http://nsis.sourceforge.net/Main_Page Nullsoft Scriptable Install System]''' (Optional; nur relevant für Windows bzw. wenn Windows-Install-Bundles unter Linux gebaut werden sollen.)<br />Die PATH-Umgebungsvariable muss ggf. so angepasst werden, dass sie den Ordner enthält, in dem sich <tt>makensis</tt> befindet.  Auf Debian-basierten Systemen ist NSIS im Paket ''nsis'' enthalten.
+
+== WollMux-Quelltext und weitere nötige Bibliotheken ==
+Der Source Code des WollMux steht auf [http://github.com/WollMux/WollMux/ GitHub] in einem Git-Repository zur Verfügung. Mehr dazu erfahren Sie auch auf der Seite '''[[Repository]]'''.
+
+Um den WollMux zu kompilieren langt es allerdings nicht, nur den WollMux-Quelltext herunterzuladen (d.h. aus dem Repository ''auszuchecken''), sondern Sie benötigen insgesamt den Code bzw. Bibliotheken aus drei Unterprojekten:
+* '''[http://github.com/WollMux/WollMux/ WollMux]'''<br/>Enthält den Code für die WollMux-Extension und die [[WollMuxBar]].
+* '''[http://github.com/WollMux/UNOHelper/ UNOHelper]'''<br/>Enthält Hilfsklassen für die Arbeit mit der UNO API von LibreOffice/OpenOffice.org, die vom WollMux verwendet wird.
+* '''[http://wollmux.net/files/classes.tar.gz classes.tar.gz]'''<br/>Enthält JNI-Funktionen für die Arbeit mit der Registry unter Windows.
+
+=== Herunterladen der benötigten Projekte ===
+Alle drei oben aufgeführte Projekte/Bibliotheken müssen in denselben Ordner auf Ihrem System heruntergeladen werden. Dies geschieht mit Hilfe von Git über die im folgenden aufgeführten Kommandos, die in einer Shell/Kommandozeilenumgebung ausgeführt werden müssen (Mit der Entwicklungsumgebung [http://www.eclipse.org Eclipse]] können WollMux und UNOHelper auch direkt in einen Workspace importiert werden):
+
+* WollMux (mit Git)<pre>git clone https://github.com/WollMux/WollMux</pre>
+* UNOHelper (mit Git)<pre>git clone https://github.com/WollMux/UNOHelper</pre>
+* [http://www.wollmux.net/files/classes.tar.gz classes.tar.gz]<br/>Ganz normal per Browser herunterladen und auspacken. (Unter Windows kann man mit Hilfe von [http://www.7-zip.org/ 7-Zip] Tar-Dateien auspacken.)
+
+== Kompilieren ==
+Vor dem Kompilieren müssen die Pfade in der Datei <code>unix.properties</code> bzw. <code>windows.properties</code> im Projekt WollMux auf den Installationspfad von LibreOffice/OpenOffice.org angepasst werden.
+
+Zum Kompilieren des WollMux muss im Ordner <code>WollMux</code> das Kommando
+
+ ant all
+
+aufgerufen werden.
+
+Die fertigen binären Dateien befinden sich danach im Ordner <code>WollMux/dist</code>.
+
+== Kurzanleitung für Eclipse ==
+Wenn Sie die Entwicklungsumgebung [http://www.eclipse.org Eclipse] verwenden möchten, um mit dem WollMux-Projekt zu arbeiten, hilft Ihnen zusätzlich zu obigen Informationen evtl. noch folgende Kurzanleitung weiter:
+
+# [http://eclipse.org/egit EGit-Plugin] installieren
+# WollMux-Projekt von GitHub mit Eclipse auschecken (Import-> Git)
+# UNOHelper-Projekt von GitHub mit Eclipse auschecken (Import-> Git)
+# Neue User Library namens "LibreOffice" bzw. "OpenOffice" erstellen, welche folgende Jar-Dateien enthält:<br/>'''java_uno.jar, juh.jar, jurt.jar, ridl.jar, unoloader.jar''' ''(im Ordner: <code>URE\java\</code>)''<br/>'''unoil.jar''' ''(im Ordner: <code>program\classes</code>)''
+# Pfade in <code>unix.properties</code> bzw. <code>windows.properties</code> im WollMux-Projekt anpassen
+# [http://www.wollmux.net/files/classes.tar.gz classes.tar.gz] in Workspace-Ordner von Eclipse entpacken und in Eclipse dann neues Java-Projekt namens "classes" anlegen.
+
+
+== Siehe auch ==
+* [[Repository]]
+* [[WollMux installieren]]
+* [[Wollmux-Debugging]]
+* [[WollMuxBar]]
+* [[Konfigurationsdatei wollmux.conf]]
+
+
+[[Category:Eierlegender_WollMux]]
+[[Category:Handbuch_des_WollMux]]

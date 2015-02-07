@@ -1,0 +1,51 @@
+[[Main Page | English version]]
+
+__NOTOC__
+= [[Datei:Wollmux_logo_medium.gif]] - das Briefkopf- und Formularsystem der LHM =
+
+Der "Eierlegende WollMux" (kurz: WollMux) ist eine Extension für [http://www.openoffice.org OpenOffice.org] / [http://www.documentfoundation.org LibreOffice], die von der [http://www.muenchen.de Landeshauptstadt München] im Rahmen des [http://www.muenchen.de/limux LiMux-Projekts] entwickelt wurde. Der WollMux erweitert OpenOffice.org / LibreOffice um zahlreiche Funktionen, welche die Arbeit mit Vorlagen, Formularen und Briefköpfen wesentlich erleichtern. Da der WollMux als OpenSource veröffentlicht wurde und für jeden frei verfügbar ist, kommt er mittlerweile auch in anderen Kommunen und Unternehmen zum Einsatz.
+
+Mehr darüber, was der WollMux alles kann, erfahren Sie hier: '''[[Features|Features des WollMux]]'''
+
+<div style="background-color:#FFFD7A; border:1px dashed gray; padding: 2px 6px; margin-top:1.2em; margin-bottom:1.2em; margin-left:1px; margin-right:auto; font-size:smaller;">{{:News}}
+
+'''[[News|Weitere Neuigkeiten...]]'''
+</div>
+
+<div style="background-color:#C4EFA1; border:1px dashed gray; width:34em; padding: 2px 6px; margin-top:1.2em; margin-bottom:1.2em; margin-left:1px; margin-right:auto">
+<span style="font-size:larger;font-weight:bold;color:#1D9101">WollMux Herunterladen</span>
+*'''[http://www.wollmux.net/files/WollMux-11.10a-installer.exe WollMux 11.10a]''' ([[Datei:Windows-icon.png]] Windows, 3MB)
+*'''[http://www.wollmux.net/files/wollmux-config-de-11.11a-installer.exe WollMux-Konfiguration 11.11a]''' ([[Datei:Windows-icon.png]] Windows, deutsch, 4MB)
+* [[Download|Linux/Andere Betriebssysteme & Sprachen]]
+<span style="font-size:smaller; color:gray;">Für den Einsatz des WollMux ist unbedingt eine WollMux-Konfiguration erforderlich!</span>
+
+</div>
+
+== Dokumentation ==
+
+'''[[:Kategorie:Handbuch_des_WollMux|Handbuch des WollMux]]''' - Anleitungen zur Verwendung und Konfiguration des WollMux
+
+'''[http://www.wollmux.net/wiki/images/8/8e/FormularMax_Handbuch.pdf FormularMax-Handbuch (PDF)]''' - Ausführliches Handbuch für die Erstellung von WollMux-Vorlagen mit dem im WollMux enthaltenen "FormularMax 4000"
+
+'''[[Mailinglisten]]''' - Weitere Hilfe steht Ihnen jederzeit über unsere Mailinglisten zur Verfügung.
+
+== Source Code ==
+
+Der WollMux ist ein OpenSource-Projekt (lizenziert unter der [http://joinup.ec.europa.eu/software/page/eupl European Union Public License]). Den aktuellen Quelltext finden Sie in unserem '''[https://github.com/WollMux/WollMux Source Code Repository]'''.
+
+Eine Anleitung zum Auschecken des Quelltextes aus dem Code Repository und wie Sie den WollMux selber compilieren können, finden Sie auf der Wiki-Seite '''[[Repository]]'''.
+
+Bei weitergehenden Fragen wenden Sie sich an unsere '''[[Mailinglisten]]'''.
+
+== Fehlermeldungen ==
+
+Fehler im WollMux können über den öffentlichen [https://github.com/WollMux/WollMux/issues] auf GitHub gemeldet werden.
+
+== Weitergehende Links ==
+[[Datei:Limux_power.gif|right|link=http://www.muenchen.de/limux]]
+
+* https://github.com/WollMux/WollMux - WollMux-Repository bei GitHub
+* http://www.muenchen.de/wollmux - WollMux-Seite auf muenchen.de
+* http://www.muenchen.de/limux - Informationen zum LiMux-Projekt
+* http://joinup.ec.europa.eu/software/wollmux/description - WollMux-Projektseite bei Joinup
+* http://wiki.stadt.freiburg.de/ooo/ - OpenOffice.org-Wiki der Stadt Freiburg
