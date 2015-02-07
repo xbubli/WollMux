@@ -2,10 +2,19 @@
 # coding=utf-8
 import urllib2
 import xml.etree.ElementTree as ET
+from subprocess import call, check_output
+import sys
 
 WIKI="http://www.wollmux.net/wiki"
 ALL_PAGES_URL=WIKI + "/Spezial:Alle_Seiten"
 DEST="doc/wiki"
+
+# onl start this if current index is empty
+index = check_output(['git', 'diff', '--cached', '--name-only'])
+if index != "":
+	print "You have uncommitted changes in your index."
+	print "please commit them or reset your index first!"
+	sys.exit(1)
 
 # reading article overview
 response = urllib2.urlopen(ALL_PAGES_URL)
@@ -32,3 +41,7 @@ for i in articles:
 	fo = open(DEST + "/" + i + ".mediawiki", "wb")
 	fo.write( mwText.encode('utf8') )
 	fo.close()
+
+# add wiki-changes to the index and commit them
+call(['git', 'add', '--all', DEST])
+call(['git', 'commit', '-m', 'update from wollmux-wiki'])
