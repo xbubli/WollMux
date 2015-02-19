@@ -1,45 +1,48 @@
-FormularMax 4000 is an integrated development environment (IDE) for creating and maintaining WollMux forms and templates. THIS PAGE UNDER CONSTRUCTION. Please check back frequently. Tranlation has just begun.
+FormularMax 4000 is an integrated development environment (IDE) for creating and maintaining WollMux forms and templates. THIS PAGE IS UNDER CONSTRUCTION. Please check back frequently. Tranlation has just begun. Note: this page may refer to OpenOffice.org or LibreOffice interchangeably, at least for now. Make the appropriate substitutions in the instructions. FormularMax 4000 is also referred to as FM4000.
 
 = Handbook for Converting and Adapting WollMux Templates =
 
 There is a German-language handbook on FormularMax 4000 at the following link: '''[http://www.wollmux.net/wiki/images/8/8e/FormularMax_Handbuch.pdf ein Handbuch (PDF)]''' If you read German, it will be quite useful, although many of the URLs it contains are dead links, as it gives a very detailed description of FormularMax 4000 and its use (much more so than this Wiki page). This page, however, will be updated regularly -- not so the ''Handbuch''.
 
-= Button einrichten =
-Um den FormularMax 4000 aufrufen zu können muss zuerst der Symbolleiste ein entsprechender Button hinzugefügt werden. Wenn Sie über Ansicht/Symbolleisten die Leiste "Werkzeuge für Vorlagenersteller (WollMux) aktivieren, so haben Sie einen entsprechenden Button. Ansonsten können Sie sich auch einen Button manuell in eine Symbolleiste einfügen wie folgt:
+= Add the FormularMax 4000 toolbar buttons =
+To start FormularMax 4000, you'll need a corresponding toolbar with buttons.  Go to View -> Toolbars -> "Tools for creating templates(WollMux)" and select this option. The "FormularMax 4000" toolbar should appear below the menu items, and above the document editing frame. If this doesn't work for you, add FormularMax 4000 manually as follows:
 
-# Extras/Anpassen.../Reiter "Symbolleisten"
-# Oben bei Symbolleiste "Standard" auswählen
-# Unten bei Speichern in "OpenOffice.org Writer" auswählen
-# Button "Hinzufügen..." anklicken
-# Links bei "Bereich" auswählen OpenOffice.org Makros/Meine Makros/WollMux/Call
-# Rechts bei Befehle auswählen FormularMax4000
-# Button "Hinzufügen"
-# Button "Schließen"
-# Button "OK"
+# Tools -> Customize -> "Toolbars" tab
+# At the top of the Toolbars tab is a "Toolbars" combo box. Select "Standard"
+# At the bottom of the Toolbars tab is a "Save in" combo box. Select "LibreOffice Writer" or "OpenOffice.org Writer"
+# Click on the "Add..." button on the right of the Toolbars tab
+# To the left under "Category" select (OpenOffice.org/LibreOffice) Macros/My Macros/WollMux/Call
+# On the right under "Commands" select FormularMax4000
+# Click "Add"
+# Click "Close"
+# Click "OK"
 
-= FormularMax 4000 verwenden =
-;Wichtig: Die jeweilige Instanz des FormularMax 4000 hängt dauerhaft an dem Dokument, das im Vordergrund war zum Zeitpunkt des Aufrufs des FormularMax 4000. Der FM4000 schließt sich  automatisch wenn dieses Dokument geschlossen wird. Das heißt für jede zu bearbeitende Vorlage muss ein neuer FormularMax4000 geöffnet werden.
+Note: if you've already installed a FormularMax 4000 toolbar via the menu, the path to FormularMax 4000 will already exist under "LibreOffice Macros" and not "My Macros". Choose one method or the other - not both. 
 
-== Menüleiste ==
-Im folgenden werden die Funktionen in der FM4000 Menüleiste in der Reihenfolge des typischen Arbeitsablaufs vorgestellt.
+= Using FormularMax 4000 =
+;Important: The current instance of FormularMax 4000 remains attached to document that had focus when FormularMax 4000 was started.  FM4000 closes automatically when this document is closed. This means that you need to open a new FM4000 for each template you want to work on.
 
-=== Formular/Formularfelder aus Dokument einlesen ===
-Erfasst alle Eingabefelder, Dropdowns und Checkboxen, ''die noch nicht von WollMux-Kommandos umschlossen sind'' (d.h. nur die seit dem letzten Mal neu hinzugekommenen) und integriert sie in die Formularbeschreibung. Des weiteren werden die entsprechenden Formularfelder des Dokuments mit passenden WollMux-Textmarken umschlossen. 
-;Hinweis: Derzeit werden Checkboxen nur erfasst, wenn sie am Zeichen oder als Zeichen verankert sind oder wenn sie aus Word-Dokumenten importiert sind (und damit keine Standardverankerung haben).
+== Menus ==
+The functions of FM4000 available from the menu are described below, in the order a typical work process would require.
 
-Beim Erfassen der Felder schaut der FormularMax4000 nach speziellen Hinweisen/Namen/Einträgen, die diesem Muster entsprechen
+=== Form/Get Form Fields from Template ===
+This "grabs" all input fields, "dropdowns" and checkboxes ''that are not already assigned WollMux commands'' (in other words, only newly entered form fields are picked up) and integrates them into the form description. Once "harvested", the corresponding form fields will be enclosed by WollMux command characters.
+;Tip: At present, checkboxes are only "harvested" if they are anchored ''as'' a character or anchored ''to'' a character, or if they've been imported from a Word document (and therefore have no standard anchoring). Refer to [https://help.libreoffice.org/Writer/Positioning_Objects Positioning Objects] if necessary.
+
+FormularMax4000 looks for references/names/entries with the following pattern:
  Text1<<Text2>>
-Diese Zusatzinformationen werden herangezogen um Labels, IDs und andere Informationen zu bestimmen. Folgende Fälle werden unterschieden:
- 
-* ''Eingabefeld'': Als "Hinweis" kann "Label<<ID>>" angegeben werden und wird beim Import             entsprechend berücksichtigt um Label und ID des Feldes in der Formular-GUI zu liefern. Wird nur "<<ID>>" angegeben, so markiert das Feld eine reine Einfügestelle (insertValue oder insertContent) und es wird kein Formularsteuerelement in der Formular-GUI erzeugt.
-* ''Eingabeliste/Dropdown'': Als "Name" kann "Label<<ID>>" angegeben werden und wird wie oben berücksichtigt. Als Spezialeintrag in der Liste kann "<<Freitext>>" eingetragen werden und signalisiert dem FM4000, dass die ComboBox in der Formular-GUI auch die Freitexteingabe erlauben soll. Wie bei Eingabefeldern auch ist die Angabe "<<ID>>" ohne Label möglich und signalisiert, dass es sich um eine reine Einfügestelle handelt, die keine ComboBox in der Formular-GUI erzeugen soll. Falls vorhanden werden bis zu N-1 Leerzeichen am Ende der Einträge in der Dropdown-Liste entfernt, wobei N die Anzahl der Einträge ist, die bis auf                         folgende Leerzeichen identisch zu diesem Eintrag sind. Dies ermöglicht es, das selbe Wort mehrfach in die Liste aufzunehmen.
-* ''Checkbox'': Bei Checkboxen kann als "Hilfetext" "Label<<ID>>" angegeben werden und wird beim Import entsprechend berücksichtigt.
-* Bei Eingabefeldern und Eingabelisten ist auch die Angabe "<<ID>>" ohne Label möglich. Dies signalisiert eine reine Einfügestelle an der der Wert des Formularfelds ID eingefügt wird. Dies wird verwendet, um den selben Wert an mehreren Stellen einfügen zu können ohne dass der Benutzer ihn mehrmals eingeben muss.
-* Bei Eingabefeldern und Eingabelisten ist auch die Angabe "<<glob:ID>>" ohne Label möglich. Dies signalisiert eine insertValue-Einfügestelle, an der globale Daten (normalerweise die Absenderdaten des Sachbearbeiters) eingefügt werden.
-* Bei Eingabelisten/Dropdows ist die Angabe "<<gender:ID>>" erlaubt. Diese erzeugt eine reine Einfügestelle, die mit einer Gender-TRAFO versehen wird, die abhängig vom Formularfeld ID einen der Werte des Dropdowns auswählt, und zwar bei "Herr" oder "Herrn" den ersten Eintrag, bei "Frau" den zweiten Eintrag und bei allem sonstigen den dritten Eintrag. Hat das Dropdown nur 2 Einträge, so wird im sonstigen Fall das Feld ID untransformiert übernommen. Falls vorhanden werden ein bis 2 Spaces am Ende eines Eintrages der Dropdown-Liste entfernt. Dies ermöglicht es, das selbe Wort mehrfach in die Liste aufzunehmen.
+Entries with patterns of this type are pulled in for determination of labels, IDs, and other information. The following cases are distinguishable in some respects:
 
-=== Formular/Formulartitel setzen ===
-Erlaubt es, den Fenstertitel der Formular-Eingabemaske zu editieren.
+ 
+* ''Input field'': A "Reference" of the form "Label<<ID>>" will be imported and used to determine the label and ID of the correpsonding field in the form GUI. An entry of the form "<<ID>>" marks the field purely as a placeholder (insertValue or insertContent). No corresponding control element will be created in the form GUI. 
+* ''Input list/Dropdown'': A "Name" of the form "Label<<ID>>" can be entered. It will be handled as above. You can use the special entry "<<Freitext>>", letting FM4000 know that the Combobox should allow free text. As for input fields, "<<ID>>" without "Label" lets FM4000 know to treat this as a place holder, without creating a combox in the form GUI. If present, up to (N-1) spaces will be removed from entries in the dropdown list, where N equals the number of entries identical to this entry except for trailing spaces. This makes it possible to enter the same word in the list more than once. Tip: You don't need to use <<Freitext>> for free text. To the right of comboxes in FM4000 are a checkbox, "N" and "X". Checking the checkbox allows free text. In fact, if you use <<Freitext>>, the checkbox will appear checked in FM4000 when you "harvest" form fields from your template.
+* ''Checkbox'': For checkboxes, you can enter "help text" of the form "Label<<ID>>", which will be handled accordingly.
+* For input fields and input lists, "<<ID>>" without Label is permitted. As described above, this signals the presence of a placeholder to be replaced with the value of the form field's ID. Use this to allow multiple entries of the same value without requiring the end user to enter it more than once. 
+* For input fields and input lists, "<<glob:ID>>" without Label is permitted. This signals an "insertValue" placeholder for global data (in WollMux's original incarnation, usually the sender data of the end user).
+* Gender-related entries. ''Note: For languages other than German, this functionality can be problematic.'' Somewhere in your template there must be a combobox with two or three entries related to gender (you can hide it, a topic covered elsewhere). Originally, it appears that the pattern was "Anrede<<Anrede>> for this entry, but now other values appear to work. "Title<<Title>> has been used successfully. (Other values may work fine, but the translator hasn't tested them yet.) It is suggested that you use the following values: Entry No. 1: It appears not to matter what you put, but the first entry is always male. I use "Mr.". Entry No. 2: As with Entry No. 1, but will always be female. I use "Mrs." or "Ms.". Entry No. 3: For this to work, it is suggested that you use the German entry "Damen und Herren". I don't know why, but it doesn't work with "Mr. and Mrs.", for example.  For input lists/dropdowns, the entry form "<<gender:ID>>" is permitted. This creates a pure placeholder provided with a Gender function designator ("TRAFO"). Depending on the form field id, the TRAFO will insert one of the values from the dropdown: If the dropdown has only 2 entries, a third case will insert the field ID unchanged. If present, 1 to 2 spaces at the end of the entry will be removed. This makes it possible to enter the same word in the list more than once. This topic is covered in much greater detail in the ''Handbuch''.
+
+=== Form/Set Title Of Form ===
+Here you can change the window title of the form's GUI.
 
 === Formular/Druckfunktionen setzen ===
 In der erscheinenden Maske können eine oder mehrere Druckfunktionen aus einer DropDown-Liste ausgewählt und für dieses Dokument gesetzt werden. In der DropDown-Liste werden alle Druckfunktionen angezeigt, die im globalen [[Konfigurationsdatei_wollmux.conf#Druckfunktionen|Druckfunktionen-Abschnitt]] der WollMux-Konfiguration konfiguriert sind. Von den mit dem WollMux und der Standardkonfiguration ausgelieferten Funktionen, können nur die folgenden hier sinnvoll verwendet werden:

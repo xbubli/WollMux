@@ -39,7 +39,7 @@ Bei weitergehenden Fragen wenden Sie sich an unsere '''[[Mailinglisten]]'''.
 
 == Fehlermeldungen ==
 
-Fehler im WollMux können über den öffentlichen [https://github.com/WollMux/WollMux/issues] auf GitHub gemeldet werden.
+Fehler im WollMux können über den öffentlichen [https://github.com/WollMux/WollMux/issues Issue Tracker] auf GitHub gemeldet werden.
 
 == Weitergehende Links ==
 [[Datei:Limux_power.gif|right|link=http://www.muenchen.de/limux]]

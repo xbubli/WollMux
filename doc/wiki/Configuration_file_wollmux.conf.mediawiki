@@ -118,58 +118,59 @@ Setting SENDER_DISPLAYTEMPLATE values controls which entries from the Personal S
 
 Adjustments to SENDER_DISPLAYTEMPLATE have notable effects on the display of the Sender List in [[#Menue-Elemente|Menu Elements]] of type  "senderbox" in the WollMuxBar. Such adjustments, however, have no effect at all on the dialog "[[#Pers.C3.B6nliche_Absenderliste_Verwalten|Manage Personal Sender List]]" or the dialog "[[Konfigurationsdatei_wollmux.conf#Absender_Ausw.C3.A4hlen|Select Sender]]". Display of those elements, i.e. of type "listbox" with ID "suchergebnis" (search result) or "pal" (personal sender list), is controlled via the DISPLAY attribute. Please see DISPLAY section for more information.
 
-= Der PERSISTENT_DATA_MODE =
-Ab WollMux 11.9 wird das globale Attribut PERSISTENT_DATA_MODE ausgewertet.
+= PERSISTENT_DATA_MODE =
+From WollMux 11.9 on the global attribute PERSISTENT_DATA_MODE is evaluated.
 
 ;Syntax
- PERSISTENT_DATA_MODE "<modus>"
-;Beispiel
+ PERSISTENT_DATA_MODE "<mode>"
+;Example
  PERSISTENT_DATA_MODE "transition"
- oder
+ or
  PERSISTENT_DATA_MODE "rdfReadLegacy"
 
-Für mehrere Zwecke speichert der WollMux bestimmte Informationen über interne Zustände (sog. Metadaten) im Dokument ab. Über das Setzen von PERSISTENT_DATA_MODE kann gesteuert werden wie und wo der WollMux diese Daten hinterlegt. Folgende Werte stehen zur Auswahl:
+For a number of reasons Wollmux stores certain information about internal conditions (metadata)in the document itself. By setting  PERSISTENT_DATA_MODE you can control how and where WollMux stores this data. The following values are available:
 
 {|{{Prettytable}}
- ! <modus>
- ! Beschreibung
+ ! <mode>
+ ! Description
  |-
  ! annotation<br>''(deprecated)''
- | Im Modus "annotation" werden Metadaten wie standardmäßig in allen Vorgängerversionen von WollMux 11.9 in versteckten Notizen im Dokument hinterlegt. Dieser Mechanismus hat sich in der Vergangenheit als Fehleranfällig erwiesen, da Notizen (oder "Kommentare", wie sie ab OpenOffice.org 3.2.1 heißen) nicht für die Speicherung von Metadaten vorgesehen sind. Seit OpenOffice.org 3.0 wurde das Benutzerkonzept für Notizen/Kommentare komplett überarbeitet und vereinfacht, so dass sich die Speicherung von WollMux-Metdaten in Notizen für Anwenderinnen und Anwender zunehmend störend auswirkt. So kam es z.B. vor, dass Metadaten ungewollt für Anwenderinnen und Anwender sichtbar wurden.
+ | In "annotation" mode (as was standard in all WollMux versions prior to 11.9) metadata is stored in the document as hidden annotations.  This mechanism has proven in the past to be error-prone, as annotations (or "comments", from OpenOffice.org 3.2.1 on) were not intended for metadata storage.  Starting with OpenOffice.org 3.0 the user experience with annotations/comments was completely reworked and simplified, with the result that metadata storage in comments had increasingly objectionable effects for software users.  For example, WollMux metadata was exposed when this was not desired.
 
-'''Von einer Verwendung dieses Modus wird ausdrücklich abgeraten'''. Der Modus kann in Einzelfällen eingesetzt werden, um im Fehlerfall das Verhalten von WollMux-Versionen älter als 11.9 nachzubilden.
+'''Use of this mode is strongly discouraged'''. Its use should probably be restricted to isolated cases where reproducing errors in the behavior of WollMux versions older than 11.9 is necessary. 
  |-
  ! rdf
- | Im Modus "rdf" werden Metadaten in einer eigenen XML-Datei namens "wollmux.rdf" im ODF-Paket des Dokuments abgelegt. Dieser Modus sorgt dafür, dass WollMux-Metadaten und das eigentliche Dokument sauber getrennt sind und keine störenden Effekte möglich sind. Da der RDF-Modus explizit eine  [http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/OfficeDev/RDF_metadata UNO-Schnittstelle für Metadaten] verwendet, ist davon auszugehen, dass der Modus "rdf" dauerhaft stabil und zuverlässig bleiben wird.
+ | In "rdf" mode metadata are stored in a unique XML file named "wollmux.rdf" archived in the document's ODF packet. This mode ensures that WollMux metadata and the actual document itself are strictly separated and preventing the possibility of objectionable effects. Since RDF mode explicitly uses a [[http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/OfficeDev/RDF_metadata UNO-Schnittstelle für Metadaten|UNO Interface for RDF Metadata]], we can assume that "rdf" mode will remain stable and reliable over the long term.
 
-Der Modus "rdf" ist aus konzeptioneller Sicht der sauberste Weg zur Speicherung von WollMux-Metadaten. In diesem Modus werden Metadaten ausschließlich in die XML-Datei geschrieben und ausschließlich von dort gelesen. Das macht den Modus in der Praxis ungeeignet, wenn bereits WollMux-Dokumente im Modus "annotation" (also mit älteren WollMux-Versionen) erzeugt wurden und diese sich noch im Umlauf befinden.
+From a conceptual perspective, "rdf" mode is the cleanes way to store WollMux metadata. In this mode metadata are only written to the XML file, and only read from there. Practically speaking, this mode is unsuitable for WollMux documents still in circulation that were created in "annotation" mode, i.e. with older WollMux versions.
 
-'''Von einer Verwendung dieses Modus wird abgeraten, wenn Ihr Dokumentenbestand Dokumente enthält, die mit WollMux-Versionen älter als 11.9 erzeugt wurden, oder Austausch mit solchen Dokumenten besteht.''' Der Modus ist empfohlen und geeignet für alle Unternehmen/Kommunen, die ab WollMux 11.9 eine Neueinführung des WollMux planen und bisher noch keine WollMux-Dokumente im Einsatz haben.
+'''Use of this mode is discouraged if your document archive either contains documents created with WollMux versions older than 11.9, or if there is exchange of data with such documents.''' The mode is suitable and recommended for any enterprise or community planning a new WollMux installation, one with no WollMux documents yet in use.
  |-
  ! transition
- | Im Modus "transition" werden Metadaten sowohl im Modus "annotation" als auch im Modus "rdf" geschrieben. Beim Lesen von Metadaten haben immer die in den Notizen verfügbaren Werte den Vorrang, so dass die Abwärtskompatibilität in der Phase eines Mischbetriebs von WollMux 11.9 und älter problemfrei sichergestellt ist. 
+ | In "transition" mode, metada is stored both as in "annotation" mode and as in "rdf" mode. When reading metadata, the values contained in the annotations/comments take priority. This ensures problem-free backward compatibility in "mixed-moded" installations, i.e. with newer and older versions of WollMux in use.   
 
-'''Dieser Modus ermöglicht mittelfristig die Überführung des Dokumentenbestands in die XML-Metadaten (siehe Modus "rdf"), ohne den Mischbetrieb mit alten WollMux-Versionen (im Modus "annotation") zu gefährden.'''
+'''This mode makes it possible in the short term to convert the metadata of your document collection to "rdf" mode data, without jeopardizing "mixed-mode" installations, i.e. those with "annotation" mode documents.'''
  |-
  ! rdfReadLegacy
- | Im Modus "rdfReadLegacy" werden Metadaten ausschließlich wie in Modus "rdf" gespeichert. Befinden sich im Dokument noch mit "annotation" geschriebene Notizen, so werden sie aus Gründen der Abwärtskompatibilität vorrangig gelesen, jedoch anschließend sofort gelöscht und durch entsprechende Einträge in den RDF-Daten ersetzt.
+ | In "rdfReadLegacy" mode metadata is only stored as in "rdf" mode. For backward compatibility, "annotation" mode metadata is read with priority, but thereafter immediately deleted and replaced with corresponding RDF data entries.  
 
-'''Dieser Modus ist für den langfristigen Einsatz''' in allen Unternehmen/Kommunen '''vorgesehen''', die bereits WollMux-Dokumente mit in Notizen hinterlegten Metadaten im Einsatz haben und flächendeckend ältere WollMux-Versionen (im Modus "annotation") abgelöst haben.'''
+'''This mode is suitable for long-term adoption''' by all enterprises or communities that have documents in circulation using "annotation" metadata, but have since demobilized older, organization-level versions of WollMux that use "annotation" mode.'''
  |-
  |}
 
-Ist die Einstellung PERSISTENT_DATA_MODE nicht angegeben, so gilt:
-* Für Alle WollMux-Versionen < Version 11.9 ist implizit der Modus "annotation" gesetzt.
-* Ab WollMux-Version 11.9 ist der Modus "transition" voreingestellt.
+If no setting is present for PERSISTENT_DATA_MODE the following applies:
+* For all versions < 11.9 "annotation" mode is implicitly set.
+* From WollMux 11.9 on, "transition" mode is the preset parameter.
 
-Desweiteren gilt, dass die Einstellungen '''"rdf", "transition" und "rdfReadLegacy" erst ab OpenOffice.org 3.2.1 unterstützt''' werden. Beim Einsatz des WollMux mit älteren Versionen von OpenOffice.org wird automatisch auf den Modus "annotation" gewechselt.
+Further, the settings '''"rdf", "transition" and "rdfReadLegacy" are supported only from OpenOffice.org 3.2.1 onward'''. Installations of WollMux with older versions of OpenOffice.org automatically switch to "annotation" mode.
 
-Weitere Informationen zu WollMux-Metadaten sind auf der Seite [[Dokumentkommandos_des_WollMux#WollMux-Metadaten_im_Dokument|Dokumentkommanndos des WollMux]] beschrieben.
+More information on WollMux metadata can be found at [[Dokumentkommandos_des_WollMux#WollMux-Metadaten_im_Dokument|WollMux Document Commands]].
 
-= Der Abschnitt OOoEinstellungen =
-Für die korrekte Funktionsfähigkeit des WollMux ist es notwendig, dass bestimmte Konfigurationsoptionen in OpenOffice eingestellt sind. Um das zu erreichen, können im Abschnitt "OOoEinstellungen" Werte für Konfigurationseinstellungen vorgegeben werden, die bei jedem Start des WollMux neu gesetzt werden.
+= The "OOoEinstellungen" section (or %include file OooEinstellungen.conf) =
+For WollMux to function properly, certain configuration options have to be set in OpenOffice.
+To achieve this, in "OOoEinstellungen.conf" you can provide values for configuration settings, which will be set again every time WollMux starts.
 
-Hier ein Beispiel eines solchen Abschnitts:
+Here's an example from the file:
  OOoEinstellungen (
  
    (NODE "/org.openoffice.Office.Writer/AutoFunction/Format/ByInput/ApplyNumbering"
@@ -186,17 +187,17 @@ Hier ein Beispiel eines solchen Abschnitts:
  
  )
 
-Wie im Beispiel gezeigt enthält der Abschnitt eine Liste mit Konfigurationsoptionen und den zugehörigen Werten. Jedes Element der Liste hat den Aufbau
- (NODE "<Pfad/Knotenname>" PROP "<NameDerProperty>" TYPE "<DatentypDerProperty>" VALUE "<zuSetzenderWert>")
-;NODE: Beschreibt den Pfad und den Knotennamen unter dem die Konfigurationseinstellung im OOo-Konfigurationsbaum liegt. (Anmerkung: Technisch gesehen ist dies der HierarchicalName)
-;PROP: Beschreibt den Namen der Property und damit die zu verändernde Einstellung selbst.
-;TYPE: Beschreibt den Datentyp, in dem der Wert VALUE in die Property übertragen werden soll. Folgende Typen stehen zur Auswahl: "string", "boolean", "integer" und "float".
-;VALUE: Enthält den zu setzenden Wert, der vom Typ TYPE sein muss. Entspricht der Wert nicht dem angegebenen Typ, so erscheint eine Fehlermeldung in der wollmux.log und die Einstellung wird nicht gesetzt.
+As shown in the example, the section contains a list of configuration options and their values. Each element in the list is of the form
+ (NODE "<Path/NodeName>" PROP "<NameOfProperty>" TYPE "<DatatypeOfProperty>" VALUE "<ValueToSet>")
+;NODE: Describes the path and node name where the config setting is in the OpenOffice.org configuration tree. (Remark: From a technical point of view this is the hierarchical name)
+;PROP: Describes the property name, and therefore the setting to change.
+;TYPE: Describes the datatype for the VALUE of the property. The choice is: "string", "boolean", "integer" and "float".
+;VALUE: Describes the value for the TYPE. You'll get an error message in wollmux.log if the type doesn't match, and the setting won't be accomplished.
 
-Innerhalb der Konfigurationsdatei wollmux.conf können mehrere Abschnitte OOoEinstellungen definiert werden, wobei alle darin enthalten Einstellungen der Reihe nach gesetzt werden. So ist es z.B. möglich zentrale Vorgaben über die WollMux-Standard-Config zu machen, die dann in der Datei referat.conf bei Bedarf erweitert werden können.
+Within the wollmux.conf file you can define several "OooEinstellungen" sections. All setting changes they contain will be applied in order. A typical scenario is that centrally-determined defaults are set in WollMux-Standard-Config, which can be modified if necessary at the department level in referat.conf.
 
-== Bestimmung von NODE, PROP und TYPE ==
-Wenn bereits eine Konfigurationsdatei (*.xcu) vorliegt, so können die Namen aus dem Inhalt dieser Datei abgeleitet werden. Z.B.
+== Determining NODE, PROP and TYPE ==
+If a configuration file (*.xcu) is present, you can derive these names from the content of that file. For example:
  <?xml version="1.0" encoding="UTF-8"?>
  <oor:component-data xmlns:oor="<nowiki>http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema"</nowiki> 
  oor:name="Inet" oor:package="org.openoffice">
@@ -211,35 +212,35 @@ Wenn bereits eine Konfigurationsdatei (*.xcu) vorliegt, so können die Namen aus
 * PROP = ooInetProxyType
 * TYPE = integer
 
-Also in etwa nach der Regel:
-* NODE = "/" + <oor:component-data/oor:package> + "." + <oor:component-data/oor:name> + "/" + <node/oor:name> [ + "/" + <node/oor:name> ](für jeden Unterknoten)
+The general rule then, is:
+* NODE = "/" + <oor:component-data/oor:package> + "." + <oor:component-data/oor:name> + "/" + <node/oor:name> [ + "/" + <node/oor:name> ](for each subnode)
 * PROP = <prop/oor:name>
-* TYPE = Abgeleitet aus <prop/oor:type> (z.B. xs:int --> integer)
+* TYPE = Derived from <prop/oor:type> (for example, xs:int --> integer)
 
-= Look And Feel Konfiguration =
+= Look And Feel Configuration =
 
-Ab WollMux 11.9 wird das globale Attribut LAF_CLASS_NAME ausgewertet.
+From WollMux 11.9 forward the global attribute LAF_CLASS_NAME is evaluated.
 
 ;Syntax
  LAF_CLASS_NAME "<package.class>"
-;Beispiel
+;Example
  LAF_CLASS_NAME "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"
 
-Über das Setzen des LAF_CLASS_NAME wird somit die Oberfläche aller WollMux-Dialoge an das vorgegebene LookAndFeel angepasst. Diese Option ist besonders für Anwendungen interessant, die den WollMux einbetten möchten. Bei unterschiedlichen LookAndFeels des WollMux und der Anwendung kommt es ansonsten sehr wahrscheinlich zu Problemen.
+By setting LAF_CLASS_NAME you can give the UI of all WollMux dialogs the same "look and feel". This option is particularly interesting for applications with an embedded WollMux. Different "look and feel" for the application and its embedded WollMux will likely lead to problems.
 
-Wird diese Option nicht verwendet, bleibt das Metal-LAF (javax.swing.plaf.metal.MetalLookAndFeel) die Standardeinstellung.
+If you don't use this option, the default setting Metal-LAF (javax.swing.plaf.metal.MetalLookAndFeel) remains in place.
 
-= Dialoge =
-Der WollMux hat verschiedene Dialoge, die sich konfigurativ beeinflussen und auf die Bedürfnisse der Referate maßschneidern lassen.
+= Dialogs =
+WollMux has various dialogs that influence configuration. These can be custom-tailored to meet departmental needs.
 
 == FONT_ZOOM ==
-Durch die Direktive FONT_ZOOM auf der obersten Verschachtelungsebene des Dialoge-Abschnitts kann für alle WollMux-Eingabemasken die Schriftgröße verändert werden. Hinter FONT_ZOOM wird eine Gleitkommazahl angegeben, mit der alle Schriftgrößen multipliziert werden. Beispiel
+Via the directive FONT_ZOOM at the uppermost nesting level of the dialog section, you can change font size for all WollMux UIs. After FONT_ZOOM, enter a floating-point number as shown as a multiplier for font size.  Example:
  Dialoge(
-   FONT_ZOOM "2.0"  # alle Schriften doppelt so groß wie normal.
+   FONT_ZOOM "2.0"  # all fonts are twice their normal size.
  )
 
-== Absenderdaten Bearbeiten ==
-Dieser Dialog dient dazu, den Benutzer die Daten für Einträge aus seiner persönlichen Absenderliste (und damit insbesondere seine eigenen Benutzerdaten) überprüfen und bei Bedarf ändern zu lassen. Die Beschreibung dieses Dialogs befindet sich innerhalb der Konfigurationsdatei in einem Abschnitt ''Dialoge/AbsenderdatenBearbeiten'' und hat folgende Struktur:
+== Configure Sender Data ==
+This dialog enables the user to check data entries from his or her personal list (and especially his or her own user data) and to modify these entries if required.  The description of this dialog can be found in "dialoge.conf", in the section  ''Dialoge/AbsenderdatenBearbeiten''. There is a warning at the top of "dialoge.conf" indicating that individual departments shouldn't alter "dialoge.conf"; instead, changes can be made in "referat.conf".  It has the following structure in "dialoge.conf":
 
  Dialoge(
    AbsenderdatenBearbeiten(
@@ -291,85 +292,86 @@ Dieser Dialog dient dazu, den Benutzer die Daten für Einträge aus seiner pers�
    )
  )
 
-Die 3 Unterabschnitte Person, Orga und Fusszeile beschreiben jeweils ein Dialogfenster. Im jeweiligen Unterabschnitt Eingabefelder werden die Benutzerlemente (z.B. Textfelder oder ComboBoxen) beschrieben, die der Anzeige und Bearbeitung der Absenderdaten dienen. Im dazugehörigen Unterabschnitt Buttons werden die Buttons der Dialogseite mit ihrer Beschriftung und Funktion spezifiziert. Im Folgenden werden die einzelnen Spezifikationselemente erläutert:
+The 3 subsections Person, Orga und Fusszeile (footer) each describe a dialog window. In the respective subsection "Eingabefelder" the user elements controlling display and editing of sender data (i.e. text fields or comboboxes) are described. The related subsection Buttons specifies labeling and function of the dialog page's buttons. The following explains the individual specification elements:
 
-=== MODIFY_MARKER_COLOR "<Farbangabe>" ===
-Wenn der Benutzer einen Wert der Absenderdaten ändert, so wird diese Änderung aus offensichtlichen Gründen nicht in die zugrundeliegende Datenbank (z.B. LDAP) zurückgeschrieben. Stattdessen wird für den geänderten Wert benutzerspezifischer Override angelegt. Der Wert ist ab diesem Zeitpunkt von der Datenbank abgekoppelt. Damit solchermaßen abgekoppelte Felder deutlich erkennbar sind, werden sie farblich markiert. Die Farbe, die dafür verwendet wird, wird durch MODIFY_MARKER_COLOR angegeben. Die <Farbangabe> ist eine wie in CSS übliche hexadezimale Beschreibung der Farbe im Format "#RRGGBB", wobei RR, GG und BB die Rot, Grün und Blau-Komponenten angeben (hexadezimal, 00-FF).
+=== MODIFY_MARKER_COLOR <Color entry> ===
+If the user modifies a sender data value, for obvious reasons this isn't written back to the underlying database (i.e. LDAP). Instead, a user-specific override is set for the modified value. The value is decoupled from the database from that point forward. To make such decoupled fields easily recognizable, they receive a colored marker. The color used is determined by MODIFY_MARKER_COLOR. Die <Color entry>, as in CSS, is a hexadecimal number in the format "#RRGGBB", where RR, GG and BB signify the red, green and blue components (hexadecimal, 00-FF).
 
-=== TITLE "<Titel>" ===
-Der Titel ist der im Rahmen des Fensters angezeigte Titel, wenn die entsprechende Dialogseite angezeigt wird. Im Titel eingebettet können Direktiven der Form "%{Spalte}" sein, die durch den Wert der entsprechenden Spalte des bearbeiteten Datensatzes ersetzt werden. Typischerweise wird hier in den Titel "%{Name} %{Vorname} (%{Rolle})" eingebaut.
+=== TITLE <Title> ===
+This is the dialog window's display title. You can embed directives in the form of "%{<ColumnName>}". These are replaced by the corresponding values in the named column of the correspoding data record. A typical title would be:
+TITLE "Personal data for %{FirstName} %{LastName} (%{Role})"
 
-=== CLOSEACTION "<Aktion>" ===
-Gibt an, welche Aktion ausgeführt werden soll, wenn der Benutzer das Fenster über die Mechanismen des Betriebssystems (z.B. den Schließen-Knopf in der Titelleiste des Fensters) schließt. Erlaubte Aktionen sind [[Konfigurationsdatei_wollmux.conf#ACTION_.22Aktion.22|weiter unten]] beschrieben.
+=== CLOSEACTION "<action>" ===
+Indicates which action will be carried out when the user closes the window with OS-specific actions, (for example, the "X" in the window's title bar). Permitted actions are described [[Konfigurationsdatei_wollmux.conf#ACTION_.22Aktion.22|below]].
 
-=== (<Beschreibung Eingabefeld 1>) ===
-Die Beschreibung eines Eingabefeldes besteht aus Schlüssel-Wert-Paaren. Die möglichen Paare werden in den folgenden Abschnitten beschrieben. Dabei ist zu beachten, dass nicht alle für jede Art von Eingabefeld Anwendung finden. 
+=== (<Input Field Description 1>) ===
+The description of an input field consists of "key-value" pairs. Possible pairs are described in the sections below. Note that not all of these key-value pairs are useable for every type of input field.
 
 ==== LABEL "Label" ====
-Der Label-Text wird links neben dem Eingabeelement angezeigt.
+The label text is shown to the left of the input element.
 
-==== TYPE "Feldtyp" ====
-Der Feldtyp spezifiziert die Art des GUI-Elements. Die folgenden Feldtypen werden unterstützt:
-* textfield: Ein einzeiliges Feld zur Eingabe einer Zeichenkette
-* textarea: Ein mehrzeiliges Feld zur Einhabe eines Textes
-* combobox: Ein kombiniertes Text/Drop-Down-Feld, das mehrere vordefinierte Werte zur Auswahl anbietet
-* label: kein Eingabefeld. Wird verwendet, um nur den LABEL-Text anzuzeigen.
-* separator: eine horizontale Linie zur Gruppierung ohne weitere Funktion
+==== TYPE "Field type" ====
+The field type specifies which GUI element is used. The following field types are supported:
+* textfield: a single-line field for the entry of a string
+* textarea: like a textfield, but can take multiple lines
+* combobox: a combination text/dropdown field, offering a selection of more than one preset values
+* label: not an input field. Only shows LABEL text.
+* separator: a horizontal line used for grouping purposes, with no further function.
 
-==== DB_SPALTE "Spalte" ====
-Dies gibt die Spalte an, deren Daten in den Eingabefeldern angezeigt und damit bearbeitet werden. Die Spaltennamen beziehen sich dabei auf die mittels [[Konfigurationsdatei_wollmux.conf#SENDER_SOURCE|SENDER_SOURCE]] festgelegte [[Konfigurationsdatei_wollmux.conf#Datenquellen|Datenquelle]]. Der bearbeitete Datensatz ist der im Dialog [[Konfigurationsdatei_wollmux.conf#Pers.C3.B6nliche_Absenderliste_Verwalten|Persönliche Absenderliste Verwalten]] ausgewählte.
+==== DB_SPALTE "Column" ====
+This indicates the column containing the data to be displayed in the input field and to be worked with. Column names refer to those determined by [[Konfigurationsdatei_wollmux.conf#SENDER_SOURCE|SENDER_SOURCE]] contained in [[Konfigurationsdatei_wollmux.conf#Datenquellen|Data source]]. The data record being worked with is that selected in the dialog [[Konfigurationsdatei_wollmux.conf#Pers.C3.B6nliche_Absenderliste_Verwalten|Configure sender data]].
 
-==== VALUES (<Liste>) ====
-Diese Liste von Strings spezifiziert die Werte, die ein Eingabefeld des Typs "combobox" dem Benutzer zur Auswahl anbietet.
+==== VALUES (<List>) ====
+This list of strings specifies the values that a "combobox" input field offers the user.
 
-==== LINES "Anzahl" ====
-Legt die Anzahl der angezeigten Zeilen für ein Element des Typs "textarea" fest. Die Eingabe wird dadurch nicht begrenzt. Es können beliebig viele Zeilen eingegeben werden.
+==== LINES "Number" ====
+Determines the number of lines shown in the form GUI for "textarea" input. This number does not limit input. As many lines as desired can be entered.
 
 ==== WRAP "false" ====
-Die Angabe WRAP "false" unterbindet bei Elementen des Typs "textarea" den Umbruch der Zeilen in der Anzeige. Standardeinstellung ist WRAP "true", d.h. lange Zeilen werden am Rand des Feldes umgebrochen. Man beachte, dass dies nur die Anzeige im Dialogfenster betrifft. Es werden keine harten Zeilenumbrüche eingefügt.
+The statement WRAP "false" suppresses word wrap for "textarea" display. The default is WRAP "true", in other words long sentences will be wrapped at the boundary of the field. Note that this setting affects the dialog window display only. No hard line breaks are entered regardless of the setting.
 
 ==== READONLY "true" ====
-Wird dies angegeben, so kann der Benutzer den Wert des Eingabefeldes nicht ändern.
+If this is set, the user can't modify the input field's value.
 
 ==== EDIT "true" ====
-Wird dies bei einem Feld vom Type "combobox" angegeben, so kann der Benutzer nicht nur aus der Liste auswählen, sondern auch freien Text eingeben.
+If this is set for a "combobox" field, the user can not only select from the list, but enter text as well.
 
-=== (<Beschreibung von Button 1>) ===
-Die Beschreibung eines Buttons besteht aus einer Liste von Schlüssel-Wert-Paaren. Die möglichen Paare werden in den folgenden Abschnitten beschrieben. Dabei ist zu beachten, dass nicht alle für jedes Element der Button-Leiste Anwendung finden.
+=== (<Button Description 1>) ===
+The description of a button consists of "key-value" pairs. Possible pairs are described in the sections below. Note that not all of these key-value pairs are useable for each and every element of the button list. 
 
 ==== LABEL "Label" ====
-Die Beschriftung des Buttons.
+The button's label.
 
-==== TYPE "Typ" ====
-Der Typ des Eingabeelements. Folgende Typen werden unterstützt:
-* button: ein normaler Button
-* glue: ein unsichtbares Element, das dazu dient, Abstände zwischen 2 Buttons einzufügen
+==== TYPE "Type" ====
+Type of input element. The following types are supported:
+* button: a normal button
+* glue: an invisible element that serves to add distance between 2 buttons.
 
-==== MINSIZE "Pixelzahl" ====
-Diese Angabe wird nur bei Elementen vom Typ "glue" ausgewertet und gibt die minimale Breite des einzufügenden Leerraumes in Pixeln an. Wird diese Angabe weggelassen wird 0 angenommen.
+==== MINSIZE "No. pixels" ====
+This entry is only valid for elements of type "glue". It indicates the minimum width of the empty space between buttons, in pixels. If this value is not given, "0" is assumed.
 
-==== MAXSIZE "Pixelzahl" ====
-Diese Angabe wird nur bei Elementen vom Typ "glue" ausgewertet und gibt die maximale Breite des einzufügenden Leerraumes in Pixeln an. Wird diese Angabe weggelassen wird unendlich angenommen.
+==== MAXSIZE "No. pixels" ====
+This entry is only valid for elements of type "glue". It indicates the maximum width of the empty space between buttons, in pixels. If this value is not given, "infinite" is assumed.
 
-==== PREFSIZE "Pixelzahl" ====
-Diese Angabe wird nur bei Elementen vom Typ "glue" ausgewertet und gibt die bevorzugte Breite des einzufügenden Leerraumes in Pixeln an. Wird diese Angabe weggelassen wird 0 angenommen.
+==== PREFSIZE "No. pixels" ====
+This entry is only valid for elements of type "glue". It indicates the preferred width of the empty space between buttons, in pixels. If this value is not given, "0" is assumed.
 
-==== HOTKEY "Buchstabe" ====
-Wird dies angegeben, so kann die mit dem Button verknüpfte Aktion über die Tastatur mit der Kombination Alt-Buchstabe aufgerufen werden. Für Buchstaben sind keine Umlaute oder Sonderzeichen erlaubt. ACHTUNG: Mit Windows 2000 wurde in "Eigenschaften von Anzeige" (Rechts-Click auf Desktop -> Eigenschaften) auf dem Reiter "Effekte" die Option hinzugefügt "Tastaturnavigationsanzeiger ausblenden (mit ALT-Taste einblenden)". Wenn diese Option aktiviert ist, dann werden die Hotkey-Buchstaben im Button-Text nur unterstrichen, wenn die Alt-Taste gedrückt wird. Dieses Verhalten weicht vom gewohnten Standardverhalten der meisten Applikationen ab, da diese die entsprechende Windows-Funktion nicht unterstützen.
+==== HOTKEY "letter" ====
+If this entry exists, the action associated with the button can be executed by the combination Alt-"letter". No special characters are allowed. CAUTION: With Windows 2000,  in "Display Properties" (right-click on Desktop -> Properties) in the "Effects" tab there is the option "Hide keyboard navigation indicators until I use the ALT key". If this option is activated, the hotkeys are only underscored when you press the ALT key. This is not standard behavior and most Windows applications don't support it. 
 
-==== ACTION "Aktion" ====
-Die Aktion spezifiziert, was passieren soll, wenn der Benutzer den entsprechenden Button aktiviert. Die folgenden Aktionen werden unterstützt:
-* ''abort'': Der Dialog wird abgebrochen. Änderungen werden ''nicht'' gespeichert.
-* ''back'': Kehrt zum vorherigen Dialog zurück. Änderungen werden ''nicht'' gespeichert.
-* ''restoreStandard'': Nach Bestätigung einer Sicherheitsabfrage werden alle vom Benutzer geänderten Felder auf der angezeigten Dialogseite (und nur auf dieser) wieder an die Werte aus der entsprechenden Datenbank (z.B. LDAP) gekoppelt.
-* ''switchWindow'': bringt die durch WINDOW angegebene Dialogseite in den Vordergrund
-* ''save'': die durch den Benutzer geänderten Werte werden als lokale Overrides gespeichert und überdecken von da an die Werte der Ursprungsdatenbank. Durch restoreStandard kann dies wieder aufgehoben werden.
-* ''saveAndExit'': wie "save", jedoch wird der Dialog danach automatisch geschlossen.
-* ''saveAndBack'': wie "save", jedoch wird danach zum vorherigen Dialog zurückgekehrt.
-Wird die ACTION gar nicht angegeben oder wird ein leerer String als Aktion spezifiziert, so wird der Button ausgegraut und hat keine Funktion.
+==== ACTION "Action" ====
+The ACTION specifies what should occur when the user presses the corresponding button. The following actions are supported:
+* ''abort'': The dialog is cancelled. Modifications are ''not'' saved.
+* ''back'': Returns to previous dialog. Modifications are ''not'' saved.
+* ''restoreStandard'': After the user completes a security dialog, all user-made changes in the diplayed dialog page (and only on this page) are restored to the values existing in the corresponding data source (i.e. LDAP). 
+* ''switchWindow'': brings to the foreground the dialog page indicated by WINDOW.
+* ''save'': User-made modifications are stored as local overrides. From then on they will override the values from the original data source. Use restoreStandard to return to data source values.
+* ''saveAndExit'': like "save", but the dialog closes.
+* ''saveAndBack'': like "save", but returns to the previous dialog.
+If ACTION is not entered at all or specified by an empty string, the button is grayed out and has no function.
 
-==== WINDOW "Fenster" ====
-Gibt für die "switchWindow" Aktion das zu aktivierende Dialogfenster an. Der Name entspricht dem Schlüssel des Unterabschnitts von Fenster(...), also "Person", "Orga" oder "Fusszeile".
+==== WINDOW "Window" ====
+For the "switchWindow" action, this names the window to switch to. The name corresponds to the subsection key of Window(...), which in a standard configuration will be "Person", "Orga" or "Fusszeile".
 
 == Persönliche Absenderliste Verwalten ==
 Dieser Dialog erlaubt dem Benutzer, Einträge zu seiner persönlichen Absenderliste hinzuzufügen oder von ihr zu entfernen. Der Dialog bietet ein Suchfeld, über das der Benutzer bequem auf die Absenderdaten aus vorhandenen Verzeichnissen (insbes. LDAP) zugreifen kann, um diese in seine Absenderliste zu übernehmen. Die Beschreibung dieses Dialogs befindet sich innerhalb der Konfigurationsdatei in einem Abschnitt ''Dialoge/PersoenlicheAbsenderliste'', der im Auslieferungszustand folgenden Inhalt hat:

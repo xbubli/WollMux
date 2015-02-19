@@ -1,9 +1,9 @@
-Ein wesentlicher Bestandteil des WollMux sind die sog. "WollMux-Kommandos", die Sie in OOo-Dokumente integrieren können. Die Kommandos sorgen dafür, dass die Inhalte (z.B. Absenderdaten), die der WollMux bereitstellt in das Zieldokument eingefügt werden.
+"WollMux Commands" constitute a fundamental element of WollMux. You can integrate them in OOo documents. These commands ensure that data provided by WollMux (such as sender data) is inserted into the target document. 
 
-= WollMux-Kommandos =
-Ein WollMux-Kommando ist ein benanntes Bookmark (eine Textmarke), wobei der Name des Bookmarks zugleich das Kommando enthält. Ein WollMux-Kommando hat folgenden Aufbau:
+= WollMux Commands =
+A WollMux Command is a named "Bookmark", for which the name of the Bookmark also consists of the command itself. A WollMux Command has the following structure: 
 
- WM(CMD '<kommando>' <ARGUMENT_1> '<foo1>' ...  <ARGUMENT_N> '<fooN>')<nummer>
+ WM(CMD '<command>' <ARGUMENT_1> '<foo1>' ...  <ARGUMENT_N> '<fooN>')<number>
 
 Die Syntax der WM-Kommandos richtet sich nach dem [[Format von WollMux-Config-Dateien]]. Jedes WollMux-Kommando beginnt mit dem Schüsselwort "WM" und ist von runden Klammern umgeben. Innerhalb der Klammer werden folgende Schlüssel-Wert-Paare akzeptiert:
 
