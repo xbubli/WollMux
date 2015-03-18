@@ -198,6 +198,16 @@ public class FunctionSelectionAccessView implements View
   }
 
   /**
+   * TODO für Simona : Beschreibung
+   * @param funcSel
+   */
+  public void updateFunctionSelection(FunctionSelectionAccess funcSel) {
+    this.funcSel = funcSel;
+    this.functionSelectorBox = null;
+    buildPanel();
+  }
+
+  /**
    * Baut {@link #myPanel} komplett neu auf für den momentanen Zustand des
    * FunctionSelectionAccess.
    * 
