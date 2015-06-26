@@ -198,8 +198,10 @@ public class FunctionSelectionAccessView implements View
   }
 
   /**
-   * TODO für Simona : Beschreibung
+   * Baut {@link #myPanel} neu wenn die Parameter des FunctionSelectionAccess sich 
+   * geändert haben.
    * @param funcSel
+   * @author Christoph Lutz (CIB software GmbH)
    */
   public void updateFunctionSelection(FunctionSelectionAccess funcSel) {
     this.funcSel = funcSel;

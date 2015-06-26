@@ -1580,10 +1580,9 @@ public class FormularMax4000
             }
             else
             {
-              // TODO: Simona hier auch noch die ID des benötigten FormControlls anzeigen 
               Logger.error(L.m(
-                "Kann das für DependentFormControl benötige FormControl nicht auflösen!",
-                dep.getType().toString()));
+                "Kann das ID \"%1\" des benötigten FormControl nicht auflösen!",
+                dep.getId().toString()));
             }
             
             break;
@@ -1832,9 +1831,8 @@ public class FormularMax4000
         // füllen werden. Wir fügen das FormControl für die spätere Bearbeitung der
         // Liste dependentFormControls hinzu.
         FunctionSelection selectTrafo = new FunctionSelection();
-        // TODO: Simona Bessere Fehlermeldung als Dummy!
         ConfigThingy dummyConf = new ConfigThingy("dummy");
-        dummyConf.add(Function.ERROR);
+        dummyConf.add(L.m("Kein Feld mit ID: \"%1\" vorbehalten", id));
         selectTrafo.setExpertFunction(dummyConf);
         imodel.setTrafo(selectTrafo);
         dependentFormControls.add(new DependentFormControl(id,

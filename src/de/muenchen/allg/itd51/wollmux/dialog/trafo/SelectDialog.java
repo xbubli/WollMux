@@ -1,7 +1,7 @@
 /*
  * Dateiname: Select.java
  * Projekt  : WollMux
- * Funktion : Erlaubt die Bearbeitung der Funktion eines Select-Feldes.
+ * Funktion : Erlaubt die Bearbeitung der Funktion Select mit mehrere Wenn-Dann Feldes.
  * 
  * Copyright (c) 2008 Landeshauptstadt München
  *
@@ -30,7 +30,6 @@
  */
 package de.muenchen.allg.itd51.wollmux.dialog.trafo;
 
-import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -39,10 +38,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -51,6 +53,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -63,26 +66,30 @@ import javax.swing.border.EmptyBorder;
 import de.muenchen.allg.itd51.parser.ConfigThingy;
 import de.muenchen.allg.itd51.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.L;
-import de.muenchen.allg.itd51.wollmux.dialog.DimAdjust;
 import de.muenchen.allg.itd51.wollmux.dialog.JPotentiallyOverlongPopupMenuButton;
 import de.muenchen.allg.itd51.wollmux.dialog.TextComponentTags;
 
 /**
  * Erlaubt die Bearbeitung der Funktion eines Select-Feldes.
  * 
- * @author Simona LOi (I23)
+ * @author Matthias Benkmann (D-III-ITD 5.1), Simona Loi (I23)
  */
 public class SelectDialog extends TrafoDialog
 {
-  private static Border CASCADED_ITE_BORDER =
-    BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0),
-      BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(),
-        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+  /**
+   * Auswahl des zu vergleichenden Feldes.
+   */
+  private JComboBox<String> fieldSelector;
 
   /**
-   * Das Panel, das den Dialoginhalt präsentiert.
+   * Der Button um einzelnen Fall zu löschen.
    */
-  private JSelectPanel selectPanel;
+  private JButton cancelIf;
+
+  /**
+   * Das Panel, das die JCasePanels enthält.
+   */
+  private JPanel casesPanel;
 
   /**
    * Das Objekt, das den Startinhalt des Dialogs spezifiziert (und am Ende verwendet
@@ -100,6 +107,32 @@ public class SelectDialog extends TrafoDialog
    */
   private MyWindowListener oehrchen;
 
+  /**
+   * Die Liste, die die JCasePanel enthält.
+   */
+  private List<JCasePanel> list;
+
+  /**
+   * Der Sonst-Teil.
+   */
+
+  private ConditionalResult elseResult = new ConditionalResult();
+
+
+  private static class ConditionalResult
+  {
+    /**
+     * Texteingabe für den Dann. Ist niemals null.
+     */
+    public TextComponentTags text;
+
+    /**
+     * ScrollPane in der sich {@link #text} befindet. Niemals null.
+     */
+    public JScrollPane scrollPane;
+
+  }
+
   public SelectDialog(TrafoDialogParameters params)
   {
     this.params = params;
@@ -108,27 +141,27 @@ public class SelectDialog extends TrafoDialog
 
     params.isValid = false; // erst bei Beendigung mit Okay werden sie wieder valid
 
-    selectPanel =
-      new JSelectPanel(params.conf, params.fieldNames,
-        new MyRepackActionListener());
+    fieldSelector = new JComboBox<String>(new Vector<String>(params.fieldNames));
+    fieldSelector.setEditable(false);
+
+    cancelIf = new JButton("-");
+
+    casesPanel = new JPanel();
+    casesPanel.setLayout(new BoxLayout(casesPanel, BoxLayout.Y_AXIS));
+
+    list = new ArrayList<>();
+
+    parse(params.conf, params.fieldNames);
+
   }
 
-  private class MyRepackActionListener implements ActionListener
+  private static class JCasePanel extends JPanel
   {
-    public void actionPerformed(ActionEvent e)
-    {
-      repack();
-    }
-  }
 
-  private static class JSelectPanel extends JPanel
-  {
     /**
      * Kanitverstan.
      */
     private static final long serialVersionUID = -3752064852698886087L;
-
-    // private
 
     private static class TestType
     {
@@ -166,6 +199,8 @@ public class SelectDialog extends TrafoDialog
      */
     private JComboBox<String> fieldSelector;
 
+    private JButton cancelIf;
+
     /**
      * Auswahl zwischen "" und "nicht".
      */
@@ -181,38 +216,16 @@ public class SelectDialog extends TrafoDialog
      */
     private JTextField compareTo;
 
-    private static class ConditionalResult
-    {
-      /**
-       * Texteingabe für den Dann, wenn {@link #type} == 0. Ist
-       * niemals null.
-       */
-      public TextComponentTags text;
-
-      /**
-       * ScrollPane in der sich {@link #text} befindet. Niemals null.
-       */
-      public JScrollPane scrollPane;
-
-      /**
-       * Eingabe des Dann oder Sonst-Teils, wenn {@link #type} == 1. Kann null sein,
-       * wenn {@link #type} == 0.
-       */
-      public JSelectPanel panel;
-
-      /**
-       * 0 => {@link #text} zählt. 1 => {@link #panel} zählt.
-       */
-      public int type;
-    }
-
     /**
      * Der Dann-Teil.
      */
     private ConditionalResult thenResult = new ConditionalResult();
 
+    /**
+     * Der Radio Button um die Fälle zu selektieren.
+     */
+    private JRadioButton radio;
 
-    private ActionListener packNecessary;
 
     /**
      * Erzeugt eine Dialog-Komponente, die mit den Werten aus conf vorbelegt ist,
@@ -220,46 +233,35 @@ public class SelectDialog extends TrafoDialog
      * Knoten von conf ist ein beliebiger Bezeichner (typischwerweise der
      * Funktionsname).
      * 
-     * @param packNecessary
-     *          wird aufgerufen, wannimmer sich im Panelinhalt soviel getan hat, dass
-     *          ein erneutes pack() sinnvoll wäre.
-     * 
      * @throws IllegalArgumentException
      *           falls conf nicht verstanden wird.
      * 
-     * @author Matthias Benkmann (D-III-ITD D.10) TESTED
+     * @author Matthias Benkmann (D-III-ITD D.10), Simona Loi (I23)
      */
-    public JSelectPanel(ConfigThingy conf, List<String> fieldNames,
-        ActionListener packNecessary)
+    public JCasePanel(ConfigThingy conf, List<String> fieldNames, JComboBox<String> fieldSelector,
+        JButton cancelIf)
     {
-      this.packNecessary = packNecessary;
+      this.fieldSelector = fieldSelector;
+      this.cancelIf = cancelIf;
 
-      if (conf.count() != 1) throw new IllegalArgumentException();
-      try
+      if (conf.count() == 2)
       {
-        conf = conf.getFirstChild();
-      }
-      catch (Exception x)
-      {}
-      ;
-      if (conf.getName().equals("IF"))
-      {
-        if (conf.count() == 2)
+        Iterator<ConfigThingy> iter = conf.iterator();
+        ConfigThingy ifConf = iter.next();
+        ConfigThingy thenConf = iter.next();
+        if (thenConf.getName().equals("THEN"))
         {
-          Iterator<ConfigThingy> iter = conf.iterator();
-          ConfigThingy ifConf = iter.next();
-          ConfigThingy thenConf = iter.next();
-          if (thenConf.getName().equals("THEN"))
-          {
-            parseCondition(ifConf, fieldNames);
-            parseThenElse(thenConf, thenResult, fieldNames);
-            buildGUI(fieldNames); // GUI Elemente in this einfügen (wir erben ja von JPanel).
-            return;
-          }
+          parseCondition(ifConf, fieldNames);
+          parseThen(thenConf, thenResult, fieldNames);
+          buildGUI(fieldNames); // GUI Elemente in this einfügen (wir erben ja von JPanel).
+          return;
         }
       }
+    }
 
-      throw new IllegalArgumentException();
+    public ConditionalResult getThenResult()
+    {
+      return thenResult;
     }
 
     private void buildGUI(List<String> fieldNames)
@@ -267,40 +269,37 @@ public class SelectDialog extends TrafoDialog
       this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
       Box ifBox = Box.createHorizontalBox();
-      Border border =
-        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-          L.m("Wenn"));
-      border = new CompoundBorder(border, new EmptyBorder(2, 5, 5, 5));
-      ifBox.setBorder(border);
-      ifBox.add(fieldSelector);
+      ifBox.setBorder(new EmptyBorder(10, 8, 0, 8));
+      this.add(ifBox);
+
+      radio = new JRadioButton("");
+      radio.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent e) {
+          cancelIf.setEnabled(true);
+        }
+      });
+      ifBox.add(radio);
+      ifBox.add(Box.createHorizontalStrut(10));
+      ifBox.add(new JLabel(L.m("falls")));
       ifBox.add(Box.createHorizontalStrut(10));
       ifBox.add(notSelector);
       ifBox.add(Box.createHorizontalStrut(10));
       ifBox.add(testSelector);
       ifBox.add(Box.createHorizontalStrut(10));
       ifBox.add(compareTo);
-      this.add(DimAdjust.maxHeightIsPrefMaxWidthUnlimited(ifBox));
-
-      Box thenElseBox = Box.createHorizontalBox();
-      thenElseBox.setBorder(new EmptyBorder(10, 8, 0, 8));
-      this.add(thenElseBox);
-
-      //buildConditionalResultGUI(fieldNames, thenElseBox, L.m("Dann"), thenResult);
-
-      this.add(Box.createVerticalStrut(4));
-      thenElseBox.add(new JLabel(L.m("Dann")));
-      thenElseBox.add(Box.createHorizontalGlue());
-      //statt die zwei RadioButton nur ein Panel
-      this.add(thenResult.scrollPane);
-      thenElseBox.add(Box.createHorizontalGlue());
-      JPotentiallyOverlongPopupMenuButton butt =
-        new JPotentiallyOverlongPopupMenuButton(L.m("Serienbrieffeld"),
-          TextComponentTags.makeInsertFieldActions(fieldNames,
-            thenResult.text));
-      butt.setFocusable(false);
-      thenElseBox.add(butt);
       
+      Box thenBox = Box.createHorizontalBox();
+      thenBox.setBorder(new EmptyBorder(10, 8, 0, 8));
+      thenBox.add(new JLabel(L.m("dann")));
+      thenBox.add(Box.createHorizontalStrut(450));
+      this.add(thenBox);
+      this.add(Box.createVerticalStrut(5));
+      Box scrollBox = Box.createHorizontalBox();
+      scrollBox.add(Box.createHorizontalStrut(38));
+      scrollBox.add(thenResult.scrollPane);
+      this.add(scrollBox);
     }
+
 
     /**
      * Erzeugt {@link #fieldSelector}, {@link #notSelector}, {@link #testSelector}
@@ -356,8 +355,6 @@ public class SelectDialog extends TrafoDialog
           {
             String compareConf = conf.getLastChild().toString();
             compareTo = new JTextField(compareConf, 20);
-            fieldSelector = new JComboBox<String>(new Vector<String>(fieldNames));
-            fieldSelector.setEditable(false);
             String fieldName = value.toString();
             Iterator<String> iter = fieldNames.iterator();
             findFieldName: while (true)
@@ -389,7 +386,7 @@ public class SelectDialog extends TrafoDialog
     }
 
     /**
-     * Initialisiert res anhand von conf (was ein ELSE oder THEN Knoten sein muss).
+     * Initialisiert res anhand von conf (was THEN Knoten sein muss).
      * 
      * @param fieldNames
      *          die Feldnamen, die in eventuellen Subpanels angeboten werden sollen.
@@ -397,15 +394,15 @@ public class SelectDialog extends TrafoDialog
      * @throws IllegalArgumentException
      *           falls conf nicht verstanden wird.
      * 
-     * @author Matthias Benkmann (D-III-ITD D.10) TESTED
+     * @author Matthias Benkmann (D-III-ITD D.10), Simona Loi (I23)
      */
-    private void parseThenElse(ConfigThingy conf, ConditionalResult res,
+    private void parseThen(ConfigThingy conf, ConditionalResult res,
         List<String> fieldNames)
     {
       try
       {
         if (conf.count() == 1
-          && (conf.getName().equals("THEN") || conf.getName().equals("ELSE")))
+          && (conf.getName().equals("THEN")))
         {
           ConfigThingy innerConf = conf.getFirstChild();
 
@@ -418,19 +415,10 @@ public class SelectDialog extends TrafoDialog
 
           if (innerConf.count() == 0 || innerConf.getName().equals("CAT"))
           {
-            res.type = 0;
             if (innerConf.getName().equals("CAT"))
               res.text.setContent(TextComponentTags.CAT_VALUE_SYNTAX, innerConf);
             else
               textArea.setText(innerConf.toString());
-            return;
-          }
-          else
-          {
-            res.type = 1; // ACHTUNG! neue JSelectPanels werden noch anderswo
-            // instanziiert
-            res.panel = new JSelectPanel(conf, fieldNames, packNecessary);
-            res.panel.setBorder(CASCADED_ITE_BORDER);
             return;
           }
         }
@@ -447,7 +435,7 @@ public class SelectDialog extends TrafoDialog
      * Liefert ein frisches ConfigThingy, das die von diesem Panel repräsentierte
      * Trafo darstellt. Oberster Knoten ist immer "IF".
      * 
-     * @author Matthias Benkmann (D-III-ITD D.10) TESTED
+     * @author Matthias Benkmann (D-III-ITD D.10), Simona Loi (I23)
      */
     public ConfigThingy getConf()
     {
@@ -462,17 +450,18 @@ public class SelectDialog extends TrafoDialog
 
       ConfigThingy thenConf = conf.add("THEN");
       thenConf.addChild(thenResult.text.getContent(TextComponentTags.CAT_VALUE_SYNTAX));
-//      if (thenResult.type == 0)
-//        thenConf.addChild(thenResult.text.getContent(TextComponentTags.CAT_VALUE_SYNTAX));
-//      else if (thenResult.type == 1) thenConf.addChild(thenResult.panel.getConf());
-//
-//      ConfigThingy elseConf = conf.add("ELSE");
-//      if (elseResult.type == 0)
-//        elseConf.addChild(elseResult.text.getContent(TextComponentTags.CAT_VALUE_SYNTAX));
-//      else if (elseResult.type == 1) elseConf.addChild(elseResult.panel.getConf());
-
       return conf;
     }
+
+    public boolean isSelected() {
+       return this.radio.isSelected();
+    }
+  }
+
+  private ConfigThingy getElseConf() {
+    ConfigThingy elseConf = new ConfigThingy("ELSE");
+    elseConf.addChild(elseResult.text.getContent(TextComponentTags.CAT_VALUE_SYNTAX));
+    return elseConf;
   }
 
   /**
@@ -483,15 +472,43 @@ public class SelectDialog extends TrafoDialog
   private void updateTrafoConf()
   {
     params.conf = new ConfigThingy(params.conf.getName());
-    params.conf.addChild(selectPanel.getConf());
+    for(JCasePanel pan : list)
+      params.conf.addChild(pan.getConf());
+    params.conf.addChild(getElseConf());
     params.isValid = true;
   }
+
+  private List<Action> makeInsertThenActions (List<String> fieldNames,
+    final List<JCasePanel> casesPan) {
+        List<Action> actions = new Vector<Action>();
+        Iterator<String> iter = fieldNames.iterator();
+        while (iter.hasNext())
+        {
+          final String name = iter.next();
+          Action action = new AbstractAction(name)
+          {
+            private static final long serialVersionUID = -9123184290299840565L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+              for(JCasePanel pan : casesPan) {
+                if(pan.isSelected()) {
+                  pan.getThenResult().text.insertTag(name);
+                }
+              }
+            }
+          };
+          actions.add(action);
+        }
+        return actions;
+  }
+
 
   /**
    * Fügt {@link #selectPanel} in dialog ein und zeigt ihn an.
    * 
    * @param dialog
-   * @author Matthias Benkmann (D-III-ITD D.10) TESTED
+   * @author Matthias Benkmann (D-III-ITD D.10), Simona Loi (I23)
    */
   private void show(String windowTitle, JDialog dialog)
   {
@@ -501,16 +518,38 @@ public class SelectDialog extends TrafoDialog
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.addWindowListener(oehrchen);
 
-    JPanel myPanel = new JPanel(new BorderLayout());
+    JPanel myPanel = new JPanel();
+    myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
     myPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
     dialog.add(myPanel);
-    JScrollPane scrollPane = new JScrollPane(selectPanel);
+
+    Box titleBox = Box.createHorizontalBox();
+    Border border =
+      BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+        L.m("Fallunterscheidung für"));
+    border = new CompoundBorder(border, new EmptyBorder(2, 5, 5, 5));
+    titleBox.setBorder(border);
+    titleBox.add(fieldSelector);
+    myPanel.add(titleBox);
+
+    JScrollPane scrollPane = new JScrollPane(casesPanel);
     scrollPane.setBorder(null);
-    myPanel.add(scrollPane, BorderLayout.CENTER);
+    myPanel.add(scrollPane);
+
+    myPanel.add(Box.createVerticalStrut(10));
+
+    Box elseBox = Box.createHorizontalBox();
+    elseBox.setBorder(new EmptyBorder(10, 8, 0, 8));
+    elseBox.add(new JLabel(L.m("Sonst")));
+    elseBox.add(Box.createHorizontalStrut(500));
+    myPanel.add(elseBox);
+    myPanel.add(Box.createVerticalStrut(10));
+
+    myPanel.add(elseResult.scrollPane);
     
     Box lowerButtons = Box.createHorizontalBox();
     lowerButtons.setBorder(new EmptyBorder(10, 4, 5, 4));
-    myPanel.add(lowerButtons, BorderLayout.SOUTH);
+    myPanel.add(lowerButtons);
     
     JButton cancel = new JButton(L.m("Abbrechen"));
     cancel.addActionListener(new ActionListener()
@@ -520,6 +559,31 @@ public class SelectDialog extends TrafoDialog
         abort();
       }
     });
+
+    cancelIf.setEnabled(false);
+    cancelIf.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        deleteCondition();
+      }
+    });
+
+    JButton newIf = new JButton("+");
+    newIf.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+        insertNewCondition();
+      }
+    });
+
+    JPotentiallyOverlongPopupMenuButton butt =
+        new JPotentiallyOverlongPopupMenuButton(L.m("Serienbrieffeld"),
+            makeInsertThenActions(params.fieldNames , list));
+
+    butt.setFocusable(false);
+
     JButton insert = new JButton(L.m("OK"));
     insert.addActionListener(new ActionListener()
     {
@@ -530,10 +594,93 @@ public class SelectDialog extends TrafoDialog
       }
     });
     lowerButtons.add(cancel);
+    lowerButtons.add(Box.createRigidArea(new Dimension(15,0)));
+    lowerButtons.add(cancelIf);
+    lowerButtons.add(Box.createRigidArea(new Dimension(4,0)));
+    lowerButtons.add(newIf);
+    lowerButtons.add(Box.createRigidArea(new Dimension(4,0)));
+    lowerButtons.add(butt);
+    lowerButtons.add(Box.createRigidArea(new Dimension(10,0)));
     lowerButtons.add(Box.createHorizontalGlue());
     lowerButtons.add(insert);
     this.myDialog = dialog;
     repack();
+  }
+
+  protected void insertNewCondition()
+  {
+    try
+    {
+      ConfigThingy  ifConf = params.conf.getFirstChild();
+      JCasePanel pan = new JCasePanel(ifConf, params.fieldNames, fieldSelector,
+        cancelIf);
+      this.casesPanel.add(pan);
+      repack();
+      list.add(pan);
+    }
+    catch (NodeNotFoundException e)
+    {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  protected void deleteCondition()
+  {
+    Iterator<JCasePanel> i = list.iterator();
+    while (i.hasNext()) {
+      JCasePanel pan = i.next();
+      if(pan.isSelected()) {
+        this.casesPanel.remove(pan);
+        this.casesPanel.validate();
+        this.casesPanel.repaint();
+        list.remove(pan);
+        i = list.iterator();
+      }
+    }
+    this.myDialog.pack();
+    cancelIf.setEnabled(false);
+  }
+
+  private void parse(ConfigThingy conf, List<String> fieldNames)
+  {
+    if (!conf.getName().equals("SELECT")) throw new IllegalArgumentException();
+    Iterator<ConfigThingy> iter = conf.iterator();
+    while (iter.hasNext())
+    {
+      conf = iter.next();
+      if (conf.getName().equals("IF")){
+        JCasePanel caseIf = new JCasePanel(conf, params.fieldNames,
+          fieldSelector, cancelIf);
+        casesPanel.add(caseIf);
+        list.add(caseIf);
+      }
+      else if (conf.getName().equals("ELSE")) {
+        try
+        {
+          ConfigThingy elseConf = conf.getFirstChild();
+          JTextArea textArea = new JTextArea(3, 40);
+          textArea.setLineWrap(true);
+          elseResult.scrollPane =
+            new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+          elseResult.text = new TextComponentTags(textArea);
+          if (elseConf.count() == 0 || elseConf.getName().equals("CAT"))
+          {
+            if (elseConf.getName().equals("CAT"))
+              elseResult.text.setContent(TextComponentTags.CAT_VALUE_SYNTAX, elseConf);
+            else
+              textArea.setText(elseConf.toString());
+            return;
+          }
+        }
+        catch (NodeNotFoundException e)
+        {
+          throw new IllegalArgumentException(e);
+        }
+      } else {
+        throw new IllegalArgumentException();
+      }
+    }
   }
 
   /**
@@ -653,12 +800,16 @@ public class SelectDialog extends TrafoDialog
   {
     ConfigThingy funConf =
       new ConfigThingy(
-        "Func",
-        "IF(STRCMP(VALUE \"foo\", \"bar\") THEN(\"Krass, ey!\"))");
+        "SELECT",
+        "IF(STRCMP(VALUE \"Elemente\", \"Erde\") THEN(\"braun\"))" +
+        "IF(STRCMP(VALUE \"Elemente\", \"Wasser\") THEN(\"blau\"))" +
+        "ELSE(\"rot\")");
     Vector<String> fieldNames = new Vector<String>();
-    fieldNames.add("Du");
-    fieldNames.add("bist");
-    fieldNames.add("doof");
+    fieldNames.add("Select:Elemente");
+    fieldNames.add("Erde");
+    fieldNames.add("Wasser");
+    fieldNames.add("braun");
+    fieldNames.add("blau");
     final TrafoDialogParameters params = new TrafoDialogParameters();
     params.conf = funConf;
     params.fieldNames = fieldNames;
