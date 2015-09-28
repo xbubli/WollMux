@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.sun.star.beans.NamedValue;
@@ -437,6 +438,12 @@ public class OOoBasedMailMerge
 
         data.put(columnName, content);
       }
+
+      for (Map.Entry<String, Boolean> entry : simRes.getGroupsVisibilityState().entrySet())
+      {
+        Logger.log(entry.getKey() + " --> " + entry.getValue());
+      }
+      
       try
       {
         getDataSourceWriter().addDataset(data);
