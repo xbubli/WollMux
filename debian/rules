@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+include /usr/share/cdbs/1/rules/buildvars.mk
+
+%:
+	dh $@
+
+override_dh_auto_build:
+
+override_dh_install:
+	pod2man -c 'WollMux for Landeshauptstadt München' -r WollMux-$(DEB_UPSTREAM_VERSION) \
+	  debian/wollmuxbar.pod > debian/wollmuxbar.1
+	inkscape -h 128 -D -e debian/wollmuxbar.png debian/frog.svg
+	install -m 644 -D dist/WollMuxBar.jar \
+          debian/wollmuxbar/usr/share/java/WollMuxBar-$(DEB_UPSTREAM_VERSION).jar
+	dh_link -pwollmuxbar /usr/share/java/WollMuxBar-$(DEB_UPSTREAM_VERSION).jar \
+          /usr/share/java/WollMuxBar.jar
+	dh_install
+
+override_dh_auto_clean:
+	$(RM) debian/stamp-* debian/wollmuxbar.1 debian/wollmuxbar.png 
+	$(RM) debian/*.{pre,post}{inst,rm}
+
+
+

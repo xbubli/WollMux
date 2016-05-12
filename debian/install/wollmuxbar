@@ -1,0 +1,15 @@
+#!/bin/sh
+JAR_FILE="/usr/share/java/WollMuxBar.jar"
+case "_$1" in
+  _--*) ;;
+  _) ;;
+  *) set -- --load "$@" ;;
+esac
+
+FIFO="/tmp/wollmuxbar_$USER"
+if [ ! -p $FIFO ]; then
+  mkfifo $FIFO
+  set -- --firstrun "$@"
+fi
+
+exec java -jar "${JAR_FILE}" --quickstarter --fifo $FIFO "$@"

@@ -1,0 +1,46 @@
+Source: wollmux
+Section: misc
+Priority: optional
+Maintainer: WollMux mailing list <wollmux-general@lists.forge.osor.eu>
+Uploaders: Felix WollMux <wollmux-general@lists.forge.osor.eu>
+Build-Depends: cdbs, debhelper (>= 5), inkscape, default-jdk 
+Standards-Version: 3.8.0
+Homepage: http://www.wollmux.org
+
+Package: libreoffice-wollmux
+Architecture: all
+Depends: ${misc:Depends}, default-jre, libreoffice-writer
+Suggests: wollmuxbar
+Description: WollMux extension for LibreOffice
+ The package adds an extension to LibreOffice with the following features:
+  - On the fly template generation from fragments (e.g. letterhead, footer,
+    form)
+  - Pre-filling templates with personal and organizational data from a variety
+    of databases (LDAP, local user data, and other sources)
+  - Advanced form support with auto-computed fields and input validity checking
+  - Improved user interface for interactive form data
+  - Hiding and showing parts of the document based on form input
+  - Advanced autotext support with identifier pattern matching and a shortcut
+    syntax for filling in placeholders
+  - Chainable printing plugins to provide custom dialogs and transformations
+    when printing
+  - Automatic printing of document variants according to document content
+  - Enhanced serial letter functionality that ties in with the form
+    functionality (e.g. auto-computed fields) and the custom print plugins.
+
+Package: wollmuxbar
+Architecture: all
+Depends: libreoffice-wollmux (= ${binary:Version})
+Conflicts: wollmux (<< ${binary:Version})
+Replaces: wollmux (<< ${binary:Version})
+Description: Standalone toolbar for WollMux
+ The package adds a toolbar to your desktop that provides easy access to the
+ libreoffice-wollmux extension without a permanently running instance of
+ LibreOffice / Apache OpenOffice / OpenOffice.org Writer.
+
+Package: wollmux
+Architecture: all
+Depends: wollmuxbar (= ${binary:Version})
+Description: Transitional package for WollMux Bar
+ Ease transition from wollmux to wollmuxbar package
+

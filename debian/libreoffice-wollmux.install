@@ -1,0 +1,12 @@
+basic/                          /usr/lib/libreoffice/share/extensions/wollmux/
+debian/install/buildinfo        /usr/lib/libreoffice/share/extensions/wollmux/
+debian/install/description.xml  /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/Addons.xcu                  /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/Factories.xcu               /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/META-INF/manifest.xml       /usr/lib/libreoffice/share/extensions/wollmux/META-INF/
+oxt/ProtocolHandler.xcu         /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/Sidebar.xcu                 /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/WollMux.rdb                 /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/WriterWindowState.xcu       /usr/lib/libreoffice/share/extensions/wollmux/
+oxt/help/component*.txt         /usr/lib/libreoffice/share/extensions/wollmux/help/
+oxt/wollmux.png                 /usr/lib/libreoffice/share/extensions/wollmux/icons/
