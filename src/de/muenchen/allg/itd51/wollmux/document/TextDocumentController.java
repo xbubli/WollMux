@@ -23,7 +23,9 @@ import com.sun.star.uno.RuntimeException;
 import de.muenchen.allg.afid.UNO;
 import de.muenchen.allg.itd51.wollmux.SachleitendeVerfuegung;
 import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
-import de.muenchen.allg.itd51.wollmux.WollMuxSingleton;
+import de.muenchen.allg.itd51.wollmux.core.db.ColumnNotFoundException;
+import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasetNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.dialog.DialogLibrary;
 import de.muenchen.allg.itd51.wollmux.core.document.FormFieldFactory;
 import de.muenchen.allg.itd51.wollmux.core.document.FormFieldFactory.FormField;
@@ -45,11 +47,7 @@ import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.parser.SyntaxErrorException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.core.util.Utils;
-import de.muenchen.allg.itd51.wollmux.db.ColumnNotFoundException;
-import de.muenchen.allg.itd51.wollmux.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.db.DatasetNotFoundException;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoiner;
+import de.muenchen.allg.itd51.wollmux.db.DatasourceJoinerFactory;
 import de.muenchen.allg.itd51.wollmux.dialog.DialogFactory;
 import de.muenchen.allg.itd51.wollmux.dialog.formmodel.FormModel;
 import de.muenchen.allg.itd51.wollmux.dialog.formmodel.InvalidFormDescriptorException;
@@ -140,7 +138,7 @@ public class TextDocumentController
   public synchronized void addPrintFunction(String functionName)
   {
     model.addPrintFunction(functionName);
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
     
     // Frame veranlassen, die dispatches neu einzulesen - z.B. damit File->Print
     // auch auf die neue Druckfunktion reagiert.
@@ -166,7 +164,7 @@ public class TextDocumentController
   public synchronized void removePrintFunction(String functionName)
   {
     model.removePrintFunction(functionName);
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
     
     // Frame veranlassen, die dispatches neu einzulesen - z.B. damit File->Print
     // auch auf gelöschte Druckfunktion reagiert.
@@ -434,7 +432,7 @@ public class TextDocumentController
   synchronized public void addNewInputUserField(XTextRange r, String trafoName,
       String hint)
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
 
     try
     {
@@ -808,7 +806,7 @@ public class TextDocumentController
    */
   public synchronized void markAsFormDocument()
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
     model.setType("formDocument");
     model.getPersistentData().setData(DataID.SETTYPE, "formDocument");
   }
@@ -822,7 +820,7 @@ public class TextDocumentController
    */
   public synchronized void deForm()
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
 
     XBookmarksSupplier bmSupp = UNO.XBookmarksSupplier(model.doc);
     XNameAccess bookmarks = bmSupp.getBookmarks();
@@ -876,7 +874,7 @@ public class TextDocumentController
    */
   public synchronized void setFilenameGeneratorFunc(ConfigThingy c)
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
     if (c == null)
       model.getPersistentData().removeData(DataID.FILENAMEGENERATORFUNC);
     else
@@ -890,7 +888,7 @@ public class TextDocumentController
    */
   public synchronized void removeNonWMBookmarks()
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
 
     XBookmarksSupplier bmSupp = UNO.XBookmarksSupplier(model.doc);
     XNameAccess bookmarks = bmSupp.getBookmarks();
@@ -934,7 +932,7 @@ public class TextDocumentController
   public synchronized void setPrintBlocksProps(String blockName, boolean visible,
       boolean showHighlightColor)
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
 
     Iterator<DocumentCommand> iter = new HashSet<DocumentCommand>().iterator();
     if (blockName.equals(SachleitendeVerfuegung.BLOCKNAME_SLV_ALL_VERSIONS))
@@ -1197,7 +1195,7 @@ public class TextDocumentController
   {
     if (simulationResult == null)
     {
-      model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+      model.updateLastTouchedByVersionInfo();
       if (value == null)
         model.getFormFieldValues().remove(fieldId);
       else
@@ -1248,7 +1246,7 @@ public class TextDocumentController
    */
   private void storeCurrentFormDescription()
   {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
+    model.updateLastTouchedByVersionInfo();
 
     ConfigThingy conf = model.getFormDescription();
     try
@@ -1696,7 +1694,7 @@ public class TextDocumentController
     {
       try
       {
-        Dataset ds = DatasourceJoiner.getDatasourceJoiner().getSelectedDatasetTransformed();
+        Dataset ds = DatasourceJoinerFactory.getDatasourceJoiner().getSelectedDatasetTransformed();
         String value = ds.get(overrideFragDbSpalte);
         if (value == null) value = "";
         overrideFragConf = new ConfigThingy("overrideFrag", value);

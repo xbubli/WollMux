@@ -52,8 +52,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -70,23 +68,20 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.muenchen.allg.itd51.wollmux.core.db.DJDataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DJDatasetListElement;
+import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
+import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
 import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.db.DJDataset;
-import de.muenchen.allg.itd51.wollmux.db.DJDatasetListElement;
-import de.muenchen.allg.itd51.wollmux.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.db.QueryResults;
-import de.muenchen.allg.itd51.wollmux.db.TestDatasourceJoiner;
 
 /**
  * Diese Klasse baut anhand einer als ConfigThingy übergebenen Dialogbeschreibung
@@ -871,76 +866,4 @@ public class AbsenderAuswaehlen
     catch (Exception x)
     {/* Hope for the best */}
   }
-
-  /**
-   * Sorgt für das dauernde Neustarten des Dialogs.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1)
-   */
-  private static class RunTest implements ActionListener
-  {
-    private DatasourceJoiner dj;
-
-    private ConfigThingy conf;
-
-    private ConfigThingy verConf;
-
-    private ConfigThingy abConf;
-
-    public RunTest(ConfigThingy conf, ConfigThingy verConf, ConfigThingy abConf,
-        DatasourceJoiner dj)
-    {
-      this.dj = dj;
-      this.conf = conf;
-      this.abConf = abConf;
-      this.verConf = verConf;
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-      try
-      {
-        try
-        {
-          if (e.getActionCommand().equals("abort")) System.exit(0);
-        }
-        catch (Exception x)
-        {}
-        new AbsenderAuswaehlen(conf, verConf, abConf, dj, this);
-      }
-      catch (ConfigurationErrorException x)
-      {
-        Logger.error(x);
-      }
-    }
-  }
-
-  public static void main(String[] args) throws Exception
-  {
-    LookAndFeelInfo[] lf = UIManager.getInstalledLookAndFeels();
-    for (int i = 0; i < lf.length; ++i)
-      System.out.println(lf[i].getClassName());
-    System.out.println("Default L&F: " + UIManager.getSystemLookAndFeelClassName());
-    String confFile = "testdata/WhoAmI.conf";
-    String verConfFile = "testdata/PAL.conf";
-    String abConfFile = "testdata/AbsenderdatenBearbeiten.conf";
-    ConfigThingy conf =
-      new ConfigThingy("", new URL(
-        new File(System.getProperty("user.dir")).toURI().toURL(), confFile));
-    ConfigThingy verConf =
-      new ConfigThingy("", new URL(
-        new File(System.getProperty("user.dir")).toURI().toURL(), verConfFile));
-    ConfigThingy abConf =
-      new ConfigThingy("", new URL(
-        new File(System.getProperty("user.dir")).toURI().toURL(), abConfFile));
-    TestDatasourceJoiner dj = new TestDatasourceJoiner();
-    RunTest test =
-      new RunTest(conf.get("AbsenderAuswaehlen"),
-        verConf.get("PersoenlicheAbsenderliste"),
-        abConf.get("AbsenderdatenBearbeiten"), dj);
-    test.actionPerformed(null);
-    Thread.sleep(600000);
-    System.exit(0);
-  }
-
 }

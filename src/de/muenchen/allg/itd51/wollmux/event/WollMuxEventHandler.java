@@ -130,6 +130,12 @@ import de.muenchen.allg.itd51.wollmux.WollMuxSingleton;
 import de.muenchen.allg.itd51.wollmux.Workarounds;
 import de.muenchen.allg.itd51.wollmux.XPALChangeEventListener;
 import de.muenchen.allg.itd51.wollmux.XPrintModel;
+import de.muenchen.allg.itd51.wollmux.core.db.DJDataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DJDatasetListElement;
+import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
+import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
+import de.muenchen.allg.itd51.wollmux.core.db.TimeoutException;
 import de.muenchen.allg.itd51.wollmux.core.dialog.Dialog;
 import de.muenchen.allg.itd51.wollmux.core.document.Bookmark;
 import de.muenchen.allg.itd51.wollmux.core.document.TextDocumentModel;
@@ -146,12 +152,7 @@ import de.muenchen.allg.itd51.wollmux.core.parser.InvalidIdentifierException;
 import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.db.DJDataset;
-import de.muenchen.allg.itd51.wollmux.db.DJDatasetListElement;
-import de.muenchen.allg.itd51.wollmux.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.db.QueryResults;
-import de.muenchen.allg.itd51.wollmux.db.TimeoutException;
+import de.muenchen.allg.itd51.wollmux.db.DatasourceJoinerFactory;
 import de.muenchen.allg.itd51.wollmux.dialog.AbsenderAuswaehlen;
 import de.muenchen.allg.itd51.wollmux.dialog.Common;
 import de.muenchen.allg.itd51.wollmux.dialog.PersoenlicheAbsenderlisteVerwalten;
@@ -574,7 +575,7 @@ public class WollMuxEventHandler
         // Dialog modal starten:
         setLock();
         new AbsenderAuswaehlen(whoAmIconf, PALconf, ADBconf,
-          DatasourceJoiner.getDatasourceJoiner(), unlockActionListener);
+          DatasourceJoinerFactory.getDatasourceJoiner(), unlockActionListener);
         waitForUnlock();
       }
       catch (Exception e)
@@ -621,7 +622,7 @@ public class WollMuxEventHandler
         // Dialog modal starten:
         setLock();
         new PersoenlicheAbsenderlisteVerwalten(PALconf, ADBconf,
-          DatasourceJoiner.getDatasourceJoiner(), unlockActionListener);
+          DatasourceJoinerFactory.getDatasourceJoiner(), unlockActionListener);
         waitForUnlock();
 }
       catch (Exception e)
@@ -1696,7 +1697,7 @@ public class WollMuxEventHandler
       // Cache und LOS auf Platte speichern.
       try
       {
-        DatasourceJoiner.getDatasourceJoiner().saveCacheAndLOS(WollMuxFiles.getLosCacheFile());
+        DatasourceJoinerFactory.getDatasourceJoiner().saveCacheAndLOS(WollMuxFiles.getLosCacheFile());
       }
       catch (IOException e)
       {
@@ -2273,7 +2274,7 @@ public class WollMuxEventHandler
     @Override
     protected void doit()
     {
-      DatasourceJoiner dsj = DatasourceJoiner.getDatasourceJoiner();
+      DatasourceJoiner dsj = DatasourceJoinerFactory.getDatasourceJoiner();
 
       if (dsj.getLOS().size() == 0)
       {
@@ -2293,7 +2294,7 @@ public class WollMuxEventHandler
       {
         // Liste der nicht zuordnenbaren Datensätze erstellen und ausgeben:
         String names = "";
-        List<String> lost = DatasourceJoiner.getLostDatasetDisplayStrings();
+        List<String> lost = DatasourceJoinerFactory.getLostDatasetDisplayStrings();
         if (lost.size() > 0)
         {
           for (String l : lost)

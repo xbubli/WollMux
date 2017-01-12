@@ -69,7 +69,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -102,22 +101,21 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
+import de.muenchen.allg.itd51.wollmux.core.db.ColumnNotFoundException;
+import de.muenchen.allg.itd51.wollmux.core.db.DJDataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DJDatasetListElement;
+import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasetNotFoundException;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
+import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
+import de.muenchen.allg.itd51.wollmux.core.db.Search;
+import de.muenchen.allg.itd51.wollmux.core.db.SearchStrategy;
+import de.muenchen.allg.itd51.wollmux.core.db.TimeoutException;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
 import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.db.ColumnNotFoundException;
-import de.muenchen.allg.itd51.wollmux.db.DJDataset;
-import de.muenchen.allg.itd51.wollmux.db.DJDatasetListElement;
-import de.muenchen.allg.itd51.wollmux.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.db.DatasetNotFoundException;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.db.QueryResults;
-import de.muenchen.allg.itd51.wollmux.db.Search;
-import de.muenchen.allg.itd51.wollmux.db.SearchStrategy;
-import de.muenchen.allg.itd51.wollmux.db.TestDatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.db.TimeoutException;
 
 /**
  * Diese Klasse baut anhand einer als ConfigThingy übergebenen Dialogbeschreibung
@@ -1543,63 +1541,4 @@ public class PersoenlicheAbsenderlisteVerwalten
     catch (Exception x)
     {/* Hope for the best */}
   }
-
-  /**
-   * Sorgt für das dauernde Neustarten des Dialogs.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1)
-   */
-  private static class RunTest implements ActionListener
-  {
-    private DatasourceJoiner dj;
-
-    private ConfigThingy conf;
-
-    private ConfigThingy abConf;
-
-    public RunTest(ConfigThingy conf, ConfigThingy abConf, DatasourceJoiner dj)
-    {
-      this.dj = dj;
-      this.conf = conf;
-      this.abConf = abConf;
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-      try
-      {
-        if (e.getActionCommand().equals("abort")) System.exit(0);
-      }
-      catch (Exception x)
-      {}
-      try
-      {
-        new PersoenlicheAbsenderlisteVerwalten(conf, abConf, dj, this);
-      }
-      catch (ConfigurationErrorException x)
-      {
-        Logger.error(x);
-      }
-    }
-  }
-
-  public static void main(String[] args) throws Exception
-  {
-    String confFile = "testdata/PAL.conf";
-    String abConfFile = "testdata/AbsenderdatenBearbeiten.conf";
-    ConfigThingy conf =
-      new ConfigThingy("", new URL(
-        new File(System.getProperty("user.dir")).toURI().toURL(), confFile));
-    ConfigThingy abConf =
-      new ConfigThingy("", new URL(
-        new File(System.getProperty("user.dir")).toURI().toURL(), abConfFile));
-    TestDatasourceJoiner dj = new TestDatasourceJoiner();
-    RunTest test =
-      new RunTest(conf.get("PersoenlicheAbsenderliste"),
-        abConf.get("AbsenderdatenBearbeiten"), dj);
-    test.actionPerformed(new ActionEvent(test, 0, ""));
-    Thread.sleep(600000);
-    System.exit(0);
-  }
-
 }

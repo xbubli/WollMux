@@ -557,27 +557,6 @@ public class PrintParametersDialog
     }
   }
   
-  /**
-   * Setzt den Namen des aktuell zu diesem Dokument eingestellten Druckers.
-   * 
-   * @author Judith Baur, Simona Loi
-   */
-  public static void setCurrentPrinterName(XTextDocument doc, String druckerName)
-  {
-    XPrintable printable = UNO.XPrintable(doc);
-    PropertyValue[] printer = null;    
-    UnoProps printerInfo = new UnoProps(printer);
-    try
-    {
-      printerInfo.setPropertyValue("Name", druckerName);
-      if (printable != null) printable.setPrinter(printerInfo.getProps());
-    }
-    catch (Exception e)
-    {
-      System.out.println("property setzen: " + e.getMessage());
-    }
-  }
-
   public static void main(String[] args) throws Exception
   {
     UNO.init();

@@ -1084,4 +1084,27 @@ public class FunctionFactory
     return funcs;
   }
 
+	public static Map<String, Function> parseTrafos(ConfigThingy trafoConf, String nodeName, FunctionLibrary funcLib,
+			DialogLibrary dialogLib, Map<Object, Object> context) {
+		Map<String, Function> trafos = new HashMap<String, Function>();
+		Iterator<ConfigThingy> suIter = trafoConf.query(nodeName, 1).iterator();
+		while (suIter.hasNext()) {
+			ConfigThingy spaltenumsetzung = suIter.next();
+
+			for (ConfigThingy transConf : spaltenumsetzung) {
+				String name = transConf.getName();
+				try {
+					Function func = FunctionFactory.parseChildren(transConf, funcLib, dialogLib, context);
+					if (func == null)
+						throw new ConfigurationErrorException(L.m(
+								"Leere Funktionsdefinition ist nicht erlaubt. Verwenden Sie stattdessen den leeren String \"\""));
+					trafos.put(name, func);
+				} catch (ConfigurationErrorException e) {
+					Logger.error(
+							L.m("Fehler beim Parsen der Spaltenumsetzungsfunktion für Ergebnisspalte \"%1\"", name), e);
+				}
+			}
+		}
+		return trafos;
+	}
 }

@@ -73,6 +73,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
+import de.muenchen.allg.itd51.wollmux.core.db.ColumnNotFoundException;
+import de.muenchen.allg.itd51.wollmux.core.db.ColumnTransformer;
+import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
+import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
+import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
+import de.muenchen.allg.itd51.wollmux.core.db.Search;
+import de.muenchen.allg.itd51.wollmux.core.db.SearchStrategy;
+import de.muenchen.allg.itd51.wollmux.core.db.TimeoutException;
 import de.muenchen.allg.itd51.wollmux.core.dialog.Dialog;
 import de.muenchen.allg.itd51.wollmux.core.dialog.DialogLibrary;
 import de.muenchen.allg.itd51.wollmux.core.functions.FunctionLibrary;
@@ -80,16 +88,10 @@ import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.db.ColumnNotFoundException;
-import de.muenchen.allg.itd51.wollmux.db.ColumnTransformer;
-import de.muenchen.allg.itd51.wollmux.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.db.QueryResults;
-import de.muenchen.allg.itd51.wollmux.db.Search;
-import de.muenchen.allg.itd51.wollmux.db.SearchStrategy;
-import de.muenchen.allg.itd51.wollmux.db.TimeoutException;
+import de.muenchen.allg.itd51.wollmux.db.DatasourceJoinerFactory;
 import de.muenchen.allg.itd51.wollmux.dialog.controls.Listbox;
 import de.muenchen.allg.itd51.wollmux.dialog.controls.UIElement;
+import de.muenchen.allg.itd51.wollmux.func.FunctionFactory;
 
 /**
  * Dialog zur Suche nach Daten in einer Datenquelle, die über DIALOG-Funktion
@@ -501,8 +503,8 @@ public class DatasourceSearchDialog implements Dialog
       try
       {
         columnTransformer =
-          new ColumnTransformer(conf, "Spaltenumsetzung", funcLib, dialogLib,
-            context);
+          new ColumnTransformer(FunctionFactory.parseTrafos(conf, "Spaltenumsetzung", funcLib, dialogLib,
+            context));
       }
       catch (ConfigurationErrorException x)
       {
@@ -1299,7 +1301,7 @@ public class DatasourceSearchDialog implements Dialog
         new File(System.getProperty("user.dir")).toURI().toURL(), confFile));
     Dialog dialog =
       DatasourceSearchDialog.create(conf.get("Funktionsdialoge").get(
-        "Empfaengerauswahl"), DatasourceJoiner.getDatasourceJoiner());
+        "Empfaengerauswahl"), DatasourceJoinerFactory.getDatasourceJoiner());
     Map<Object, Object> myContext = new HashMap<Object, Object>();
     dialog.instanceFor(myContext).show(null, new FunctionLibrary(),
       new DialogLibrary());
