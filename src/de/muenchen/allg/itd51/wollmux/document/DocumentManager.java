@@ -57,7 +57,6 @@ import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 import de.muenchen.allg.itd51.wollmux.dialog.formmodel.FormModel;
-import de.muenchen.allg.itd51.wollmux.dialog.mailmerge.MailMergeNew;
 import de.muenchen.allg.itd51.wollmux.event.WollMuxEventHandler;
 import de.muenchen.allg.itd51.wollmux.former.FormularMax4kController;
 
@@ -78,7 +77,6 @@ public class DocumentManager
   
   private Map<XTextDocument, FormModel> formModels = new HashMap<XTextDocument, FormModel>();
   private Map<XTextDocument, FormularMax4kController> fm4k = new HashMap<XTextDocument, FormularMax4kController>();
-  private Map<XTextDocument, MailMergeNew> mailMerge = new HashMap<XTextDocument, MailMergeNew>();
   
   /**
    * Enthält alle registrierten XEventListener, die bei Statusänderungen der
@@ -282,28 +280,6 @@ public class DocumentManager
   }
 
   /**
-   * Setzt die Instanz des aktuell geöffneten, zu diesem Dokument gehörenden
-   * MailMergeNew.
-   * 
-   * @param max
-   */
-  synchronized public void setCurrentMailMergeNew(XTextDocument doc, MailMergeNew max)
-  {
-    mailMerge.put(doc, max);
-  }
-
-  /**
-   * Liefert die Instanz des aktuell geöffneten, zu diesem Dokument gehörenden
-   * MailMergeNew zurück, oder null, falls kein FormularMax gestartet wurde.
-   * 
-   * @return
-   */
-  synchronized public MailMergeNew getCurrentMailMergeNew(XTextDocument doc)
-  {
-    return mailMerge.get(doc);
-  }
-
-  /**
    * Liefert das aktuelle TextDocumentModel zum übergebenen XTextDocument doc;
    * existiert zu doc noch kein TextDocumentModel, so wird hier eines erzeugt und das
    * neu erzeugte zurück geliefert.
@@ -452,9 +428,6 @@ public class DocumentManager
   {
     if (fm4k.containsKey(doc)) fm4k.get(doc).abort();
     fm4k.remove(doc);
-
-    if (mailMerge.containsKey(doc)) mailMerge.get(doc).dispose();
-    mailMerge.remove(doc);
 
     if (formModels.containsKey(doc)) formModels.get(doc).closing(doc);
     formModels.remove(doc);

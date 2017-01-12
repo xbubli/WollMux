@@ -29,21 +29,15 @@
  */
 package de.muenchen.allg.itd51.wollmux.event;
 
-import javax.naming.OperationNotSupportedException;
-
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.frame.XDispatch;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XLayoutManager;
-import com.sun.star.frame.XModel2;
 import com.sun.star.frame.XStatusListener;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.uno.RuntimeException;
-import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.URL;
 
 import de.muenchen.allg.afid.UNO;
-import de.muenchen.allg.afid.UnoProps;
 import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
 import de.muenchen.allg.itd51.wollmux.document.DocumentManager;
 import de.muenchen.allg.itd51.wollmux.document.TextDocumentController;
@@ -191,11 +185,6 @@ public class DocumentDispatch extends Dispatch
       PropertyValue[] props)
   {
     WollMuxEventHandler.handleTextbausteinEinfuegen(getDocumentController(), false);
-  }
-
-  public void dispatch_wollmux_seriendruck(String arg, PropertyValue[] props)
-  {
-    WollMuxEventHandler.handleSeriendruck(getDocumentController(), false);
   }
 
   public void dispatch_wollmux_test(String arg, PropertyValue[] props)

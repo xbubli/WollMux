@@ -15,7 +15,6 @@ import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 import de.muenchen.allg.itd51.wollmux.dialog.FormGUI;
-import de.muenchen.allg.itd51.wollmux.dialog.mailmerge.MailMergeDatasource;
 import de.muenchen.allg.itd51.wollmux.document.TextDocumentController;
 import de.muenchen.allg.itd51.wollmux.event.Dispatch;
 import de.muenchen.allg.itd51.wollmux.event.WollMuxEventHandler;
@@ -405,12 +404,24 @@ public class SingleDocumentFormModel implements FormModel
     {
       XFrame frame = UNO.XModel(documentController.getModel().doc).getCurrentController().getFrame();
       String frameTitle = (String) UNO.getProperty(frame, "Title");
-      frameTitle = MailMergeDatasource.stripOpenOfficeFromWindowName(frameTitle);
+      frameTitle = SingleDocumentFormModel.stripOpenOfficeFromWindowName(frameTitle);
       return frameTitle;
     }
     catch (Exception x)
     {
       return null;
     }
+  }
+
+  private static String stripOpenOfficeFromWindowName(String str)
+  {
+    /*
+     * Sonderfall für OpenOffice
+     */
+    int idx = str.indexOf(" - OpenOffice");
+    /* Fallback für andere Office-Varianten */
+    if (idx < 0) idx = str.lastIndexOf(" -");
+    if (idx > 0) str = str.substring(0, idx);
+    return str;
   }
 }

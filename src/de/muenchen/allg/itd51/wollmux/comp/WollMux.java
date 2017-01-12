@@ -551,11 +551,7 @@ public class WollMux extends WeakBase implements XServiceInfo, XDispatchProvider
   
   private void createMenuItems()
   {
-    // "Extras->Seriendruck (WollMux)" erzeugen:
     List<String> removeButtonsFor = new ArrayList<String>();
-    removeButtonsFor.add(Dispatch.DISP_wmSeriendruck);
-    WollMux.createMenuButton(Dispatch.DISP_wmSeriendruck, L.m("Seriendruck (WollMux)"),
-      ".uno:ToolsMenu", ".uno:MailMergeWizard", removeButtonsFor);
 
     // "Help->Info über WollMux" erzeugen:
     removeButtonsFor.clear();

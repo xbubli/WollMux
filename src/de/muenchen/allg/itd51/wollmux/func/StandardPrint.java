@@ -42,22 +42,16 @@ import com.sun.star.uno.UnoRuntime;
 
 import de.muenchen.allg.afid.UNO;
 import de.muenchen.allg.afid.UnoService;
-import de.muenchen.allg.itd51.wollmux.ModalDialogs;
 import de.muenchen.allg.itd51.wollmux.SachleitendeVerfuegung;
-import de.muenchen.allg.itd51.wollmux.Workarounds;
 import de.muenchen.allg.itd51.wollmux.XPrintModel;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 import de.muenchen.allg.itd51.wollmux.dialog.SachleitendeVerfuegungenDruckdialog.VerfuegungspunktInfo;
-import de.muenchen.allg.itd51.wollmux.dialog.mailmerge.MailMergeNew;
-import de.muenchen.allg.itd51.wollmux.print.MailMerge;
-import de.muenchen.allg.itd51.wollmux.print.OOoBasedMailMerge;
 import de.muenchen.allg.itd51.wollmux.print.PrintFunction;
 import de.muenchen.allg.itd51.wollmux.print.PrintFunctionLibrary;
 import de.muenchen.allg.itd51.wollmux.print.PrintIntoFile;
-import de.muenchen.allg.itd51.wollmux.print.OOoBasedMailMerge.OutputType;
 
 public class StandardPrint
 {
@@ -174,162 +168,6 @@ public class StandardPrint
   }
 
   /**
-   * Druckt das zu pmod gehörende Dokument für jeden Datensatz der aktuell über
-   * Bearbeiten/Datenbank austauschen eingestellten Tabelle einmal aus.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1) TESTED
-   */
-  public static void mailMergeWithoutSelection(XPrintModel pmod)
-  {
-    MailMerge.mailMerge(pmod, false);
-  }
-
-  /**
-   * Druckt das zu pmod gehörende Dokument für die Datensätze, die der Benutzer in
-   * einem Dialog auswählt. Für die Anzeige der Datensätze im Dialog wird die Spalte
-   * "WollMuxDescription" verwendet. Falls die Spalte "WollMuxSelected" vorhanden ist
-   * und "1", "ja" oder "true" enthält, so ist der entsprechende Datensatz in der
-   * Auswahlliste bereits vorselektiert.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1) TESTED
-   */
-  public static void mailMergeWithSelection(XPrintModel pmod)
-  {
-    MailMerge.mailMerge(pmod, true);
-  }
-
-  /**
-   * Startet den ultimativen MailMerge für pmod.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1)
-   */
-  public static void superMailMerge(XPrintModel pmod)
-  {
-    MailMerge.superMailMerge(pmod);
-  }
-
-  /**
-   * PrintFunction, die das jeweils nächste Element der Seriendruckdaten nimmt und
-   * die Seriendruckfelder im Dokument entsprechend setzt. Siehe
-   * {@link MailMergeNew#mailMergeNewSetFormValue(XPrintModel)}.
-   * 
-   * @throws Exception
-   *           falls was schief geht.
-   * @author Matthias Benkmann (D-III-ITD 5.1), Christoph Lutz (D-III-ITD 5.1)
-   */
-  public static void mailMergeNewSetFormValue(final XPrintModel pmod)
-      throws Exception
-  {
-    MailMergeNew.mailMergeNewSetFormValue(pmod, null);
-  }
-
-  /**
-   * Druckfunktion zum Aufruf des Seriendrucks über den OOo-MailMergeService.
-   * 
-   * @throws Exception
-   *           falls was schief geht.
-   * @author Christoph Lutz (D-III-ITD-D101)
-   */
-  public static void oooMailMergeToOdtFile(final XPrintModel pmod) throws Exception
-  {
-    // Meldung, wenn die maximal verarbeitbare Größe der Selection überschritten ist.
-    Integer maxProcessableDatasets =
-      Workarounds.workaroundForTDFIssue89783(pmod.getTextDocument());
-    if (maxProcessableDatasets != null
-      && MailMergeNew.mailMergeNewGetSelectionSize(pmod) > maxProcessableDatasets)
-    {
-      ModalDialogs.showInfoModal(
-        L.m("WollMux-Seriendruck Fehler"),
-        L.m(
-          "Bei diesem Seriendruck-Hauptdokument kann Ihre aktuelle Office-Version maximal %1 Datensätze verarbeiten. "
-            + "Bitte schränken Sie die Anzahl der Datensätze im Druckdialog unter 'folgende Datensätze verwenden' entsprechend ein!",
-          maxProcessableDatasets));
-      pmod.cancel();
-      return;
-    }
-    
-    OOoBasedMailMerge.oooMailMerge(pmod, OOoBasedMailMerge.OutputType.toShell);
-  }
-
-  /**
-   * Druckfunktion zum Aufruf des Seriendrucks über den OOo-MailMergeService.
-   * 
-   * @throws Exception
-   *           falls was schief geht.
-   * @author Christoph Lutz (D-III-ITD-D101)
-   */
-  public static void oooMailMergeToPrinter(final XPrintModel pmod) throws Exception
-  {
-    OOoBasedMailMerge.oooMailMerge(pmod, OOoBasedMailMerge.OutputType.toPrinter);
-  }
-
-  /**
-   * Druckfunktion zum Abspeichern der durch den Seriendruck erzeugten Daten in
-   * einzelnen Dateien.
-   * 
-   * @author Ignaz Forster (D-III-ITD-D102)
-   * @throws Exception
-   */
-  public static void mailMergeNewToSingleODT(final XPrintModel pmod)
-      throws Exception
-  {
-    boolean isODT = true;
-    MailMergeNew.saveToFile(pmod, isODT);
-  }
-  
-  /**
-   * Druckfunktion zum Abspeichern der durch den Seriendruck erzeugten Daten in
-   * einzelnen Dateien.
-   * 
-   * @author Ignaz Forster (D-III-ITD-D102)
-   * @throws Exception
-   */
-  public static void mailMergeNewToSinglePDF(final XPrintModel pmod)
-      throws Exception
-  {
-    boolean isODT = false;
-    MailMergeNew.saveToFile(pmod, isODT);
-  }
-
-  /**
-   * <b>DEPRECATED</b>: Druckfunktion zum Versenden der durch den Seriendruck erzeugten odt Dokumente per
-   * E-Mail. Funktion existiert noch für die Kompatibilität zu alten Konfigurationen. Zukünftig werden 
-   * <b>"mailMergeNewToODTEMail"</b> bzw. <b>"mailMergeNewToPDFEMail"</b> diese Funktion ersetzen.
-   * 
-   * @author Stefan Ströbl (ITM-B17)
-   */
-  public static void mailMergeNewToEMail(final XPrintModel pmod)
-  {
-    //TODO Funktion entfernen, wenn die Standard-Config 13.X schon länger (~2 Jahre) im Einsatz ist
-    boolean isODT = true;
-    MailMergeNew.sendAsEmail(pmod, isODT);
-  }
-  
-  /**
-   * Druckfunktion zum Versenden der durch den Seriendruck erzeugten odt Dokumente per
-   * E-Mail
-   * 
-   * @author Ignaz Forster (D-III-ITD-D102)
-   */
-  public static void mailMergeNewToODTEMail(final XPrintModel pmod)
-  {
-    boolean isODT = true;
-    MailMergeNew.sendAsEmail(pmod, isODT);
-  }
-  
-  /**
-   * Druckfunktion zum Versenden der durch den Seriendruck erzeugten pdf Dokumente per
-   * E-Mail
-   * 
-   * @author judith baur (D-III-ITD-D102)
-   */
-  public static void mailMergeNewToPDFEMail(final XPrintModel pmod)
-  {
-    boolean isODT = false;
-    MailMergeNew.sendAsEmail(pmod, isODT);
-  }
-  
-  /**
    * Hängt das zu pmod gehörige TextDocument an das im Property
    * PrintIntoFile_OutputDocument gespeicherte XTextDocument an. Falls noch kein
    * solches Property existiert, wird ein leeres Dokument angelegt.
@@ -410,22 +248,8 @@ public class StandardPrint
   private enum InternalPrintFunction {
     SachleitendeVerfuegung("sachleitendeVerfuegung", 50),
   
-    MailMergeNewSetFormValue("mailMergeNewSetFormValue", 75),
-  
-    SachleitendeVerfuegungOutput("sachleitendeVerfuegungOutput", 150),
-  
-    MailMergeNewToSingleODT("mailMergeNewToSingleODT", 200),
+    SachleitendeVerfuegungOutput("sachleitendeVerfuegungOutput", 150);
     
-    MailMergeNewToSinglePDF("mailMergeNewToSinglePDF", 200),
-  
-    MailMergeNewToODTEMail("mailMergeNewToODTEMail", 200),
-    
-    MailMergeNewToPDFEMail("mailMergeNewToPDFEMail", 200),
-  
-    OOoMailMergeToPrinter("oooMailMergeToPrinter", 200),
-  
-    OOoMailMergeToOdtFile("oooMailMergeToOdtFile", 200);
-  
     private String intMethodName;
   
     private int order;

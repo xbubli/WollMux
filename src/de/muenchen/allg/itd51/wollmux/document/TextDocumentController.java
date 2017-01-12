@@ -14,11 +14,9 @@ import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.XComponent;
-import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XDependentTextField;
 import com.sun.star.text.XTextContent;
-import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextRange;
 import com.sun.star.uno.RuntimeException;
 
@@ -27,13 +25,11 @@ import de.muenchen.allg.itd51.wollmux.SachleitendeVerfuegung;
 import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
 import de.muenchen.allg.itd51.wollmux.WollMuxSingleton;
 import de.muenchen.allg.itd51.wollmux.core.dialog.DialogLibrary;
-import de.muenchen.allg.itd51.wollmux.core.document.Bookmark;
 import de.muenchen.allg.itd51.wollmux.core.document.FormFieldFactory;
 import de.muenchen.allg.itd51.wollmux.core.document.FormFieldFactory.FormField;
 import de.muenchen.allg.itd51.wollmux.core.document.PersistentDataContainer.DataID;
 import de.muenchen.allg.itd51.wollmux.core.document.SimulationResults;
 import de.muenchen.allg.itd51.wollmux.core.document.TextDocumentModel;
-import de.muenchen.allg.itd51.wollmux.core.document.TextDocumentModel.FieldSubstitution;
 import de.muenchen.allg.itd51.wollmux.core.document.TextDocumentModel.OverrideFragChainException;
 import de.muenchen.allg.itd51.wollmux.core.document.VisibilityElement;
 import de.muenchen.allg.itd51.wollmux.core.document.commands.DocumentCommand;
@@ -93,13 +89,6 @@ public class TextDocumentController
    */
   private SimulationResults simulationResult = null;
   
-  /**
-   * Der Vorschaumodus ist standardmäßig immer gesetzt - ist dieser Modus nicht
-   * gesetzt, so werden in den Formularfeldern des Dokuments nur die Feldnamen in
-   * spitzen Klammern angezeigt.
-   */
-  private boolean formFieldPreviewMode;
-
   private DialogLibrary globalDialogs;
 
   private FunctionLibrary globalFunctions;
@@ -107,7 +96,6 @@ public class TextDocumentController
   public TextDocumentController(TextDocumentModel model, FunctionLibrary globalFunctions, DialogLibrary globalDialogs)
   {
     this.model = model;
-    this.formFieldPreviewMode = true;
     this.globalFunctions = globalFunctions;
     this.globalDialogs = globalDialogs;
     
@@ -390,7 +378,6 @@ public class TextDocumentController
   public synchronized void addFormFieldValue(String id, String value)
   {
     setFormFieldValue(id, value);
-    updateFormFields(id);
   }
   
   /**
@@ -1002,346 +989,6 @@ public class TextDocumentController
   }
   
   /**
-   * Diese Methode ersetzt die Referenzen der ID fieldId im gesamten Dokument durch
-   * neue IDs, die in der Ersetzungsregel subst spezifiziert sind. Die
-   * Ersetzungsregel ist vom Typ FieldSubstitution und kann mehrere Elemente (fester
-   * Text oder Felder) enthalten, die an Stelle eines alten Feldes gesetzt werden
-   * sollen. Damit kann eine Ersetzungsregel auch dafür sorgen, dass aus einem früher
-   * atomaren Feld in Zukunft mehrere Felder entstehen. Folgender Abschnitt
-   * beschreibt, wie sich die Ersetzung auf verschiedene Elemente auswirkt.
-   * 
-   * 1) Ersetzungsregel "&lt;neueID&gt;" - Einfache Ersetzung mit genau einem neuen
-   * Serienbrieffeld (z.B. "&lt;Vorname&gt;"): bei insertFormValue-Kommandos wird
-   * WM(CMD'insertFormValue' ID '&lt;alteID&gt;' [TRAFO...]) ersetzt durch WM(CMD
-   * 'insertFormValue' ID '&lt;neueID&gt;' [TRAFO...]). Bei Serienbrieffeldern wird
-   * die ID ebenfalls direkt ersetzt durch &lt;neueID&gt;. Bei
-   * WollMux-Benutzerfeldern, die ja immer eine Trafo hinterlegt haben, wird jede
-   * vorkommende Funktion VALUE 'alteID' ersetzt durch VALUE 'neueID'.
-   * 
-   * 2) Ersetzungsregel "&lt;A&gt; &lt;B&gt;" - Komplexe Ersetzung mit mehreren neuen
-   * IDs und Text: Diese Ersetzung ist bei transformierten Feldern grundsätzlich
-   * nicht zugelassen. Ein bestehendes insertFormValue-Kommando ohne Trafo wird wie
-   * folgt manipuliert: anstelle des alten Bookmarks WM(CMD'insertFormValue' ID
-   * 'alteId') wird der entsprechende Freitext und entsprechende neue
-   * WM(CMD'insertFormValue' ID 'neueIDn') Bookmarks in den Text eingefügt. Ein
-   * Serienbrieffeld wird ersetzt durch entsprechende neue Serienbrieffelder, die
-   * durch den entsprechenden Freitext getrennt sind.
-   * 
-   * 3) Leere Ersetzungsregel - in diesem Fall wird keine Ersetzung vorgenommen und
-   * die Methode kehrt sofort zurück.
-   * 
-   * In allen Fällen gilt, dass die Änderung nach Ausführung dieser Methode sofort
-   * aktiv sind und der Aufruf von setFormFieldValue(...) bzw. updateFormFields(...)
-   * mit den neuen IDs direkt in den veränderten Feldern Wirkung zeigt. Ebenso werden
-   * aus dem Formularwerte-Abschnitt in den persistenten Daten die alten Werte der
-   * ersetzten IDs gelöscht.
-   * 
-   * @param fieldId
-   *          Feld, das mit Hilfe der Ersetzungsregel subst ersetzt werden soll.
-   * @param subst
-   *          die Ersetzungsregel, die beschreibt, welche Inhalte an Stelle des alten
-   *          Feldes eingesetzt werden sollen.
-   * 
-   * @author Christoph Lutz (D-III-ITD-5.1) TESTED
-   */
-  public synchronized void applyFieldSubstitution(String fieldId,
-      FieldSubstitution subst)
-  {
-    // keine Ersetzung, wenn subst leer ist.
-    if (!subst.iterator().hasNext()) return;
-
-    // enthält später die neue FieldId, wenn eine 1-zu-1-Zuordnung vorliegt
-    String newFieldId = null;
-
-    // Neuen Text zusammenbauen, Felder sind darin mit <feldname> gekennzeichnet
-    String substStr = "";
-    int count = 0;
-    for (Iterator<FieldSubstitution.SubstElement> substIter = subst.iterator(); substIter.hasNext();)
-    {
-      FieldSubstitution.SubstElement ele = substIter.next();
-      if (ele.isFixedText())
-      {
-        substStr += ele.getValue();
-      }
-      else if (ele.isField())
-      {
-        substStr += "<" + ele.getValue() + ">";
-        newFieldId = ele.getValue();
-      }
-      count++;
-    }
-    if (count != 1) newFieldId = null;
-
-    // Alle InsertFormValue-Felder anpassen:
-    List<FormField> c = model.getIdToFormFields().get(fieldId);
-    if (c != null)
-    {
-      for (Iterator<FormField> iter = c.iterator(); iter.hasNext();)
-      {
-        FormField f = iter.next();
-        if (f.getTrafoName() != null)
-        {
-          // Transformierte Felder soweit möglich behandeln
-          if (newFieldId != null)
-            // 1-zu-1 Zuordnung: Hier kann substitueFieldID verwendet werden
-            f.substituteFieldID(fieldId, newFieldId);
-          else
-            Logger.error(L.m("Kann transformiertes Feld nur durch eine 1-zu-1 Zuordnung ersetzen."));
-        }
-        else
-        {
-          // Untransformierte Felder durch neue Felder ersetzen
-          XTextRange anchor = f.getAnchor();
-          if (f.getAnchor() != null)
-          {
-            // Cursor erzeugen, Formularfeld löschen und neuen String setzen
-            XTextCursor cursor = anchor.getText().createTextCursorByRange(anchor);
-            f.dispose();
-            cursor.setString(substStr);
-
-            // Neue Bookmarks passend zum Text platzieren
-            cursor.collapseToStart();
-            for (Iterator<FieldSubstitution.SubstElement> substIter =
-              subst.iterator(); substIter.hasNext();)
-            {
-              FieldSubstitution.SubstElement ele = substIter.next();
-              if (ele.isFixedText())
-              {
-                cursor.goRight((short) ele.getValue().length(), false);
-              }
-              else if (ele.isField())
-              {
-                cursor.goRight((short) (1 + ele.getValue().length() + 1), true);
-                new Bookmark(
-                  "WM(CMD 'insertFormValue' ID '" + ele.getValue() + "')", model.doc,
-                  cursor);
-                cursor.collapseToEnd();
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Alle Datenbank- und Benutzerfelder anpassen:
-    c = model.getIdToTextFieldFormFields().get(fieldId);
-    if (c != null)
-    {
-      for (Iterator<FormField> iter = c.iterator(); iter.hasNext();)
-      {
-        FormField f = iter.next();
-        if (f.getTrafoName() != null)
-        {
-          // Transformierte Felder soweit möglich behandeln
-          if (newFieldId != null)
-            // 1-zu-1 Zuordnung: hier kann f.substitueFieldId nicht verwendet
-            // werden, dafür kann aber die Trafo angepasst werden.
-            substituteFieldIdInTrafo(f.getTrafoName(), fieldId, newFieldId);
-          else
-            Logger.error(L.m("Kann transformiertes Feld nur durch eine 1-zu-1 Zuordnung ersetzen."));
-        }
-        else
-        {
-          // Untransformierte Felder durch neue Felder ersetzen
-          XTextRange anchor = f.getAnchor();
-          if (f.getAnchor() != null)
-          {
-            // Cursor über den Anker erzeugen und Formularfeld löschen
-            XTextCursor cursor = anchor.getText().createTextCursorByRange(anchor);
-            f.dispose();
-            cursor.setString(substStr);
-
-            // Neue Datenbankfelder passend zum Text einfügen
-            cursor.collapseToStart();
-            for (Iterator<FieldSubstitution.SubstElement> substIter =
-              subst.iterator(); substIter.hasNext();)
-            {
-              FieldSubstitution.SubstElement ele = substIter.next();
-              if (ele.isFixedText())
-              {
-                cursor.goRight((short) ele.getValue().length(), false);
-              }
-              else if (ele.isField())
-              {
-                cursor.goRight((short) (1 + ele.getValue().length() + 1), true);
-                insertMailMergeField(ele.getValue(), cursor);
-                cursor.collapseToEnd();
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Fügt an Stelle der aktuellen Selektion ein Serienbrieffeld ein, das auf die
-   * Spalte fieldId zugreift und mit dem Wert "" vorbelegt ist, falls noch kein Wert
-   * für fieldId gesetzt wurde. Das Serienbrieffeld wird im WollMux registriert und
-   * kann damit sofort verwendet werden.
-   */
-  synchronized public void insertMailMergeFieldAtCursorPosition(String fieldId)
-  {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-    insertMailMergeField(fieldId, model.getViewCursor());
-  }
-
-  /**
-   * Fügt an Stelle range ein Serienbrieffeld ein, das auf die Spalte fieldId
-   * zugreift und mit dem Wert "" vorbelegt ist, falls noch kein Wert für fieldId
-   * gesetzt wurde. Das Serienbrieffeld wird im WollMux registriert und kann damit
-   * sofort verwendet werden.
-   */
-  private void insertMailMergeField(String fieldId, XTextRange range)
-  {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-
-    if (fieldId == null || fieldId.length() == 0 || range == null) return;
-    try
-    {
-      // Feld einfügen
-      XMultiServiceFactory factory = UNO.XMultiServiceFactory(model.doc);
-      XDependentTextField field =
-        UNO.XDependentTextField(factory.createInstance("com.sun.star.text.TextField.Database"));
-      XPropertySet master =
-        UNO.XPropertySet(factory.createInstance("com.sun.star.text.FieldMaster.Database"));
-      UNO.setProperty(master, "DataBaseName", "DataBase");
-      UNO.setProperty(master, "DataTableName", "Table");
-      UNO.setProperty(master, "DataColumnName", fieldId);
-      if (!formFieldPreviewMode)
-        UNO.setProperty(field, "Content", "<" + fieldId + ">");
-      field.attachTextFieldMaster(master);
-
-      XTextCursor cursor = range.getText().createTextCursorByRange(range);
-      cursor.getText().insertTextContent(cursor, field, true);
-      cursor.collapseToEnd();
-
-      // Feldwert mit leerem Inhalt vorbelegen
-      if (!model.getFormFieldValuesMap().containsKey(fieldId))
-      {
-        setFormFieldValue(fieldId, "");
-      }
-
-      // Formularfeld bekanntmachen, damit es vom WollMux verwendet wird.
-      if (!model.getIdToTextFieldFormFields().containsKey(fieldId))
-        model.getIdToTextFieldFormFields().put(fieldId, new Vector<FormField>());
-      List<FormField> formFields = model.getIdToTextFieldFormFields().get(fieldId);
-      formFields.add(FormFieldFactory.createDatabaseFormField(model.doc, field));
-
-      // Ansicht des Formularfeldes aktualisieren:
-      updateFormFields(fieldId);
-    }
-    catch (java.lang.Exception e)
-    {
-      Logger.error(e);
-    }
-  }
-
-  /**
-   * Fügt an Stelle der aktuellen Selektion ein "Nächster Datensatz"-Feld für den
-   * OOo-basierten Seriendruck ein.
-   */
-  public synchronized void insertNextDatasetFieldAtCursorPosition()
-  {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-    insertNextDatasetField(model.getViewCursor());
-  }
-
-  /**
-   * Fügt an Stelle range ein "Nächster Datensatz"-Feld für den OOo-basierten
-   * Seriendruck ein.
-   */
-  private void insertNextDatasetField(XTextRange range)
-  {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-
-    try
-    {
-      // Feld einfügen
-      XMultiServiceFactory factory = UNO.XMultiServiceFactory(model.doc);
-      XDependentTextField field =
-        UNO.XDependentTextField(factory.createInstance("com.sun.star.text.TextField.DatabaseNextSet"));
-      UNO.setProperty(field, "DataBaseName", "DataBaseName");
-      UNO.setProperty(field, "DataTableName", "DataTableName");
-      UNO.setProperty(field, "DataCommandType", com.sun.star.sdb.CommandType.TABLE);
-      UNO.setProperty(field, "Condition", "true");
-
-      XTextCursor cursor = range.getText().createTextCursorByRange(range);
-      cursor.getText().insertTextContent(cursor, field, true);
-    }
-    catch (java.lang.Exception e)
-    {
-      Logger.error(e);
-    }
-  }
-  
-  /**
-   * Diese Methode speichert die als Kinder von conf übergebenen Metadaten für den
-   * Seriendruck persistent im Dokument oder löscht die Metadaten aus dem Dokument,
-   * wenn conf keine Kinder besitzt. conf kann dabei ein beliebig benannter Konten
-   * sein, dessen Kinder müssen aber gültige Schlüssel des Abschnitts
-   * WM(Seriendruck(...) darstellen. So ist z.B. "Datenquelle" ein gültiger
-   * Kindknoten von conf.
-   * 
-   * @param conf
-   * 
-   * @author Christoph Lutz (D-III-ITD-5.1) TESTED
-   */
-  public synchronized void setMailmergeConfig(ConfigThingy conf)
-  {
-    model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-
-    model.setMailmergeConf(new ConfigThingy("Seriendruck"));
-    for (Iterator<ConfigThingy> iter = conf.iterator(); iter.hasNext();)
-    {
-      ConfigThingy c = new ConfigThingy(iter.next());
-      model.getMailmergeConf().addChild(c);
-    }
-    ConfigThingy wm = new ConfigThingy("WM");
-    wm.addChild(model.getMailmergeConf());
-    if (model.getMailmergeConf().count() > 0)
-      model.getPersistentData().setData(DataID.SERIENDRUCK, wm.stringRepresentation());
-    else
-      model.getPersistentData().removeData(DataID.SERIENDRUCK);
-  }
-  
-  
-
-  /**
-   * Im Vorschaumodus überträgt diese Methode den Formularwert zum Feldes fieldId aus
-   * dem persistenten Formularwerte-Abschnitt in die zugehörigen Formularfelder im
-   * Dokument; Ist der Vorschaumodus nicht aktiv, so werden jeweils nur die
-   * Spaltennamen in spitzen Klammern angezeigt; Für die Auflösung der TRAFOs wird
-   * dabei die Funktionsbibliothek funcLib verwendet. Außerdem wird der
-   * Modified-Status des Dokuments gesetzt.
-   * 
-   * Befindet sich das TextDocumentModel in einem über {@link #startSimulation()}
-   * gestarteten Simulationslauf, so wird der Update der von fieldId abhängigen
-   * Formularelemente nur simuliert und es der Modified-Status des Dokuments wird
-   * nicht gesetzt.
-   * 
-   * @param fieldId
-   *          Die ID des Formularfeldes bzw. der Formularfelder, die im Dokument
-   *          angepasst werden sollen.
-   */
-  public synchronized void updateFormFields(String fieldId)
-  {
-    if (formFieldPreviewMode)
-    {
-      String value = model.getFormFieldValuesMap().get(fieldId);
-      if (simulationResult != null)
-        value = simulationResult.getFormFieldValues().get(fieldId);
-      if (value == null) value = "";
-      setFormFields(fieldId, value, true);
-    }
-    else
-    {
-      setFormFields(fieldId, "<" + fieldId + ">", false);
-    }
-    if (simulationResult == null) model.setDocumentModified(true);
-  }
-  
-  /**
    * Blendet alle Sichtbarkeitselemente eines Dokuments (Dokumentkommandos oder
    * Bereiche mit Namensanhang 'GROUPS ...'), die einer bestimmten Gruppe groupId
    * zugehören, ein oder aus.
@@ -1409,151 +1056,6 @@ public class TextDocumentController
     {
       Logger.error(e);
     }
-  }
-
-
-  /**
-   * Im Vorschaumodus überträgt diese Methode alle Formularwerte aus dem
-   * Formularwerte-Abschnitt der persistenten Daten in die zugehörigen Formularfelder
-   * im Dokument, wobei evtl. gesetzte Trafo-Funktionen ausgeführt werden; Ist der
-   * Vorschaumodus nicht aktiv, so werden jeweils nur die Spaltennamen in spitzen
-   * Klammern angezeigt.
-   */
-  private void updateAllFormFields()
-  {
-    for (String fieldId : model.getAllFieldIDs())
-    {
-      updateFormFields(fieldId);
-    }
-  }
-
-  /**
-   * Setzt den Inhalt aller Formularfelder mit ID fieldId auf value.
-   * 
-   * @param applyTrafo
-   *          gibt an, ob eine evtl. vorhandene TRAFO-Funktion angewendet werden soll
-   *          (true) oder nicht (false).
-   * @author Matthias Benkmann, Christoph Lutz (D-III-ITD 5.1)
-   */
-  private void setFormFields(String fieldId, String value, boolean applyTrafo)
-  {
-    setFormFields(model.getIdToFormFields().get(fieldId), value, applyTrafo, false);
-    setFormFields(model.getIdToTextFieldFormFields().get(fieldId), value, applyTrafo, true);
-    setFormFields(model.getStaticTextFieldFormFields(), value, applyTrafo, true);
-  }
-
-  /**
-   * Setzt den Inhalt aller Formularfelder aus der Liste formFields auf value und
-   * wendet dabei ggf; (abhängig von applyTrafo und useKnownFormValues) die für die
-   * Formularfelder korrekte Transformation an; Wenn simulateResult != null ist, so
-   * werden die Werte nicht tatsächlich gesetzt, sondern das Setzen in die HashMap
-   * simulateResult simuliert. formFields kann null sein, dann passiert nichts.
-   * 
-   * @param applyTrafo
-   *          gibt an ob eine evtl. vorhandenen Trafofunktion verwendet werden soll.
-   * @param useKnownFormValues
-   *          gibt an, ob die Trafofunktion mit den bekannten Formularwerten (true)
-   *          als Parameter, oder ob alle erwarteten Parameter mit dem Wert value
-   *          (false) versorgt werden - wird aus Gründen der Abwärtskompatiblität zu
-   *          den bisherigen insertFormValue-Kommandos benötigt.
-   * 
-   * @author Matthias Benkmann, Christoph Lutz (D-III-ITD 5.1)
-   */
-  private void setFormFields(List<FormField> formFields, String value,
-      boolean applyTrafo, boolean useKnownFormValues)
-  {
-    if (formFields == null) return;
-
-    if (simulationResult == null) model.updateLastTouchedByVersionInfo(WollMuxSingleton.getVersion(), Utils.getOOoVersion());
-
-    for (FormField field : formFields)
-      try
-      {
-        String result;
-        String trafoName = field.getTrafoName();
-        if (trafoName != null && applyTrafo)
-        {
-          if (useKnownFormValues)
-            result = getTransformedValue(trafoName);
-          else
-            result = getTransformedValue(trafoName, value);
-        }
-        else
-          result = value;
-
-        if (simulationResult == null)
-          field.setValue(result);
-        else
-          simulationResult.setFormFieldContent(field, result);
-      }
-      catch (RuntimeException e)
-      {
-        // Absicherung gegen das manuelle Löschen von Dokumentinhalten.
-      }
-  }
-
-  /**
-   * Schaltet den Vorschaumodus für Formularfelder an oder aus - ist der
-   * Vorschaumodus aktiviert, so werden alle Formularfelder mit den zuvor gesetzten
-   * Formularwerten angezeigt, ist der Preview-Modus nicht aktiv, so werden nur die
-   * Spaltennamen in spitzen Klammern angezeigt.
-   * 
-   * @param previewMode
-   *          true schaltet den Modus an, false schaltet auf den Vorschaumodus zurück
-   *          in dem die aktuell gesetzten Werte wieder angezeigt werden.
-   * 
-   * @author Christoph Lutz (D-III-ITD-5.1)
-   */
-  public synchronized void setFormFieldsPreviewMode(boolean previewMode)
-  {
-    this.formFieldPreviewMode = previewMode;
-    updateAllFormFields();
-    cleanupGarbageOfUnreferencedAutofunctions();
-  }
-  
-  public synchronized void clearFormFields()
-  {
-    model.clearFormFieldValues();
-  }
-  
-  /**
-   * Startet den Simulationsmodus, in dem Änderungen an Formularelementen (WollMux-
-   * und NON-WollMux-Felder) nur simuliert und nicht tatsächlich durchgeführt werden.
-   * Benötigt wird dieser Modus für den Seriendruck über den OOo-Seriendruck, bei dem
-   * die Änderungen nicht auf dem gerade offenen TextDocument durchgeführt werden,
-   * sondern auf einer durch den OOo-Seriendruckmechanismus verwalteten Kopie des
-   * Dokuments.
-   */
-  public synchronized void startSimulation()
-  {
-    simulationResult = new SimulationResults();
-    simulationResult.setFormFieldValues(model.getFormFieldValuesMap());
-    simulationResult.setGroupsVisibilityState(model.getMapGroupIdToVisibilityState());
-
-    // Aktuell gesetzte FormField-Inhalte auslesen und simulationResults bekannt
-    // machen.
-    HashSet<FormField> ffs = new HashSet<FormField>();
-    for (List<FormField> l : model.getIdToFormFields().values())
-      for (FormField ff : l)
-        ffs.add(ff);
-    for (List<FormField> l : model.getIdToTextFieldFormFields().values())
-      for (FormField ff : l)
-        ffs.add(ff);
-    ffs.addAll(model.getStaticTextFieldFormFields());
-    for (FormField ff : ffs)
-      simulationResult.setFormFieldContent(ff, ff.getValue());
-  }
-
-  /**
-   * Beendet den mit {@link #startSimulation()} gestarteten Simulationsmodus und
-   * liefert das Simulationsergebnis in SimulationResults zurück oder null, wenn der
-   * Simulationsmodus vorher nicht gestartet wurde.
-   */
-  public synchronized SimulationResults stopSimulation()
-  {
-    SimulationResults r = simulationResult;
-    simulationResult = null;
-    return r;
   }
 
   /**
@@ -1639,7 +1141,7 @@ public class TextDocumentController
       String masterName = masterNames[i];
       if (masterName == null || !masterName.startsWith(prefix)) continue;
       String varName = masterName.substring(prefix.length());
-      String trafoName = model.getFunctionNameForUserFieldName(varName);
+      String trafoName = TextDocumentModel.getFunctionNameForUserFieldName(varName);
       if (trafoName != null && !usedFunctions.contains(trafoName))
       {
         try
@@ -1766,60 +1268,6 @@ public class TextDocumentController
   }
 
   /**
-   * Diese Methode ersetzt jedes Vorkommen von VALUE "oldFieldId" in der
-   * dokumentlokalen Trafo-Funktion trafoName durch VALUE "newFieldId", speichert die
-   * neue Formularbeschreibung persistent im Dokument ab und passt die aktuelle
-   * Funktionsbibliothek entsprechend an. Ist einer der Werte trafoName, oldFieldId
-   * oder newFieldId null, dann macht diese Methode nichts.
-   * 
-   * @param trafoName
-   *          Die Funktion, in der die Ersetzung vorgenommen werden soll.
-   * @param oldFieldId
-   *          Die alte Feld-ID, die durch newFieldId ersetzt werden soll.
-   * @param newFieldId
-   *          die neue Feld-ID, die oldFieldId ersetzt.
-   * 
-   * @author Christoph Lutz (D-III-ITD-5.1) TESTED
-   */
-  private void substituteFieldIdInTrafo(String trafoName, String oldFieldId,
-      String newFieldId)
-  {
-    if (trafoName == null || oldFieldId == null || newFieldId == null) return;
-    try
-    {
-      ConfigThingy trafoConf =
-        model.getFormDescription().query("Formular").query("Funktionen").query(trafoName,
-          2).getLastChild();
-      substituteValueRecursive(trafoConf, oldFieldId, newFieldId);
-
-      // neue Formularbeschreibung persistent machen
-      storeCurrentFormDescription();
-
-      // Funktion neu parsen und Funktionsbibliothek anpassen
-      FunctionLibrary funcLib = getFunctionLibrary();
-      try
-      {
-        Function func =
-          FunctionFactory.parseChildren(trafoConf, funcLib, dialogLib,
-            getFunctionContext());
-        getFunctionLibrary().add(trafoName, func);
-      }
-      catch (ConfigurationErrorException e)
-      {
-        // sollte eigentlich nicht auftreten, da die alte Trafo ja auch schon
-        // einmal erfolgreich geparsed werden konnte.
-        Logger.error(e);
-      }
-    }
-    catch (NodeNotFoundException e)
-    {
-      Logger.error(L.m(
-        "Die trafo '%1' ist nicht in diesem Dokument definiert und kann daher nicht verändert werden.",
-        trafoName));
-    }
-  }
-
-  /**
    * Ersetzt die aktuelle Selektion (falls vorhanden) durch ein WollMux-Formularfeld
    * mit ID id, dem Hinweistext hint und der durch trafoConf definierten TRAFO. Das
    * Formularfeld ist direkt einsetzbar, d.h. sobald diese Methode zurückkehrt, kann
@@ -1866,7 +1314,6 @@ public class TextDocumentController
         // Feldwert mit leerem Inhalt vorbelegen, wenn noch kein Wert gesetzt
         // ist.
         if (!model.getFormFieldValues().containsKey(fieldId)) setFormFieldValue(fieldId, "");
-        updateFormFields(fieldId);
       }
 
       // Nicht referenzierte Autofunktionen/InputUser-TextFieldMaster löschen
@@ -1984,9 +1431,6 @@ public class TextDocumentController
     // eine feste ID-Zuordnung und kommen aus dieser auch nicht aus. D.h.
     // InsertFormValue-Bookmarks müssen nicht aktualisiert werden.
     collectNonWollMuxFormFields();
-
-    // Felder updaten:
-    updateAllFormFields();
   }
 
   /**
@@ -2045,41 +1489,6 @@ public class TextDocumentController
     {
       Logger.error(e);
       return null;
-    }
-  }
-
-  /**
-   * Durchsucht das ConfigThingy conf rekursiv und ersetzt alle VALUE-Knoten, die
-   * genau ein Kind besitzen durch VALUE-Knoten mit dem neuen Kind newId.
-   * 
-   * @param conf
-   *          Das ConfigThingy, in dem rekursiv ersetzt wird.
-   * 
-   * @author Christoph Lutz (D-III-ITD-5.1)
-   */
-  private static void substituteValueRecursive(ConfigThingy conf, String oldFieldId,
-      String newFieldId)
-  {
-    if (conf == null) return;
-
-    if (conf.getName().equals("VALUE") && conf.count() == 1
-      && conf.toString().equals(oldFieldId))
-    {
-      try
-      {
-        conf.getLastChild().setName(newFieldId);
-      }
-      catch (NodeNotFoundException e)
-      {
-        // kann wg. der obigen Prüfung nicht auftreten.
-      }
-      return;
-    }
-
-    for (Iterator<ConfigThingy> iter = conf.iterator(); iter.hasNext();)
-    {
-      ConfigThingy child = iter.next();
-      substituteValueRecursive(child, oldFieldId, newFieldId);
     }
   }
 
