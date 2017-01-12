@@ -215,7 +215,7 @@ public class WollMux extends WeakBase implements XServiceInfo, XDispatchProvider
    * @param xRegKey
    * @return
    */
-  public synchronized static boolean __writeRegistryServiceInfo(XRegistryKey xRegKey)
+  public synchronized static boolean __writeRegistryServiceInfo(XRegistryKey xRegKey) // NO_UCD (unused code)
   {
     try
     {
@@ -241,7 +241,7 @@ public class WollMux extends WeakBase implements XServiceInfo, XDispatchProvider
     }
   }
   
-  public synchronized static XSingleServiceFactory __getServiceFactory(
+  public synchronized static XSingleServiceFactory __getServiceFactory( // NO_UCD (unused code)
       final String sImplementationName,
       final XMultiServiceFactory xFactory,
       final XRegistryKey xKey)

@@ -4,6 +4,7 @@ localizedConfigStrings.conf
 oxt/WollMux.rdb
 idl/de/muenchen/allg/itd51/wollmux/*.urd
 idl/de/muenchen/allg/itd51/wollmux/*.class
+bin/*
 bin/de
 bin/data
 bin/com
@@ -32,3 +33,4 @@ misc/version
 .project
 .classpath
 /.settings
+/.idea

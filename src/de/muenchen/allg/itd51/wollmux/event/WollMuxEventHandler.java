@@ -49,125 +49,79 @@
  */
 package de.muenchen.allg.itd51.wollmux.event;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileFilter;
-
-import com.sun.star.awt.XWindow;
 import com.sun.star.beans.PropertyValue;
-import com.sun.star.container.NoSuchElementException;
 import com.sun.star.document.XEventListener;
-import com.sun.star.form.binding.InvalidBindingStateException;
 import com.sun.star.frame.XDispatch;
 import com.sun.star.frame.XFrame;
-import com.sun.star.frame.XFrames;
-import com.sun.star.lang.EventObject;
-import com.sun.star.lang.XComponent;
-import com.sun.star.text.XPageCursor;
-import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.text.XTextRange;
-import com.sun.star.text.XTextViewCursorSupplier;
-import com.sun.star.uno.AnyConverter;
-import com.sun.star.uno.RuntimeException;
-import com.sun.star.util.XStringSubstitution;
-import com.sun.star.view.DocumentZoomType;
-import com.sun.star.view.XPrintable;
 
-import de.muenchen.allg.afid.UNO;
-import de.muenchen.allg.afid.UnoProps;
-import de.muenchen.allg.afid.UnoService;
-import de.muenchen.allg.itd51.wollmux.GlobalFunctions;
-import de.muenchen.allg.itd51.wollmux.ModalDialogs;
-import de.muenchen.allg.itd51.wollmux.OpenExt;
-import de.muenchen.allg.itd51.wollmux.PersoenlicheAbsenderliste;
-import de.muenchen.allg.itd51.wollmux.SachleitendeVerfuegung;
-import de.muenchen.allg.itd51.wollmux.TextModule;
 import de.muenchen.allg.itd51.wollmux.WollMuxFehlerException;
-import de.muenchen.allg.itd51.wollmux.WollMuxFiles;
-import de.muenchen.allg.itd51.wollmux.WollMuxSingleton;
-import de.muenchen.allg.itd51.wollmux.Workarounds;
 import de.muenchen.allg.itd51.wollmux.XPALChangeEventListener;
-import de.muenchen.allg.itd51.wollmux.XPrintModel;
-import de.muenchen.allg.itd51.wollmux.core.db.DJDataset;
-import de.muenchen.allg.itd51.wollmux.core.db.DJDatasetListElement;
-import de.muenchen.allg.itd51.wollmux.core.db.Dataset;
-import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
-import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
-import de.muenchen.allg.itd51.wollmux.core.db.TimeoutException;
-import de.muenchen.allg.itd51.wollmux.core.dialog.Dialog;
-import de.muenchen.allg.itd51.wollmux.core.document.Bookmark;
 import de.muenchen.allg.itd51.wollmux.core.document.TextDocumentModel;
-import de.muenchen.allg.itd51.wollmux.core.document.VisibleTextFragmentList;
-import de.muenchen.allg.itd51.wollmux.core.document.WMCommandsFailedException;
-import de.muenchen.allg.itd51.wollmux.core.document.commands.DocumentCommand;
-import de.muenchen.allg.itd51.wollmux.core.document.commands.DocumentCommands;
-import de.muenchen.allg.itd51.wollmux.core.functions.Function;
-import de.muenchen.allg.itd51.wollmux.core.functions.FunctionLibrary;
-import de.muenchen.allg.itd51.wollmux.core.functions.Values;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
-import de.muenchen.allg.itd51.wollmux.core.parser.InvalidIdentifierException;
 import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
-import de.muenchen.allg.itd51.wollmux.db.DatasourceJoinerFactory;
-import de.muenchen.allg.itd51.wollmux.dialog.AbsenderAuswaehlen;
-import de.muenchen.allg.itd51.wollmux.dialog.Common;
-import de.muenchen.allg.itd51.wollmux.dialog.PersoenlicheAbsenderlisteVerwalten;
-import de.muenchen.allg.itd51.wollmux.dialog.formmodel.FormModel;
-import de.muenchen.allg.itd51.wollmux.dialog.formmodel.InvalidFormDescriptorException;
-import de.muenchen.allg.itd51.wollmux.dialog.formmodel.MultiDocumentFormModel;
 import de.muenchen.allg.itd51.wollmux.document.DocumentManager;
 import de.muenchen.allg.itd51.wollmux.document.DocumentManager.TextDocumentInfo;
-import de.muenchen.allg.itd51.wollmux.document.FrameController;
 import de.muenchen.allg.itd51.wollmux.document.TextDocumentController;
-import de.muenchen.allg.itd51.wollmux.document.commands.DocumentCommandInterpreter;
-import de.muenchen.allg.itd51.wollmux.former.FormularMax4kController;
-import de.muenchen.allg.itd51.wollmux.func.FunctionFactory;
-import de.muenchen.allg.itd51.wollmux.print.PrintModels;
-import de.muenchen.allg.ooo.TextDocument;
+import de.muenchen.allg.itd51.wollmux.event.handlers.BasicEvent;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnAbdruck;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnAbout;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnAddDocumentEventListener;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnAddPALChangeEventListener;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnButtonZuleitungszeilePressed;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnCheckInstallation;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnCloseAndOpenExt;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnCloseTextDocument;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnCollectNonWollMuxFormFieldsViaPrintModel;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnDumpInfo;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnExecutePrintFunction;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFocusFormField;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFormControllerInitCompleted;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFormValueChanged;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFormularMax4000Returned;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFormularMax4000Show;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnFunctionDialog;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnInitialize;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnJumpToMark;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnJumpToPlaceholder;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnKill;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnManagePrintFunction;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnMarkBlock;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnNotifyDocumentEventListener;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnOpen;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnOpenDocument;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnPALChangedNotify;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnPrint;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnPrintPage;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnProcessMultiform;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnProcessTextDocument;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnRegisterDispatchInterceptor;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnRemoveDocumentEventListener;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnRemovePALChangeEventListener;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnReprocessTextDocument;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSaveAs;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSaveTempAndOpenExt;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetFormValue;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetFormValueFinished;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetInsertValues;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetPrintBlocksPropsViaPrintModel;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetSender;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetVisibleState;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetWindowPosSize;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnSetWindowVisible;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnShowDialogAbsenderAuswaehlen;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnShowDialogPersoenlicheAbsenderlisteVerwalten;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnTextDocumentClosed;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnTextbausteinEinfuegen;
+import de.muenchen.allg.itd51.wollmux.event.handlers.OnZifferEinfuegen;
 
 /**
  * Ermöglicht die Einstellung neuer WollMuxEvents in die EventQueue.
@@ -328,210 +282,6 @@ public class WollMuxEventHandler
   }
 
   /**
-   * Dient als Basisklasse für konkrete Event-Implementierungen.
-   */
-  private static class BasicEvent implements WollMuxEvent
-  {
-
-    private boolean[] lock = new boolean[] { true };
-
-    /**
-     * Diese Method ist für die Ausführung des Events zuständig. Nach der Bearbeitung
-     * entscheidet der Rückgabewert ob unmittelbar die Bearbeitung des nächsten
-     * Events gestartet werden soll oder ob das GUI blockiert werden soll bis das
-     * nächste actionPerformed-Event beim EventProcessor eintrifft.
-     */
-    @Override
-    public void process()
-    {
-      Logger.debug("Process WollMuxEvent " + this.toString());
-      try
-      {
-        doit();
-      }
-      catch (WollMuxFehlerException e)
-      {
-        // hier wäre ein showNoConfigInfo möglich - ist aber nicht eindeutig auf no config zurückzuführen
-        errorMessage(e);
-      }
-      // Notnagel für alle Runtime-Exceptions.
-      catch (Throwable t)
-      {
-        Logger.error(t);
-      }
-    }
-
-    /**
-     * Logged die übergebene Fehlermeldung nach Logger.error() und erzeugt ein
-     * Dialogfenster mit der Fehlernachricht.
-     */
-    protected void errorMessage(Throwable t)
-    {
-      Logger.error(t);
-      String msg = "";
-      if (t.getMessage() != null) msg += t.getMessage();
-      Throwable c = t.getCause();
-      /*
-       * Bei RuntimeExceptions keine Benutzersichtbare Meldung, weil
-       * 
-       * 1. der Benutzer damit eh nix anfangen kann
-       * 
-       * 2. dies typischerweise passiert, wenn der Benutzer das Dokument geschlossen
-       * hat, bevor der WollMux fertig war. In diesem Fall will er nicht mit einer
-       * Meldung belästigt werden.
-       */
-      if (c instanceof RuntimeException) return;
-
-      if (c != null)
-      {
-        msg += "\n\n" + c;
-      }
-      ModalDialogs.showInfoModal(L.m("WollMux-Fehler"), msg);
-    }
-
-    /**
-     * Jede abgeleitete Event-Klasse sollte die Methode doit redefinieren, in der die
-     * eigentlich event-Bearbeitung erfolgt. Die Methode doit muss alle auftretenden
-     * Exceptions selbst behandeln, Fehler die jedoch benutzersichtbar in einem
-     * Dialog angezeigt werden sollen, können über eine WollMuxFehlerException nach
-     * oben weitergereicht werden.
-     */
-    protected void doit() throws WollMuxFehlerException
-    {};
-
-    /**
-     * Diese Methode kann am Ende einer doit()-Methode aufgerufen werden und versucht
-     * die Absturzwahrscheinlichkeit von OOo/WollMux zu senken in dem es den
-     * GarbageCollector der JavaVM triggert freien Speicher freizugeben. Durch
-     * derartige Aufräumaktionen insbesondere nach der Bearbeitung von Events, die
-     * viel mit Dokumenten/Cursorn/Uno-Objekten interagieren, wird die Stabilität des
-     * WollMux spürbar gesteigert.
-     * 
-     * In der Vergangenheit gab es z.B. sporadische, nicht immer reproduzierbare
-     * Abstürze von OOo, die vermutlich in einem fehlerhaften Speichermanagement in
-     * der schwer zu durchschauenden Kette JVM->UNO-Proxies->OOo begründet waren.
-     */
-    protected void stabilize()
-    {
-      System.gc();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName();
-    }
-
-    /**
-     * Setzt den Enable-Status aller OOo-Fenster, die der desktop aktuell liefert auf
-     * enabled. Über den Status kann gesteuert werden, ob das Fenster
-     * Benutzerinteraktionen wie z.B. Mausklicks auf Menüpunkte oder Tastendrücke
-     * verarbeitet. Die Verarbeitung findet nicht statt, wenn enabled==false gesetzt
-     * ist, ansonsten schon.
-     * 
-     * @param enabled
-     */
-    static void enableAllOOoWindows(boolean enabled)
-    {
-      try
-      {
-        XFrames frames = UNO.XFramesSupplier(UNO.desktop).getFrames();
-        for (int i = 0; i < frames.getCount(); i++)
-        {
-          try
-          {
-            XFrame frame = UNO.XFrame(frames.getByIndex(i));
-            XWindow contWin = frame.getContainerWindow();
-            if (contWin != null) contWin.setEnable(enabled);
-          }
-          catch (java.lang.Exception e)
-          {
-            Logger.error(e);
-          }
-        }
-      }
-      catch (java.lang.Exception e)
-      {
-        Logger.error(e);
-      }
-    }
-
-    /**
-     * Setzt einen lock, der in Verbindung mit setUnlock und der
-     * waitForUnlock-Methode verwendet werden kann, um quasi Modalität für nicht
-     * modale Dialoge zu realisieren und setzt alle OOo-Fenster auf enabled==false.
-     * setLock() sollte stets vor dem Aufruf des nicht modalen Dialogs erfolgen, nach
-     * dem Aufruf des nicht modalen Dialogs folgt der Aufruf der
-     * waitForUnlock()-Methode. Der nicht modale Dialog erzeugt bei der Beendigung
-     * ein ActionEvent, das dafür sorgt, dass setUnlock aufgerufen wird.
-     */
-    protected void setLock()
-    {
-      enableAllOOoWindows(false);
-      synchronized (lock)
-      {
-        lock[0] = true;
-      }
-    }
-
-    /**
-     * Macht einen mit setLock() gesetzten Lock rückgängig, und setzt alle
-     * OOo-Fenster auf enabled==true und bricht damit eine evtl. wartende
-     * waitForUnlock()-Methode ab.
-     */
-    protected void setUnlock()
-    {
-      synchronized (lock)
-      {
-        lock[0] = false;
-        lock.notifyAll();
-      }
-      enableAllOOoWindows(true);
-    }
-
-    /**
-     * Wartet so lange, bis der vorher mit setLock() gesetzt lock mit der Methode
-     * setUnlock() aufgehoben wird. So kann die quasi Modalität nicht modale Dialoge
-     * zu realisiert werden. setLock() sollte stets vor dem Aufruf des nicht modalen
-     * Dialogs erfolgen, nach dem Aufruf des nicht modalen Dialogs folgt der Aufruf
-     * der waitForUnlock()-Methode. Der nicht modale Dialog erzeugt bei der
-     * Beendigung ein ActionEvent, das dafür sorgt, dass setUnlock aufgerufen wird.
-     */
-    protected void waitForUnlock()
-    {
-      try
-      {
-        synchronized (lock)
-        {
-          while (lock[0] == true)
-            lock.wait();
-        }
-      }
-      catch (InterruptedException e)
-      {}
-    }
-
-    /**
-     * Dieser ActionListener kann nicht modalen Dialogen übergeben werden und sorgt
-     * in Verbindung mit den Methoden setLock() und waitForUnlock() dafür, dass quasi
-     * modale Dialoge realisiert werden können.
-     */
-    protected UnlockActionListener unlockActionListener = new UnlockActionListener();
-
-    protected class UnlockActionListener implements ActionListener
-    {
-      public ActionEvent actionEvent = null;
-
-      @Override
-      public void actionPerformed(ActionEvent arg0)
-      {
-        actionEvent = arg0;
-        setUnlock();
-      }
-    }
-  }
-
-  /**
    * Stellt das WollMuxEvent event in die EventQueue des EventProcessors.
    * 
    * @param event
@@ -551,41 +301,7 @@ public class WollMuxEventHandler
     handle(new OnShowDialogAbsenderAuswaehlen());
   }
 
-  /**
-   * Dieses Event wird vom WollMux-Service (...comp.WollMux) und aus dem
-   * WollMuxEventHandler ausgelöst und sorgt dafür, dass der Dialog AbsenderAuswählen
-   * gestartet wird.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnShowDialogAbsenderAuswaehlen extends BasicEvent
-  {
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      ConfigThingy conf = WollMuxFiles.getWollmuxConf();
-
-      try
-      {
-        // Konfiguration auslesen:
-        ConfigThingy whoAmIconf = requireLastSection(conf, "AbsenderAuswaehlen");
-        ConfigThingy PALconf = requireLastSection(conf, "PersoenlicheAbsenderliste");
-        ConfigThingy ADBconf = requireLastSection(conf, "AbsenderdatenBearbeiten");
-
-        // Dialog modal starten:
-        setLock();
-        new AbsenderAuswaehlen(whoAmIconf, PALconf, ADBconf,
-          DatasourceJoinerFactory.getDatasourceJoiner(), unlockActionListener);
-        waitForUnlock();
-      }
-      catch (Exception e)
-      {
-        throw new CantStartDialogException(e);
-      }
-
-      WollMuxEventHandler.handlePALChangedNotify();
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -598,41 +314,7 @@ public class WollMuxEventHandler
     handle(new OnShowDialogPersoenlicheAbsenderlisteVerwalten());
   }
 
-  /**
-   * Dieses Event wird vom WollMux-Service (...comp.WollMux) und aus dem
-   * WollMuxEventHandler ausgelöst und sorgt dafür, dass der Dialog
-   * PersönlicheAbsendeliste-Verwalten gestartet wird.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnShowDialogPersoenlicheAbsenderlisteVerwalten extends
-      BasicEvent
-  {
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      ConfigThingy conf = WollMuxFiles.getWollmuxConf();
-
-      try
-      {
-        // Konfiguration auslesen:
-        ConfigThingy PALconf = requireLastSection(conf, "PersoenlicheAbsenderliste");
-        ConfigThingy ADBconf = requireLastSection(conf, "AbsenderdatenBearbeiten");
-
-        // Dialog modal starten:
-        setLock();
-        new PersoenlicheAbsenderlisteVerwalten(PALconf, ADBconf,
-          DatasourceJoinerFactory.getDatasourceJoiner(), unlockActionListener);
-        waitForUnlock();
-}
-      catch (Exception e)
-      {
-        throw new CantStartDialogException(e);
-      }
-
-      handlePALChangedNotify();
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -649,80 +331,7 @@ public class WollMuxEventHandler
     handle(new OnFunctionDialog(documentController, dialogName));
   }
 
-  private static class OnFunctionDialog extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    private String dialogName;
-
-    private OnFunctionDialog(TextDocumentController documentController, String dialogName)
-    {
-      this.documentController = documentController;
-      this.dialogName = dialogName;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Dialog aus Funktionsdialog-Bibliothek holen:
-      Dialog dialog = GlobalFunctions.getInstance().getFunctionDialogs().get(dialogName);
-      if (dialog == null)
-        throw new WollMuxFehlerException(L.m(
-          "Funktionsdialog '%1' ist nicht definiert.", dialogName));
-
-      // Dialoginstanz erzeugen und modal anzeigen:
-      Dialog dialogInst = null;
-      try
-      {
-        dialogInst = dialog.instanceFor(new HashMap<Object, Object>());
-
-        setLock();
-        dialogInst.show(unlockActionListener, documentController.getFunctionLibrary(),
-          documentController.getDialogLibrary());
-        waitForUnlock();
-      }
-      catch (ConfigurationErrorException e)
-      {
-        throw new CantStartDialogException(e);
-      }
-
-      // Abbruch, wenn der Dialog nicht mit OK beendet wurde.
-      String cmd = unlockActionListener.actionEvent.getActionCommand();
-      if (!cmd.equalsIgnoreCase("select")) return;
-
-      // Dem Dokument den Fokus geben, damit die Änderungen des Benutzers
-      // transparent mit verfolgt werden können.
-      try
-      {
-        documentController.getFrameController().getFrame().getContainerWindow().setFocus();
-      }
-      catch (java.lang.Exception e)
-      {
-        // keine Gefährdung des Ablaufs falls das nicht klappt.
-      }
-
-      // Alle Werte die der Funktionsdialog sicher zurück liefert werden in
-      // das Dokument übernommen.
-      Collection<String> schema = dialogInst.getSchema();
-      Iterator<String> iter = schema.iterator();
-      while (iter.hasNext())
-      {
-        String id = iter.next();
-        String value = dialogInst.getData(id).toString();
-
-        documentController.addFormFieldValue(id, value);
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController + ", '" + dialogName
-        + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -743,175 +352,7 @@ public class WollMuxEventHandler
     handle(new OnAbout(wollMuxBarVersion));
   }
 
-  private static class OnAbout extends BasicEvent
-  {
-    private String wollMuxBarVersion;
-
-    private final URL WM_URL = this.getClass().getClassLoader().getResource(
-      "data/wollmux_klein.jpg");
-
-    private OnAbout(String wollMuxBarVersion)
-    {
-      this.wollMuxBarVersion = wollMuxBarVersion;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      Common.setLookAndFeelOnce();
-
-      // non-modal dialog. Set 3rd param to true to make modal
-      final JDialog dialog =
-        new JDialog((Frame) null, L.m("Info über Vorlagen und Formulare (WollMux)"),
-          false);
-      JPanel myPanel = new JPanel();
-      myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
-      myPanel.setBackground(Color.WHITE);
-      dialog.setBackground(Color.WHITE);
-      dialog.setContentPane(myPanel);
-      JPanel imagePanel = new JPanel(new BorderLayout());
-      imagePanel.add(new JLabel(new ImageIcon(WM_URL)), BorderLayout.CENTER);
-      imagePanel.setOpaque(false);
-      Box copyrightPanel = Box.createVerticalBox();
-      copyrightPanel.setOpaque(false);
-      Box hbox = Box.createHorizontalBox();
-      hbox.add(imagePanel);
-      hbox.add(copyrightPanel);
-      myPanel.add(hbox);
-
-      copyrightPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-      JLabel label = new JLabel(L.m("WollMux") + " " + WollMuxSingleton.getVersion());
-      Font largeFont = label.getFont().deriveFont(15.0f);
-      label.setFont(largeFont);
-      copyrightPanel.add(label);
-      label = new JLabel(L.m("Copyright (c) 2005-2016 Landeshauptstadt München"));
-      label.setFont(largeFont);
-      copyrightPanel.add(label);
-      label = new JLabel(L.m("Lizenz: %1", "European Union Public License"));
-      label.setFont(largeFont);
-      copyrightPanel.add(label);
-      label = new JLabel(L.m("Homepage: %1", "www.wollmux.org"));
-      label.setFont(largeFont);
-      copyrightPanel.add(label);
-
-      Box authorOuterPanel = Box.createHorizontalBox();
-      authorOuterPanel.add(Box.createHorizontalStrut(8));
-
-      Box authorPanelHBox = Box.createHorizontalBox();
-      authorPanelHBox.setBorder(BorderFactory.createTitledBorder(L.m("Autoren (sortiert nach LOC)")));
-      authorOuterPanel.add(authorPanelHBox);
-      authorOuterPanel.add(Box.createHorizontalStrut(8));
-
-      Box authorPanel = Box.createVerticalBox();
-      authorPanelHBox.add(authorPanel);
-      authorPanel.setOpaque(false);
-      myPanel.add(authorOuterPanel);
-
-      int authorSpacing = 1;
-
-      hbox = Box.createHorizontalBox();
-      // hbox.add(new JLabel(new ImageIcon(MB_URL)));
-      // hbox.add(Box.createHorizontalStrut(8));
-      hbox.add(new JLabel("Matthias S. Benkmann"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel.add(hbox);
-
-      hbox = Box.createHorizontalBox();
-      // hbox.add(new JLabel(new ImageIcon(CL_URL)));
-      // hbox.add(Box.createHorizontalStrut(8));
-      hbox.add(new JLabel("Christoph Lutz"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel.add(Box.createVerticalStrut(authorSpacing));
-      authorPanel.add(hbox);
-
-      authorPanel.add(Box.createVerticalGlue());
-
-      // Box authorPanel2 = Box.createVerticalBox();
-      // authorPanelHBox.add(authorPanel2);
-      Box authorPanel2 = authorPanel;
-
-      hbox = Box.createHorizontalBox();
-      hbox.add(new JLabel("Daniel Benkmann"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel2.add(Box.createVerticalStrut(authorSpacing));
-      authorPanel2.add(hbox);
-      hbox = Box.createHorizontalBox();
-      hbox.add(new JLabel("Bettina Bauer"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel2.add(Box.createVerticalStrut(authorSpacing));
-      authorPanel2.add(hbox);
-      hbox = Box.createHorizontalBox();
-      hbox.add(new JLabel("Andor Ertsey"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel2.add(Box.createVerticalStrut(authorSpacing));
-      authorPanel2.add(hbox);
-      hbox = Box.createHorizontalBox();
-      hbox.add(new JLabel("Max Meier"));
-      hbox.add(Box.createHorizontalGlue());
-      authorPanel2.add(Box.createVerticalStrut(authorSpacing));
-      authorPanel2.add(hbox);
-
-      authorPanel2.add(Box.createVerticalGlue());
-
-      myPanel.add(Box.createVerticalStrut(8));
-      Box infoOuterPanel = Box.createHorizontalBox();
-      infoOuterPanel.add(Box.createHorizontalStrut(8));
-      JPanel infoPanel = new JPanel(new GridLayout(4, 1));
-      infoOuterPanel.add(infoPanel);
-      myPanel.add(infoOuterPanel);
-      infoOuterPanel.add(Box.createHorizontalStrut(8));
-      infoPanel.setOpaque(false);
-      infoPanel.setBorder(BorderFactory.createTitledBorder(L.m("Info")));
-
-      infoPanel.add(new JLabel(L.m("WollMux") + " " + WollMuxSingleton.getBuildInfo()));
-
-      if (wollMuxBarVersion != null && !wollMuxBarVersion.equals(""))
-        infoPanel.add(new JLabel(L.m("WollMux-Leiste") + " " + wollMuxBarVersion));
-
-      infoPanel.add(new JLabel(L.m("WollMux-Konfiguration:") + " "
-        + WollMuxSingleton.getInstance().getConfVersionInfo()));
-
-      infoPanel.add(new JLabel("DEFAULT_CONTEXT: "
-        + WollMuxFiles.getDEFAULT_CONTEXT().toExternalForm()));
-
-      myPanel.add(Box.createVerticalStrut(4));
-
-      hbox = Box.createHorizontalBox();
-      hbox.add(Box.createHorizontalGlue());
-      hbox.add(new JButton(new AbstractAction(L.m("OK"))
-      {
-        private static final long serialVersionUID = 4527702807001201116L;
-
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-          dialog.dispose();
-        }
-      }));
-      hbox.add(Box.createHorizontalGlue());
-      myPanel.add(hbox);
-
-      myPanel.add(Box.createVerticalStrut(4));
-
-      dialog.setBackground(Color.WHITE);
-      myPanel.setBackground(Color.WHITE);
-      dialog.pack();
-      int frameWidth = dialog.getWidth();
-      int frameHeight = dialog.getHeight();
-      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-      int x = screenSize.width / 2 - frameWidth / 2;
-      int y = screenSize.height / 2 - frameHeight / 2;
-      dialog.setLocation(x, y);
-      dialog.setAlwaysOnTop(true);
-      dialog.setVisible(true);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -927,56 +368,7 @@ public class WollMuxEventHandler
     handle(new OnFormularMax4000Show(documentController));
   }
 
-  private static class OnFormularMax4000Show extends BasicEvent
-  {
-
-    private TextDocumentController documentController;
-
-    private OnFormularMax4000Show(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Bestehenden Max in den Vordergrund holen oder neuen Max erzeugen.
-      FormularMax4kController max = DocumentManager.getDocumentManager().getCurrentFormularMax4000(documentController.getModel().doc);
-      if (max != null)
-      {
-        max.toFront();
-      }
-      else
-      {
-        ActionListener l = new ActionListener()
-        {
-          @Override
-          public void actionPerformed(ActionEvent actionEvent)
-          {
-            if (actionEvent.getSource() instanceof FormularMax4kController)
-              WollMuxEventHandler.handleFormularMax4000Returned(documentController);
-          }
-        };
-
-        // Der Konstruktor von FormularMax erwartet hier nur die globalen
-        // Funktionsbibliotheken, nicht jedoch die neuen dokumentlokalen
-        // Bibliotheken, die das model bereitstellt. Die dokumentlokalen
-        // Bibliotheken kann der FM4000 selbst auflösen.
-        max =
-          new FormularMax4kController(documentController, l,
-            GlobalFunctions.getInstance().getGlobalFunctions(),
-            GlobalFunctions.getInstance().getGlobalPrintFunctions());
-        DocumentManager.getDocumentManager().setCurrentFormularMax4000(documentController.getModel().doc, max);
-        max.run();
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -991,28 +383,7 @@ public class WollMuxEventHandler
     handle(new OnFormularMax4000Returned(documentController));
   }
 
-  private static class OnFormularMax4000Returned extends BasicEvent
-  {
-
-    private TextDocumentController documentController;
-
-    private OnFormularMax4000Returned(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      DocumentManager.getDocumentManager().setCurrentFormularMax4000(documentController.getModel().doc, null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1052,30 +423,7 @@ public class WollMuxEventHandler
     handle(new OnTextDocumentClosed(docInfo));
   }
 
-  private static class OnTextDocumentClosed extends BasicEvent
-  {
-    private DocumentManager.Info docInfo;
-
-    private OnTextDocumentClosed(DocumentManager.Info doc)
-    {
-      this.docInfo = doc;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (docInfo.hasTextDocumentModel()) DocumentManager.getDocumentManager().dispose(docInfo.getTextDocumentController().getModel().doc);
-    }
-
-    @Override
-    public String toString()
-    {
-      String code = "unknown";
-      if (docInfo.hasTextDocumentModel())
-        code = "" + docInfo.getTextDocumentController().hashCode();
-      return this.getClass().getSimpleName() + "(#" + code + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1095,143 +443,7 @@ public class WollMuxEventHandler
     handle(new OnProcessTextDocument(documentController, visible));
   }
 
-  /**
-   * Dieses Event wird immer dann ausgelöst, wenn der GlobalEventBroadcaster von OOo
-   * ein ON_NEW oder ein ON_LOAD-Event wirft. Das Event sorgt dafür, dass die
-   * eigentliche Dokumentbearbeitung durch den WollMux angestossen wird.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnProcessTextDocument extends BasicEvent
-  {
-    TextDocumentController documentController;
-
-    boolean visible;
-
-    public OnProcessTextDocument(TextDocumentController documentController, boolean visible)
-    {
-      this.documentController = documentController;
-      this.visible = visible;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (documentController == null) return;
-
-      // Konfigurationsabschnitt Textdokument verarbeiten falls Dok sichtbar:
-      if (visible)
-        try
-        {
-          ConfigThingy tds =
-            WollMuxFiles.getWollmuxConf().query("Fenster").query("Textdokument").getLastChild();
-          documentController.getFrameController().setWindowViewSettings(tds);
-        }
-        catch (NodeNotFoundException e)
-        {}
-
-      // Workaround für OOo-Issue 103137 ggf. anwenden:
-      if (Workarounds.applyWorkaroundForOOoIssue103137())
-      {
-        // Alle mit OOo 2 erstellen Dokumente, die Textstellen enthalten, die von
-        // älteren WollMux-Versionen ein- oder ausgeblendet wurden sind potentiell
-        // betroffen. Ein- und Ausblendungen in WollMux-Formularen werden
-        // glücklicherweise auch ohne Workaround vom WollMux korrigiert, da der
-        // WollMux beim Erzeugen der FormularGUI alle Formularwerte und damit auch
-        // die Sichtbarkeiten explizit setzt. Damit bleiben nur die Sachleitenden
-        // Verfügungen übrig, die vom WollMux bisher noch nicht automatisch
-        // korrigiert wurden. Dieser Workaround macht das nun:
-        if (documentController.getModel().getPrintFunctions().contains(
-          SachleitendeVerfuegung.PRINT_FUNCTION_NAME))
-          SachleitendeVerfuegung.workaround103137(documentController);
-      }
-
-      // Mögliche Aktionen für das neu geöffnete Dokument:
-      DocumentCommandInterpreter dci = new DocumentCommandInterpreter(documentController, WollMuxFiles.isDebugMode());
-
-      try
-      {
-        // Globale Dokumentkommandos wie z.B. setType, setPrintFunction, ...
-        // auswerten.
-        dci.scanGlobalDocumentCommands();
-
-        int actions =
-          documentController.evaluateDocumentActions(GlobalFunctions.getInstance().getDocumentActionFunctions().iterator());
-
-        // Bei Vorlagen: Ausführung der Dokumentkommandos
-        if ((actions < 0 && documentController.getModel().isTemplate()) || (actions == Integer.MAX_VALUE))
-        {
-          dci.executeTemplateCommands();
-
-          // manche Kommandos sind erst nach der Expansion verfügbar
-          dci.scanGlobalDocumentCommands();
-        }
-        // insertFormValue-Kommandos auswerten
-        dci.scanInsertFormValueCommands();
-
-        // Bei Formularen:
-        // Anmerkung: actions == allactions wird NICHT so interpretiert, dass auch
-        // bei Dokumenten ohne Formularfunktionen der folgende Abschnitt ausgeführt
-        // wird. Dies würde unsinnige Ergebnisse verursachen.
-        if (actions != 0 && documentController.getModel().isFormDocument())
-        {
-          // Konfigurationsabschnitt Fenster/Formular verarbeiten falls Dok sichtbar
-          if (visible)
-            try
-            {
-              documentController.getFrameController().setDocumentZoom(WollMuxFiles.getWollmuxConf().query("Fenster").query(
-                "Formular").getLastChild().query("ZOOM"));
-            }
-            catch (java.lang.Exception e)
-            {}
-
-          // FormGUI starten, falls es kein Teil eines Multiform-Dokuments ist.
-          if (!documentController.getModel().isPartOfMultiformDocument())
-          {
-            FormModel fm;
-            try
-            {
-              fm = documentController.createSingleDocumentFormModel(visible);
-            }
-            catch (InvalidFormDescriptorException e)
-            {
-              throw new WMCommandsFailedException(
-                L.m("Die Vorlage bzw. das Formular enthält keine gültige Formularbeschreibung\n\nBitte kontaktieren Sie Ihre Systemadministration."));
-            }
-
-            DocumentManager.getDocumentManager().setFormModel(documentController.getModel().doc, fm);
-            fm.startFormGUI();
-          }
-        }
-      }
-      catch (java.lang.Exception e)
-      {
-        throw new WollMuxFehlerException(L.m("Fehler bei der Dokumentbearbeitung."),
-          e);
-      }
-
-      // Registrierte XEventListener (etwas später) informieren, dass die
-      // Dokumentbearbeitung fertig ist.
-      handleNotifyDocumentEventListener(null, ON_WOLLMUX_PROCESSING_FINISHED,
-        documentController.getModel().doc);
-
-      // ContextChanged auslösen, damit die Dispatches aktualisiert werden.
-      try
-      {
-        documentController.getFrameController().getFrame().contextChanged();
-      }
-      catch (java.lang.Exception e)
-      {}
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1252,52 +464,7 @@ public class WollMuxEventHandler
     handle(new OnProcessMultiform(documentControllers, buttonAnpassung));
   }
 
-  private static class OnProcessMultiform extends BasicEvent
-  {
-    private ConfigThingy buttonAnpassung;
-
-    private List<TextDocumentController> documentControllers;
-
-    public OnProcessMultiform(
-        List<TextDocumentController> documentControllers,
-        ConfigThingy buttonAnpassung)
-    {
-      this.documentControllers = documentControllers;
-      this.buttonAnpassung = buttonAnpassung;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      FormModel fm;
-      try
-      {
-        fm = MultiDocumentFormModel.createMultiDocumentFormModel(documentControllers, buttonAnpassung);
-      }
-      catch (InvalidFormDescriptorException e)
-      {
-        throw new WollMuxFehlerException(
-          L.m("Fehler bei der Dokumentbearbeitung."),
-          new WMCommandsFailedException(
-            L.m("Die Vorlage bzw. das Formular enthält keine gültige Formularbeschreibung\n\nBitte kontaktieren Sie Ihre Systemadministration.")));
-      }
-
-      // FormModel in allen Dokumenten registrieren:
-      for (TextDocumentController documentController : documentControllers)
-      {
-        DocumentManager.getDocumentManager().setFormModel(documentController.getModel().doc, fm);
-      }
-
-      // FormGUI starten:
-      fm.startFormGUI();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentControllers + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1317,51 +484,7 @@ public class WollMuxEventHandler
     handle(new OnReprocessTextDocument(documentController));
   }
 
-  private static class OnReprocessTextDocument extends BasicEvent
-  {
-    TextDocumentModel model;
-    private TextDocumentController documentController;
-
-    public OnReprocessTextDocument(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-      this.model = documentController.getModel();
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (model == null) return;
-
-      // Dokument mit neuen Dokumentkommandos über den
-      // DocumentCommandInterpreter bearbeiten:
-      model.getDocumentCommands().update();
-      DocumentCommandInterpreter dci =
-        new DocumentCommandInterpreter(documentController, WollMuxFiles.isDebugMode());
-      try
-      {
-        dci.executeTemplateCommands();
-
-        // manche Kommandos sind erst nach der Expansion verfügbar
-        dci.scanGlobalDocumentCommands();
-        dci.scanInsertFormValueCommands();
-      }
-      catch (java.lang.Exception e)
-      {
-        // Hier wird keine Exception erwartet, da Fehler (z.B. beim manuellen
-        // Einfügen von Textbausteinen) bereits dort als Popup angezeigt werden
-        // sollen, wo sie auftreten.
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + model + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1391,43 +514,7 @@ public class WollMuxEventHandler
     handle(new OnOpenDocument(fragIDs, asTemplate));
   }
 
-  private static class OnOpenDocument extends BasicEvent
-  {
-    private boolean asTemplate;
-
-    private List<String> fragIDs;
-
-    private OnOpenDocument(List<String> fragIDs, boolean asTemplate)
-    {
-      this.fragIDs = fragIDs;
-      this.asTemplate = asTemplate;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Baue ein ConfigThingy (als String), das die neue open-Methode versteht
-      // und leite es weiter an diese.
-      Iterator<String> iter = fragIDs.iterator();
-      StringBuffer fragIdStr = new StringBuffer();
-      while (iter.hasNext())
-      {
-        fragIdStr.append("'");
-        fragIdStr.append(iter.next());
-        fragIdStr.append("' ");
-      }
-      handleOpen("AS_TEMPLATE '" + asTemplate
-        + "' FORMGUIS 'independent' Fragmente( FRAG_ID_LIST ("
-        + fragIdStr.toString() + "))");
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "("
-        + ((asTemplate) ? "asTemplate" : "asDocument") + ", " + fragIDs + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1448,210 +535,7 @@ public class WollMuxEventHandler
     handle(new OnOpen(openConfStr));
   }
 
-  private static class OnOpen extends BasicEvent
-  {
-    private String openConfStr;
-
-    private OnOpen(String openConfStr)
-    {
-      this.openConfStr = openConfStr;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      boolean asTemplate = true;
-      boolean merged = false;
-      ConfigThingy conf;
-      ConfigThingy fragConf;
-      ConfigThingy buttonAnpassung = null;
-      try
-      {
-        conf = new ConfigThingy("OPEN", null, new StringReader(openConfStr));
-        fragConf = conf.get("Fragmente");
-      }
-      catch (java.lang.Exception e)
-      {
-        throw new WollMuxFehlerException(
-          L.m("Fehlerhaftes Kommando 'wollmux:Open'"), e);
-      }
-
-      try
-      {
-        asTemplate = conf.get("AS_TEMPLATE", 1).toString().equalsIgnoreCase("true");
-      }
-      catch (java.lang.Exception x)
-      {}
-
-      try
-      {
-        buttonAnpassung = conf.get("Buttonanpassung", 1);
-      }
-      catch (java.lang.Exception x)
-      {}
-
-      try
-      {
-        merged = conf.get("FORMGUIS", 1).toString().equalsIgnoreCase("merged");
-      }
-      catch (java.lang.Exception x)
-      {}
-
-      Iterator<ConfigThingy> iter = fragConf.iterator();
-      List<TextDocumentController> docs = new ArrayList<TextDocumentController>();
-      while (iter.hasNext())
-      {
-        ConfigThingy fragListConf = iter.next();
-        List<String> fragIds = new Vector<String>();
-        Iterator<ConfigThingy> fragIter = fragListConf.iterator();
-        while (fragIter.hasNext())
-        {
-          fragIds.add(fragIter.next().toString());
-        }
-        if (!fragIds.isEmpty())
-        {
-          TextDocumentController documentController = openTextDocument(fragIds, asTemplate, merged);
-          if (documentController.getModel() != null) docs.add(documentController);
-        }
-      }
-
-      if (merged)
-      {
-        handleProcessMultiform(docs, buttonAnpassung);
-      }
-    }
-
-    /**
-     * 
-     * @param fragIDs
-     * @param asTemplate
-     * @param asPartOfMultiform
-     * @return
-     * @throws WollMuxFehlerException
-     */
-    private TextDocumentController openTextDocument(List<String> fragIDs,
-        boolean asTemplate, boolean asPartOfMultiform) throws WollMuxFehlerException
-    {
-      // das erste Argument ist das unmittelbar zu landende Textfragment und
-      // wird nach urlStr aufgelöst. Alle weiteren Argumente (falls vorhanden)
-      // werden nach argsUrlStr aufgelöst.
-      String loadUrlStr = "";
-      String[] fragUrls = new String[fragIDs.size() - 1];
-      String urlStr = "";
-
-      Iterator<String> iter = fragIDs.iterator();
-      for (int i = 0; iter.hasNext(); ++i)
-      {
-        String frag_id = iter.next();
-
-        // Fragment-URL holen und aufbereiten:
-        Vector<String> urls = new Vector<String>();
-
-        java.lang.Exception error =
-          new ConfigurationErrorException(L.m(
-            "Das Textfragment mit der FRAG_ID '%1' ist nicht definiert!", frag_id));
-        try
-        {
-          urls = VisibleTextFragmentList.getURLsByID(WollMuxFiles.getWollmuxConf(), frag_id);
-        }
-        catch (InvalidIdentifierException e)
-        {
-          error = e;
-        }
-        if (urls.size() == 0)
-        {
-          throw new WollMuxFehlerException(
-            L.m(
-              "Die URL zum Textfragment mit der FRAG_ID '%1' kann nicht bestimmt werden:",
-              frag_id), error);
-        }
-
-        // Nur die erste funktionierende URL verwenden. Dazu werden alle URL zu
-        // dieser FRAG_ID geprüft und in die Variablen loadUrlStr und fragUrls
-        // übernommen.
-        String errors = "";
-        boolean found = false;
-        Iterator<String> iterUrls = urls.iterator();
-        while (iterUrls.hasNext() && !found)
-        {
-          urlStr = iterUrls.next();
-
-          // URL erzeugen und prüfen, ob sie aufgelöst werden kann
-          URL url;
-          try
-          {
-            url = WollMuxFiles.makeURL(urlStr);
-            urlStr = UNO.getParsedUNOUrl(url.toExternalForm()).Complete;
-            url = WollMuxFiles.makeURL(urlStr);
-            WollMuxSingleton.checkURL(url);
-          }            
-          catch (MalformedURLException e)
-          {
-            Logger.log(e);
-            errors +=
-              L.m("Die URL '%1' ist ungültig:", urlStr) + "\n"
-                + e.getLocalizedMessage() + "\n\n";
-            continue;
-          }          
-          catch (IOException e)
-          {
-            Logger.log(e);
-            errors += e.getLocalizedMessage() + "\n\n";
-            continue;
-          }
-
-          found = true;
-        }
-
-        if (!found)
-        {
-          throw new WollMuxFehlerException(L.m(
-            "Das Textfragment mit der FRAG_ID '%1' kann nicht aufgelöst werden:",
-            frag_id)
-            + "\n\n" + errors);
-        }
-
-        // URL in die in loadUrlStr (zum sofort öffnen) und in argsUrlStr (zum
-        // später öffnen) aufnehmen
-        if (i == 0)
-        {
-          loadUrlStr = urlStr;
-        }
-        else
-        {
-          fragUrls[i - 1] = urlStr;
-        }
-      }
-
-      // open document as Template (or as document):
-      TextDocumentController documentController = null;
-      try
-      {
-        XComponent doc = UNO.loadComponentFromURL(loadUrlStr, asTemplate, true);
-
-        if (UNO.XTextDocument(doc) != null)
-        {
-          documentController = DocumentManager.getTextDocumentController(UNO.XTextDocument(doc));
-          documentController.getModel().setFragUrls(fragUrls);
-          if (asPartOfMultiform)
-            documentController.getModel().setPartOfMultiformDocument(asPartOfMultiform);
-        }
-      }
-      catch (java.lang.Exception x)
-      {
-        // sollte eigentlich nicht auftreten, da bereits oben geprüft.
-        throw new WollMuxFehlerException(L.m(
-          "Die Vorlage mit der URL '%1' kann nicht geöffnet werden.", loadUrlStr), x);
-      }
-      return documentController;
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "('" + openConfStr + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1664,47 +548,7 @@ public class WollMuxEventHandler
     handle(new OnPALChangedNotify());
   }
 
-  /**
-   * Dieses Event wird immer dann erzeugt, wenn ein Dialog zur Bearbeitung der PAL
-   * geschlossen wurde und immer dann wenn die PAL z.B. durch einen
-   * wollmux:setSender-Befehl geändert hat. Das Event sorgt dafür, dass alle im
-   * WollMuxSingleton registrierten XPALChangeListener geupdatet werden.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnPALChangedNotify extends BasicEvent
-  {
-    @Override
-    protected void doit()
-    {
-      // registrierte PALChangeListener updaten
-      Iterator<XPALChangeEventListener> i = PersoenlicheAbsenderliste.getInstance().iterator();
-      while (i.hasNext())
-      {
-        Logger.debug2("OnPALChangedNotify: Update XPALChangeEventListener");
-        EventObject eventObject = new EventObject();
-        eventObject.Source = PersoenlicheAbsenderliste.getInstance();
-        try
-        {
-          i.next().updateContent(eventObject);
-        }
-        catch (java.lang.Exception x)
-        {
-          i.remove();
-        }
-      }
-
-      // Cache und LOS auf Platte speichern.
-      try
-      {
-        DatasourceJoinerFactory.getDatasourceJoiner().saveCacheAndLOS(WollMuxFiles.getLosCacheFile());
-      }
-      catch (IOException e)
-      {
-        Logger.error(e);
-      }
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1725,54 +569,7 @@ public class WollMuxEventHandler
     handle(new OnSetSender(senderName, idx));
   }
 
-  /**
-   * Dieses Event wird ausgelöst, wenn im WollMux-Service die methode setSender
-   * aufgerufen wird. Es sort dafür, dass ein neuer Absender gesetzt wird.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnSetSender extends BasicEvent
-  {
-    private String senderName;
-
-    private int idx;
-
-    public OnSetSender(String senderName, int idx)
-    {
-      this.senderName = senderName;
-      this.idx = idx;
-    }
-
-    @Override
-    protected void doit()
-    {
-      String[] pal = PersoenlicheAbsenderliste.getInstance().getPALEntries();
-
-      // nur den neuen Absender setzen, wenn index und sender übereinstimmen,
-      // d.h.
-      // die Absenderliste der entfernten WollMuxBar konsistent war.
-      if (idx >= 0 && idx < pal.length && pal[idx].toString().equals(senderName))
-      {
-        DJDatasetListElement[] palDatasets =
-            PersoenlicheAbsenderliste.getInstance().getSortedPALEntries();
-        palDatasets[idx].getDataset().select();
-      }
-      else
-      {
-        Logger.error(L.m(
-          "Setzen des Senders '%1' schlug fehl, da der index '%2' nicht mit der PAL übereinstimmt (Inkonsistenzen?)",
-          senderName, idx));
-      }
-
-      WollMuxEventHandler.handlePALChangedNotify();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + senderName + ", " + idx + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1803,35 +600,7 @@ public class WollMuxEventHandler
     handle(new OnFormValueChanged(documentController, fieldId, newValue));
   }
 
-  private static class OnFormValueChanged extends BasicEvent
-  {
-    private String fieldId;
-
-    private String newValue;
-
-    private TextDocumentController documentController;
-
-    public OnFormValueChanged(TextDocumentController documentController, String fieldId,
-        String newValue)
-    {
-      this.fieldId = fieldId;
-      this.newValue = newValue;
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.addFormFieldValue(fieldId, newValue);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + fieldId + "', '" + newValue
-        + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1864,39 +633,7 @@ public class WollMuxEventHandler
     handle(new OnSetVisibleState(documentController, groupId, visible, listener));
   }
 
-  private static class OnSetVisibleState extends BasicEvent
-  {
-    private String groupId;
-
-    private boolean visible;
-
-    private ActionListener listener;
-
-    private TextDocumentController documentController;
-
-    public OnSetVisibleState(TextDocumentController documentController, String groupId,
-        boolean visible, ActionListener listener)
-    {
-      this.documentController = documentController;
-      this.groupId = groupId;
-      this.visible = visible;
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.setVisibleState(groupId, visible);
-      if (listener != null) listener.actionPerformed(null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "('" + groupId + "', " + visible
-        + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1922,30 +659,7 @@ public class WollMuxEventHandler
     handle(new OnFocusFormField(documentController, fieldId));
   }
 
-  private static class OnFocusFormField extends BasicEvent
-  {
-    private String fieldId;
-    private TextDocumentController documentController;
-
-    public OnFocusFormField(TextDocumentController documentController, String fieldId)
-    {
-      this.documentController = documentController;
-      this.fieldId = fieldId;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.getModel().focusFormField(fieldId);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().doc + ", '" + fieldId
-        + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -1979,42 +693,7 @@ public class WollMuxEventHandler
     handle(new OnSetWindowPosSize(documentController, docX, docY, docWidth, docHeight));
   }
 
-  /**
-   * Dieses Event wird vom FormModelImpl ausgelöst, wenn die Formular-GUI die
-   * Position und die Ausmasse des Dokuments verändert. Ruft direkt setWindowsPosSize
-   * der UNO-API auf.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnSetWindowPosSize extends BasicEvent
-  {
-    private int docX, docY, docWidth, docHeight;
-
-    private TextDocumentController documentController;
-
-    public OnSetWindowPosSize(TextDocumentController documentController, int docX, int docY,
-        int docWidth, int docHeight)
-    {
-      this.documentController = documentController;
-      this.docX = docX;
-      this.docY = docY;
-      this.docWidth = docWidth;
-      this.docHeight = docHeight;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.getFrameController().setWindowPosSize(docX, docY, docWidth, docHeight);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + docX + ", " + docY + ", "
-        + docWidth + ", " + docHeight + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2035,37 +714,7 @@ public class WollMuxEventHandler
     handle(new OnSetWindowVisible(documentController, visible));
   }
 
-  /**
-   * Dieses Event wird vom FormModelImpl ausgelöst, wenn die Formular-GUI das
-   * bearbeitete Dokument sichtbar/unsichtbar schalten möchte. Ruft direkt setVisible
-   * der UNO-API auf.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnSetWindowVisible extends BasicEvent
-  {
-    boolean visible;
-
-    private TextDocumentController documentController;
-
-    public OnSetWindowVisible(TextDocumentController documentController, boolean visible)
-    {
-      this.documentController = documentController;
-      this.visible = visible;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.getFrameController().setWindowVisible(visible);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + visible + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2080,34 +729,7 @@ public class WollMuxEventHandler
     handle(new OnCloseTextDocument(documentController));
   }
 
-  /**
-   * Dieses Event wird vom FormModelImpl ausgelöst, wenn der Benutzer die
-   * Formular-GUI schließt und damit auch das zugehörige TextDokument geschlossen
-   * werden soll.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnCloseTextDocument extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnCloseTextDocument(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit()
-    {
-      documentController.getModel().close();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2128,57 +750,7 @@ public class WollMuxEventHandler
     handle(new OnCloseAndOpenExt(documentController, ext));
   }
 
-  /**
-   * Dieses Event wird vom FormModelImpl ausgelöst, wenn der Benutzer die Aktion
-   * "closeAndOpenExt" aktiviert hat.
-   * 
-   * @author matthias.benkmann
-   */
-  private static class OnCloseAndOpenExt extends BasicEvent
-  {
-    private String ext;
-    private TextDocumentController documentController;
-
-    public OnCloseAndOpenExt(TextDocumentController documentController, String ext)
-    {
-      this.documentController = documentController;
-      this.ext = ext;
-    }
-
-    @Override
-    protected void doit()
-    {
-      try
-      {
-        OpenExt openExt = new OpenExt(ext, WollMuxFiles.getWollmuxConf());
-        openExt.setSource(UNO.XStorable(documentController.getModel().doc));
-        openExt.storeIfNecessary();
-        openExt.launch(new OpenExt.ExceptionHandler()
-        {
-          @Override
-          public void handle(Exception x)
-          {
-            Logger.error(x);
-          }
-        });
-      }
-      catch (Exception x)
-      {
-        Logger.error(x);
-        return;
-      }
-
-      documentController.getModel().setDocumentModified(false);
-      documentController.getModel().close();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().hashCode() + ", " + ext
-        + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2198,55 +770,7 @@ public class WollMuxEventHandler
     handle(new OnSaveTempAndOpenExt(documentController, ext));
   }
 
-  /**
-   * Dieses Event wird vom FormModelImpl ausgelöst, wenn der Benutzer die Aktion
-   * "saveTempAndOpenExt" aktiviert hat.
-   * 
-   * @author matthias.benkmann
-   */
-  private static class OnSaveTempAndOpenExt extends BasicEvent
-  {
-    private String ext;
-
-    private TextDocumentController documentController;
-
-    public OnSaveTempAndOpenExt(TextDocumentController documentController, String ext)
-    {
-      this.documentController = documentController;
-      this.ext = ext;
-    }
-
-    @Override
-    protected void doit()
-    {
-      try
-      {
-        OpenExt openExt = new OpenExt(ext, WollMuxFiles.getWollmuxConf());
-        openExt.setSource(UNO.XStorable(documentController.getModel().doc));
-        openExt.storeIfNecessary();
-        openExt.launch(new OpenExt.ExceptionHandler()
-        {
-          @Override
-          public void handle(Exception x)
-          {
-            Logger.error(x);
-          }
-        });
-      }
-      catch (Exception x)
-      {
-        Logger.error(x);
-        return;
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().hashCode() + ", " + ext
-        + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2261,388 +785,7 @@ public class WollMuxEventHandler
     handle(new OnInitialize());
   }
 
-  /**
-   * Dieses Event wird als erstes WollMuxEvent bei der Initialisierung des WollMux im
-   * WollMuxSingleton erzeugt und übernimmt alle benutzersichtbaren (interaktiven)
-   * Initialisierungen wie z.B. das Darstellen des AbsenderAuswählen-Dialogs, falls
-   * die PAL leer ist.
-   * 
-   * @author christoph.lutz TESTED
-   */
-  private static class OnInitialize extends BasicEvent
-  {
-    @Override
-    protected void doit()
-    {
-      DatasourceJoiner dsj = DatasourceJoinerFactory.getDatasourceJoiner();
-
-      if (dsj.getLOS().size() == 0)
-      {
-        // falls es keine Datensätze im LOS gibt:
-        // Die initialen Daten nach Heuristik versuchen zu finden:
-        int found = searchDefaultSender(dsj);
-
-        // Absender Auswählen Dialog starten:
-        // wurde genau ein Datensatz gefunden, kann davon ausgegangen werden,
-        // dass dieser OK ist - der Dialog muss dann nicht erscheinen.
-        if (found != 1)
-          WollMuxEventHandler.handleShowDialogAbsenderAuswaehlen();
-        else
-          handlePALChangedNotify();
-      }
-      else
-      {
-        // Liste der nicht zuordnenbaren Datensätze erstellen und ausgeben:
-        String names = "";
-        List<String> lost = DatasourceJoinerFactory.getLostDatasetDisplayStrings();
-        if (lost.size() > 0)
-        {
-          for (String l : lost)
-            names += "- " + l + "\n";
-          String message =
-            L.m("Die folgenden Datensätze konnten nicht "
-              + "aus der Datenbank aktualisiert werden:\n\n" + "%1\n"
-              + "Wenn dieses Problem nicht temporärer "
-              + "Natur ist, sollten Sie diese Datensätze aus "
-              + "ihrer Absenderliste löschen und neu hinzufügen!", names);
-          ModalDialogs.showInfoModal(L.m("WollMux-Info"), message);
-        }
-      }
-    }
-
-    /**
-     * Wertet den Konfigurationsabschnitt
-     * PersoenlicheAbsenderlisteInitialisierung/Suchstrategie aus und versucht nach
-     * der angegebenen Strategie (mindestens) einen Datensatz im DJ dsj zu finden,
-     * der den aktuellen Benutzer repräsentiert. Fehlt der Konfigurationsabschnitt,
-     * so wird die Defaultsuche BY_OOO_USER_PROFILE(Vorname "${givenname}" Nachname
-     * "${sn}") gestartet. Liefert ein Element der Suchstrategie mindestens einen
-     * Datensatz zurück, so werden die anderen Elemente der Suchstrategie nicht mehr
-     * ausgewertet.
-     * 
-     * @param dsj
-     *          Der DatasourceJoiner, in dem nach dem aktuellen Benutzer gesucht
-     *          wird.
-     * @return liefert die Anzahl der Datensätze, die nach Durchlaufen der
-     *         Suchstrategie gefunden wurden.
-     */
-    private int searchDefaultSender(DatasourceJoiner dsj)
-    {
-      // Auswertung des Abschnitts
-      // PersoenlicheAbsenderlisteInitialisierung/Suchstrategie
-      ConfigThingy wmConf = WollMuxFiles.getWollmuxConf();
-      ConfigThingy strat = null;
-      try
-      {
-        strat =
-          wmConf.query("PersoenlicheAbsenderlisteInitialisierung").query(
-            "Suchstrategie").getLastChild();
-      }
-      catch (NodeNotFoundException e)
-      {}
-
-      if (strat != null)
-      {
-        // Suche über Suchstrategie aus Konfiguration
-        for (Iterator<ConfigThingy> iter = strat.iterator(); iter.hasNext();)
-        {
-          ConfigThingy element = iter.next();
-          int found = 0;
-          if (element.getName().equals("BY_JAVA_PROPERTY"))
-          {
-            found = new ByJavaPropertyFinder(dsj).find(element);
-          }
-          else if (element.getName().equals("BY_OOO_USER_PROFILE"))
-          {
-            found = new ByOOoUserProfileFinder(dsj).find(element);
-          }
-          else
-          {
-            Logger.error(L.m("Ungültiger Schlüssel in Suchstrategie: %1",
-              element.stringRepresentation()));
-          }
-          if (found != 0) return found;
-        }
-      }
-      else
-      {
-        // Standardsuche über das OOoUserProfile:
-        return new ByOOoUserProfileFinder(dsj).find("Vorname", "${givenname}",
-          "Nachname", "${sn}");
-      }
-
-      return 0;
-    }
-
-    /**
-     * Ein DataFinder sucht Datensätze im übergebenen dsj, wobei in der Beschreibung
-     * der gesuchten Werte Variablen in der Form "${varname}" verwendet werden
-     * können, die vor der Suche in einer anderen Datenquelle aufgelöst werden. Die
-     * Auflösung erledigt durch die konkrete Klasse.
-     */
-    private static abstract class DataFinder
-    {
-      private DatasourceJoiner dsj;
-
-      public DataFinder(DatasourceJoiner dsj)
-      {
-        this.dsj = dsj;
-      }
-
-      /**
-       * Erwartet ein ConfigThingy, das ein oder zwei Schlüssel-/Wertpaare enthält
-       * (in der Form "<KNOTEN>(<dbSpalte1> 'wert1' [<dbSpalte2> 'wert2'])" nach
-       * denen in der Datenquelle gesucht werden soll. Die Beiden Wertpaare werden
-       * dabei UND verknüpft. Die Werte wert1 und wert2 können über die Syntax
-       * "${name}" Variablen referenzieren, die vor der Suche aufgelöst werden.
-       * 
-       * @param conf
-       *          Das ConfigThingy, das die Suchabfrage beschreibt.
-       * @return Die Anzahl der gefundenen Datensätze.
-       */
-      public int find(ConfigThingy conf)
-      {
-        int count = 0;
-        String id1 = "";
-        String id2 = "";
-        String value1 = "";
-        String value2 = "";
-        for (Iterator<ConfigThingy> iter = conf.iterator(); iter.hasNext();)
-        {
-          ConfigThingy element = iter.next();
-          if (count == 0)
-          {
-            id1 = element.getName();
-            value1 = element.toString();
-            count++;
-          }
-          else if (count == 1)
-          {
-            id2 = element.getName();
-            value2 = element.toString();
-            count++;
-          }
-          else
-          {
-            Logger.error(L.m("Nur max zwei Schlüssel/Wert-Paare werden als Argumente für Suchanfragen akzeptiert!"));
-          }
-        }
-
-        if (count == 1)
-        {
-          return find(id1, value1);
-        }
-        else if (count == 2)
-        {
-          return find(id1, value1, id2, value2);
-        }
-        return 0;
-      }
-
-      /**
-       * Sucht in der Datenquelle nach Datensätzen deren Feld dbSpalte den
-       * evaluierten Wert von value enthält und überträgt die gefundenen Werte in die
-       * PAL.
-       * 
-       * @param dbSpalte
-       *          der Feldname über den nach dem evaluierten Wert von value gesucht
-       *          wird.
-       * @param value
-       *          value wird vor der Suche mittels evaluate() evaluiert (d.h. evtl.
-       *          vorhandene Variablen durch die entsprechenden Inhalte ersetzt
-       *          ersetzt).
-       * @return die Anzahl der gefundenen Datensätze
-       */
-      protected int find(String dbSpalte, String value)
-      {
-        Logger.debug2(this.getClass().getSimpleName() + ".tryToFind(" + dbSpalte
-          + " '" + value + "')");
-        try
-        {
-          String v = evaluate(value);
-          if (v.length() == 0) return 0;
-          QueryResults r = dsj.find(dbSpalte, v);
-          return addToPAL(r);
-        }
-        catch (TimeoutException e)
-        {
-          Logger.error(e);
-        }
-        catch (IllegalArgumentException e)
-        {
-          Logger.debug(e);
-        }
-        return 0;
-      }
-
-      /**
-       * Sucht in der Datenquelle nach Datensätzen wobei die beiden Suchbedingungen
-       * (dbSpalte1==evaluate(value1) und dbSpalte2==evaluate(value2)) mit UND
-       * verknüpft sind - die gefundenen Werte werden danach in die PAL kopiert.
-       * 
-       * @param dbSpalte1
-       *          der Feldname über den nach dem evaluierten Wert von value gesucht
-       *          wird.
-       * @param value1
-       *          value wird vor der Suche mittels evaluate() evaluiert (d.h. evtl.
-       *          vorhandene Variablen durch die entsprechenden Inhalte ersetzt
-       *          ersetzt).
-       * @param dbSpalte2
-       *          der Feldname über den nach dem evaluierten Wert von value gesucht
-       *          wird.
-       * @param value2
-       *          value wird vor der Suche mittels evaluate() evaluiert (d.h. evtl.
-       *          vorhandene Variablen durch die entsprechenden Inhalte ersetzt
-       *          ersetzt).
-       * @return die Anzahl der gefundenen Datensätze
-       */
-      protected int find(String dbSpalte1, String value1, String dbSpalte2,
-          String value2)
-      {
-        Logger.debug2(this.getClass().getSimpleName() + ".tryToFind(" + dbSpalte1
-          + " '" + value1 + "' " + dbSpalte2 + " '" + value2 + "')");
-        try
-        {
-          String v1 = evaluate(value1);
-          String v2 = evaluate(value2);
-          if (v1.length() == 0 || v2.length() == 0) return 0;
-          QueryResults r = dsj.find(dbSpalte1, v1, dbSpalte2, v2);
-          return addToPAL(r);
-        }
-        catch (TimeoutException e)
-        {
-          Logger.error(e);
-        }
-        catch (IllegalArgumentException e)
-        {
-          Logger.debug(e);
-        }
-        return 0;
-      }
-
-      /**
-       * Kopiert alle matches von QueryResults in die PAL.
-       */
-      private int addToPAL(QueryResults r)
-      {
-        for (Iterator<Dataset> iter = r.iterator(); iter.hasNext();)
-        {
-          DJDataset element = (DJDataset) iter.next();
-          element.copy();
-        }
-        return r.size();
-      }
-
-      /**
-       * Ersetzt die Variablen in exp durch deren evaluierten Inhalt, wobei die
-       * Evaluierung über getValueForKey() erfolgt, die von jeder konkreten Klasse
-       * implementiert wird. Evaluate() stellt auch sicher, dass die von
-       * getValueForKey() zurückgelieferten Werte nicht selbst Variablen enthalten
-       * können (indem die Variablenbegrenzer "${" und "}" durch "<" bzw. ">" ersetzt
-       * werden.
-       * 
-       * @param exp
-       *          der zu evaluierende Ausdruck
-       * @return
-       */
-      protected String evaluate(String exp)
-      {
-        final Pattern VAR_PATTERN = Pattern.compile("\\$\\{([^\\}]*)\\}");
-        while (true)
-        {
-          Matcher m = VAR_PATTERN.matcher(exp);
-          if (!m.find()) break;
-          String key = m.group(1);
-          String value = getValueForKey(key);
-          // keine Variablenbegrenzer "${" und "}" in value zulassen:
-          value = value.replaceAll("\\$\\{", "<");
-          value = value.replaceAll("\\}", ">");
-          exp = m.replaceFirst(value);
-        }
-        return exp;
-      }
-
-      /**
-       * Liefert den Wert zu einer Variable namens key und muss von jeder konkreten
-       * Finder-Klasse implementiert werden.
-       * 
-       * @param key
-       *          Der Schlüssel, zu dem der Wert zurückgeliefert werden soll.
-       * @return der zugehörige Wert zum Schlüssel key.
-       */
-      protected abstract String getValueForKey(String key);
-    }
-
-    /**
-     * Ein konkreter DataFinder, der für die Auflösung der Variable in getValueForKey
-     * im Benutzerprofil der OOo Registry nachschaut (das selbe wie
-     * Extras->Optionen->OpenOffice.org->Benutzerdaten).
-     * 
-     * @author christoph.lutz
-     */
-    private static class ByOOoUserProfileFinder extends DataFinder
-    {
-      public ByOOoUserProfileFinder(DatasourceJoiner dsj)
-      {
-        super(dsj);
-      }
-
-      @Override
-      protected String getValueForKey(String key)
-      {
-        try
-        {
-          UnoService confProvider =
-            UnoService.createWithContext(
-              "com.sun.star.configuration.ConfigurationProvider",
-              WollMuxSingleton.getInstance().getXComponentContext());
-
-          UnoService confView =
-            confProvider.create(
-              "com.sun.star.configuration.ConfigurationAccess",
-              new UnoProps("nodepath", "/org.openoffice.UserProfile/Data").getProps());
-          return confView.xNameAccess().getByName(key).toString();
-        }
-        catch (Exception e)
-        {
-          Logger.error(
-            L.m(
-              "Konnte den Wert zum Schlüssel '%1' des OOoUserProfils nicht bestimmen:",
-              key), e);
-        }
-        return "";
-      }
-    }
-
-    /**
-     * Ein konkreter DataFinder, der für die Auflösung der Variable in getValueForKey
-     * die Methode System.getProperty(key) verwendet.
-     * 
-     * @author christoph.lutz
-     */
-    private static class ByJavaPropertyFinder extends DataFinder
-    {
-      public ByJavaPropertyFinder(DatasourceJoiner dsj)
-      {
-        super(dsj);
-      }
-
-      @Override
-      protected String getValueForKey(String key)
-      {
-        try
-        {
-          return System.getProperty(key);
-        }
-        catch (java.lang.Exception e)
-        {
-          Logger.error(
-            L.m("Konnte den Wert der JavaProperty '%1' nicht bestimmen:", key), e);
-        }
-        return "";
-      }
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2658,53 +801,7 @@ public class WollMuxEventHandler
     handle(new OnAddPALChangeEventListener(listener, wollmuxConfHashCode));
   }
 
-  /**
-   * Dieses Event wird ausgelöst, wenn sich ein externer PALChangeEventListener beim
-   * WollMux-Service registriert. Es sorgt dafür, dass der PALChangeEventListener in
-   * die Liste der registrierten PALChangeEventListener im WollMuxSingleton
-   * aufgenommen wird.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnAddPALChangeEventListener extends BasicEvent
-  {
-    private XPALChangeEventListener listener;
-
-    private Integer wollmuxConfHashCode;
-
-    public OnAddPALChangeEventListener(XPALChangeEventListener listener,
-        Integer wollmuxConfHashCode)
-    {
-      this.listener = listener;
-      this.wollmuxConfHashCode = wollmuxConfHashCode;
-    }
-
-    @Override
-    protected void doit()
-    {
-      PersoenlicheAbsenderliste.getInstance().addPALChangeEventListener(listener);
-
-      WollMuxEventHandler.handlePALChangedNotify();
-
-      // Konsistenzprüfung: Stimmt WollMux-Konfiguration der entfernten
-      // Komponente mit meiner Konfiguration überein? Ansonsten Fehlermeldung.
-      if (wollmuxConfHashCode != null)
-      {
-        int myWmConfHash =
-          WollMuxFiles.getWollmuxConf().stringRepresentation().hashCode();
-        if (myWmConfHash != wollmuxConfHashCode.intValue())
-          errorMessage(new InvalidBindingStateException(
-            L.m("Die Konfiguration des WollMux muss neu eingelesen werden.\n\nBitte beenden Sie den WollMux und OpenOffice.org und schießen Sie alle laufenden 'soffice.bin'-Prozesse über den Taskmanager ab.")));
-      }
-
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + listener.hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2721,36 +818,6 @@ public class WollMuxEventHandler
     handle(new OnRemovePALChangeEventListener(listener));
   }
 
-  /**
-   * Dieses Event wird vom WollMux-Service (...comp.WollMux) ausgelöst wenn sich ein
-   * externe XPALChangeEventListener beim WollMux deregistriert. Der zu entfernende
-   * XPALChangeEventListerner wird anschließend im WollMuxSingleton aus der Liste der
-   * registrierten XPALChangeEventListener genommen.
-   * 
-   * @author christoph.lutz
-   */
-  private static class OnRemovePALChangeEventListener extends BasicEvent
-  {
-    private XPALChangeEventListener listener;
-
-    public OnRemovePALChangeEventListener(XPALChangeEventListener listener)
-    {
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit()
-    {
-      PersoenlicheAbsenderliste.getInstance().removePALChangeEventListener(listener);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + listener.hashCode() + ")";
-    }
-  }
-
   // *******************************************************************************************
   /**
    * Erzeugt ein neues WollMuxEvent zum Registrieren eines (frischen)
@@ -2765,48 +832,7 @@ public class WollMuxEventHandler
       handle(new OnRegisterDispatchInterceptor(documentController));
   }
 
-  private static class OnRegisterDispatchInterceptor extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnRegisterDispatchInterceptor(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit()
-    {
-      FrameController fc = documentController.getFrameController(); 
-      if (fc.getFrame() == null)
-      {
-        Logger.debug(L.m("Ignoriere handleRegisterDispatchInterceptor(null)"));
-        return;
-      }
-      try
-      {
-        DispatchProviderAndInterceptor.registerDocumentDispatchInterceptor(fc.getFrame());
-      }
-      catch (java.lang.Exception e)
-      {
-        Logger.error(L.m("Kann DispatchInterceptor nicht registrieren:"), e);
-      }
-
-      // Sicherstellen, dass die Schaltflächen der Symbolleisten aktiviert werden:
-      try
-      {
-        fc.getFrame().contextChanged();
-      }
-      catch (java.lang.Exception e)
-      {}
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getFrameController().getFrame().hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2822,36 +848,7 @@ public class WollMuxEventHandler
     handle(new OnAddDocumentEventListener(listener));
   }
 
-  private static class OnAddDocumentEventListener extends BasicEvent
-  {
-    private XEventListener listener;
-
-    public OnAddDocumentEventListener(XEventListener listener)
-    {
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit()
-    {
-      DocumentManager.getDocumentManager().addDocumentEventListener(listener);
-
-      List<XComponent> processedDocuments = new Vector<XComponent>();
-      DocumentManager.getDocumentManager().getProcessedDocuments(processedDocuments);
-
-      for (XComponent compo : processedDocuments)
-      {
-        handleNotifyDocumentEventListener(listener, ON_WOLLMUX_PROCESSING_FINISHED,
-          compo);
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + listener.hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2867,27 +864,7 @@ public class WollMuxEventHandler
     handle(new OnRemoveDocumentEventListener(listener));
   }
 
-  private static class OnRemoveDocumentEventListener extends BasicEvent
-  {
-    private XEventListener listener;
-
-    public OnRemoveDocumentEventListener(XEventListener listener)
-    {
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit()
-    {
-      DocumentManager.getDocumentManager().removeDocumentEventListener(listener);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + listener.hashCode() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -2916,72 +893,7 @@ public class WollMuxEventHandler
     handle(new OnNotifyDocumentEventListener(listener, eventName, source));
   }
 
-  private static class OnNotifyDocumentEventListener extends BasicEvent
-  {
-    private String eventName;
-
-    private Object source;
-
-    private XEventListener listener;
-
-    public OnNotifyDocumentEventListener(XEventListener listener, String eventName,
-        Object source)
-    {
-      this.listener = listener;
-      this.eventName = eventName;
-      this.source = source;
-    }
-
-    @Override
-    protected void doit()
-    {
-      final com.sun.star.document.EventObject eventObject =
-        new com.sun.star.document.EventObject();
-      eventObject.Source = source;
-      eventObject.EventName = eventName;
-
-      Iterator<XEventListener> i =
-          DocumentManager.getDocumentManager().documentEventListenerIterator();
-      while (i.hasNext())
-      {
-        Logger.debug2("notifying XEventListener (event '" + eventName + "')");
-        try
-        {
-          final XEventListener listener = i.next();
-          if (this.listener == null || this.listener == listener) new Thread()
-          {
-            @Override
-            public void run()
-            {
-              try
-              {
-                listener.notifyEvent(eventObject);
-              }
-              catch (java.lang.Exception x)
-              {}
-            }
-          }.start();
-        }
-        catch (java.lang.Exception e)
-        {
-          i.remove();
-        }
-      }
-
-      XComponent compo = UNO.XComponent(source);
-      if (compo != null && eventName.equals(ON_WOLLMUX_PROCESSING_FINISHED))
-        DocumentManager.getDocumentManager().setProcessingFinished(
-          compo);
-
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "('" + eventName + "', "
-        + ((source != null) ? "#" + source.hashCode() : "null") + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3000,70 +912,7 @@ public class WollMuxEventHandler
     handle(new OnExecutePrintFunction(documentController));
   }
 
-  private static class OnExecutePrintFunction extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnExecutePrintFunction(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Prüfen, ob alle gesetzten Druckfunktionen im aktuellen Kontext noch
-      // Sinn machen:
-      checkPrintPreconditions(documentController);
-      stabilize();
-
-      // Die im Dokument gesetzten Druckfunktionen ausführen:
-      final XPrintModel pmod = PrintModels.createPrintModel(documentController, true);
-
-      // Drucken im Hintergrund, damit der WollMuxEventHandler weiterläuft.
-      new Thread()
-      {
-        @Override
-        public void run()
-        {
-          pmod.printWithProps();
-        }
-      }.start();
-    }
-
-    /**
-     * Es kann sein, dass zum Zeitpunkt des Drucken-Aufrufs eine Druckfunktion
-     * gesetzt hat, die in der aktuellen Situation nicht mehr sinnvoll ist; Dieser
-     * Umstand wird in checkPreconditons geprüft und die betroffene Druckfunktion
-     * ggf. aus der Liste der Druckfunktionen entfernt.
-     * 
-     * @param printFunctions
-     *          Menge der aktuell gesetzten Druckfunktionen.
-     * 
-     * @author Christoph Lutz (D-III-ITD-5.1)
-     */
-    protected static void checkPrintPreconditions(TextDocumentController documentController)
-    {
-      Set<String> printFunctions = documentController.getModel().getPrintFunctions();
-
-      // Ziffernanpassung der Sachleitenden Verfügungen durlaufen lassen, um zu
-      // erkennen, ob Verfügungspunkte manuell aus dem Dokument gelöscht
-      // wurden ohne die entsprechenden Knöpfe zum Einfügen/Entfernen von
-      // Ziffern zu drücken.
-      if (printFunctions.contains(SachleitendeVerfuegung.PRINT_FUNCTION_NAME))
-      {
-        SachleitendeVerfuegung.ziffernAnpassen(documentController);
-      }
-
-      // ...Platz für weitere Prüfungen.....
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3094,53 +943,7 @@ public class WollMuxEventHandler
       showHighlightColor, listener));
   }
 
-  private static class OnSetPrintBlocksPropsViaPrintModel extends BasicEvent
-  {
-    private XTextDocument doc;
-
-    private String blockName;
-
-    private boolean visible;
-
-    private boolean showHighlightColor;
-
-    private ActionListener listener;
-
-    public OnSetPrintBlocksPropsViaPrintModel(XTextDocument doc, String blockName,
-        boolean visible, boolean showHighlightColor, ActionListener listener)
-    {
-      this.doc = doc;
-      this.blockName = blockName;
-      this.visible = visible;
-      this.showHighlightColor = showHighlightColor;
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      TextDocumentController documentController =
-        DocumentManager.getTextDocumentController(doc);
-      try
-      {
-        documentController.setPrintBlocksProps(blockName, visible, showHighlightColor);
-      }
-      catch (java.lang.Exception e)
-      {
-        errorMessage(e);
-      }
-
-      stabilize();
-      if (listener != null) listener.actionPerformed(null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + doc.hashCode() + ", '"
-        + blockName + "', '" + visible + "', '" + showHighlightColor + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3168,40 +971,7 @@ public class WollMuxEventHandler
     handle(new OnManagePrintFunction(doc, functionName, remove));
   }
 
-  private static class OnManagePrintFunction extends BasicEvent
-  {
-    private XTextDocument doc;
-
-    private String functionName;
-
-    private boolean remove;
-
-    public OnManagePrintFunction(XTextDocument doc, String functionName,
-        boolean remove)
-    {
-      this.doc = doc;
-      this.functionName = functionName;
-      this.remove = remove;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      TextDocumentController documentController =
-        DocumentManager.getTextDocumentController(doc);
-      if (remove)
-        documentController.removePrintFunction(functionName);
-      else
-        documentController.addPrintFunction(functionName);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + doc.hashCode() + ", '"
-        + functionName + "', remove=" + remove + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3219,35 +989,7 @@ public class WollMuxEventHandler
     handle(new OnZifferEinfuegen(documentController));
   }
 
-  private static class OnZifferEinfuegen extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnZifferEinfuegen(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-      if (viewCursor != null)
-      {
-        XTextRange vc =
-          SachleitendeVerfuegung.insertVerfuegungspunkt(documentController, viewCursor);
-        if (vc != null) viewCursor.gotoRange(vc, false);
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3264,34 +1006,7 @@ public class WollMuxEventHandler
     handle(new OnAbdruck(documentController));
   }
 
-  private static class OnAbdruck extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnAbdruck(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-      if (viewCursor != null)
-      {
-        XTextRange vc = SachleitendeVerfuegung.insertAbdruck(documentController, viewCursor);
-        if (vc != null) viewCursor.gotoRange(vc, false);
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3309,35 +1024,7 @@ public class WollMuxEventHandler
     handle(new OnButtonZuleitungszeilePressed(documentController));
   }
 
-  private static class OnButtonZuleitungszeilePressed extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnButtonZuleitungszeilePressed(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-      if (viewCursor != null)
-      {
-        XTextRange vc =
-          SachleitendeVerfuegung.insertZuleitungszeile(documentController, viewCursor);
-        if (vc != null) viewCursor.gotoRange(vc, false);
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3363,171 +1050,7 @@ public class WollMuxEventHandler
     handle(new OnMarkBlock(documentController, blockname));
   }
 
-  private static class OnMarkBlock extends BasicEvent
-  {
-    private String blockname;
-    private TextDocumentController documentController;
-
-    public OnMarkBlock(TextDocumentController documentController, String blockname)
-    {
-      this.documentController = documentController;
-      this.blockname = blockname;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (UNO.XBookmarksSupplier(documentController.getModel().doc) == null || blockname == null) return;
-
-      ConfigThingy slvConf =
-          WollMuxFiles.getWollmuxConf().query(
-          "SachleitendeVerfuegungen");
-      Integer highlightColor = null;
-
-      XTextCursor range = documentController.getModel().getViewCursor();
-
-      if (range == null) return;
-
-      if (range.isCollapsed())
-      {
-        ModalDialogs.showInfoModal(L.m("Fehler"),
-          L.m("Bitte wählen Sie einen Bereich aus, der markiert werden soll."));
-        return;
-      }
-
-      String markChange = null;
-      if (blockname.equalsIgnoreCase("allVersions"))
-      {
-        markChange = L.m("wird immer gedruckt");
-        highlightColor = getHighlightColor(slvConf, "ALL_VERSIONS_HIGHLIGHT_COLOR");
-      }
-      else if (blockname.equalsIgnoreCase("draftOnly"))
-      {
-        markChange = L.m("wird nur im Entwurf gedruckt");
-        highlightColor = getHighlightColor(slvConf, "DRAFT_ONLY_HIGHLIGHT_COLOR");
-      }
-      else if (blockname.equalsIgnoreCase("notInOriginal"))
-      {
-        markChange = L.m("wird im Original nicht gedruckt");
-        highlightColor =
-          getHighlightColor(slvConf, "NOT_IN_ORIGINAL_HIGHLIGHT_COLOR");
-      }
-      else if (blockname.equalsIgnoreCase("originalOnly"))
-      {
-        markChange = L.m("wird ausschließlich im Original gedruckt");
-        highlightColor = getHighlightColor(slvConf, "ORIGINAL_ONLY_HIGHLIGHT_COLOR");
-      }
-      else if (blockname.equalsIgnoreCase("copyOnly"))
-      {
-        markChange = L.m("wird ausschließlich in Abdrucken gedruckt");
-        highlightColor = getHighlightColor(slvConf, "COPY_ONLY_HIGHLIGHT_COLOR");
-      }
-      else
-        return;
-
-      String bookmarkStart = "WM(CMD '" + blockname + "'";
-      String hcAtt = "";
-      if (highlightColor != null)
-      {
-        String colStr = "00000000";
-        colStr += Integer.toHexString(highlightColor.intValue());
-        colStr = colStr.substring(colStr.length() - 8, colStr.length());
-        hcAtt = " HIGHLIGHT_COLOR '" + colStr + "'";
-      }
-      String bookmarkName = bookmarkStart + hcAtt + ")";
-
-      Pattern bookmarkPattern = DocumentCommands.getPatternForCommand(blockname);
-      Set<String> bmNames =
-        TextDocument.getBookmarkNamesMatching(bookmarkPattern, range);
-
-      if (bmNames.size() > 0)
-      {
-        // bereits bestehende Blöcke löschen
-        Iterator<String> iter = bmNames.iterator();
-        while (iter.hasNext())
-        {
-          bookmarkName = iter.next();
-          try
-          {
-            Bookmark b =
-              new Bookmark(bookmarkName, UNO.XBookmarksSupplier(documentController.getModel().doc));
-            if (bookmarkName.contains("HIGHLIGHT_COLOR"))
-              UNO.setPropertyToDefault(b.getTextCursor(), "CharBackColor");
-            b.remove();
-          }
-          catch (NoSuchElementException e)
-          {}
-        }
-        ModalDialogs.showInfoModal(
-          L.m("Markierung des Blockes aufgehoben"),
-          L.m(
-            "Der ausgewählte Block enthielt bereits eine Markierung 'Block %1'. Die bestehende Markierung wurde aufgehoben.",
-            markChange));
-      }
-      else
-      {
-        // neuen Block anlegen
-        documentController.getModel().addNewDocumentCommand(range, bookmarkName);
-        if (highlightColor != null)
-        {
-          UNO.setProperty(range, "CharBackColor", highlightColor);
-          // ViewCursor kollabieren, da die Markierung die Farben verfälscht
-          // darstellt.
-          XTextCursor vc = documentController.getModel().getViewCursor();
-          if (vc != null) vc.collapseToEnd();
-        }
-        ModalDialogs.showInfoModal(L.m("Block wurde markiert"),
-          L.m("Der ausgewählte Block %1.", markChange));
-      }
-
-      // PrintBlöcke neu einlesen:
-      documentController.getModel().getDocumentCommands().update();
-      DocumentCommandInterpreter dci =
-        new DocumentCommandInterpreter(documentController, WollMuxFiles.isDebugMode());
-      dci.scanGlobalDocumentCommands();
-      dci.scanInsertFormValueCommands();
-
-      stabilize();
-    }
-
-    /**
-     * Liefert einen Integer der Form AARRGGBB (hex), der den Farbwert repräsentiert,
-     * der in slvConf im Attribut attribute hinterlegt ist oder null, wenn das
-     * Attribut nicht existiert oder der dort enthaltene String-Wert sich nicht in
-     * eine Integerzahl konvertieren lässt.
-     * 
-     * @param slvConf
-     * @param attribute
-     */
-    private static Integer getHighlightColor(ConfigThingy slvConf, String attribute)
-    {
-      try
-      {
-        String highlightColor = slvConf.query(attribute).getLastChild().toString();
-        if (highlightColor.equals("") || highlightColor.equalsIgnoreCase("none"))
-          return null;
-        int hc = Integer.parseInt(highlightColor, 16);
-        return Integer.valueOf(hc);
-      }
-      catch (NodeNotFoundException e)
-      {
-        return null;
-      }
-      catch (NumberFormatException e)
-      {
-        Logger.error(L.m("Der angegebene Farbwert im Attribut '%1' ist ungültig!",
-          attribute));
-        return null;
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + documentController.getModel().hashCode() + ", '"
-        + blockname + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3545,35 +1068,6 @@ public class WollMuxEventHandler
     handle(new OnDumpInfo());
   }
 
-  private static class OnDumpInfo extends BasicEvent
-  {
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      final String title = L.m("Fehlerinfos erstellen");
-
-      String name = WollMuxFiles.dumpInfo();
-
-      if (name != null)
-        ModalDialogs.showInfoModal(
-          title,
-          L.m(
-            "Die Fehlerinformationen des WollMux wurden erfolgreich in die Datei '%1' geschrieben.",
-            name));
-      else
-        ModalDialogs.showInfoModal(
-          title,
-          L.m("Die Fehlerinformationen des WollMux konnten nicht geschrieben werden\n\nDetails siehe Datei wollmux.log!"));
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
-  
   /**
    * Druckt die aktuelle Seite eines Dokuments auf dem Standarddrucker aus.
    */
@@ -3582,37 +1076,7 @@ public class WollMuxEventHandler
     handle(new OnPrintPage(documentController));
   }
 
-  private static class OnPrintPage extends BasicEvent
-  {
-
-    private TextDocumentController documentController;
-
-		public OnPrintPage(TextDocumentController documentController) {
-			this.documentController = documentController;
-		}
-
-		@Override
-    protected void doit() throws WollMuxFehlerException
-    {
-		  XTextViewCursorSupplier viewCursorSupplier = UNO.XTextViewCursorSupplier(documentController.getModel().doc.getCurrentController());
-		  XPageCursor pageCursor = UNO.XPageCursor(viewCursorSupplier.getViewCursor());
-		  short page = pageCursor.getPage();
-		  XPrintable printable = UNO.XPrintable(documentController.getModel().doc);
-		  
-		  UnoProps props = new UnoProps();
-		  props.setPropertyValue("CopyCount", (short)1);
-      props.setPropertyValue("Pages", String.valueOf(page));
-      props.setPropertyValue("Collate", false);
-		  
-      printable.print(props.getProps());
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
+  
 
 
   // *******************************************************************************************
@@ -3629,27 +1093,7 @@ public class WollMuxEventHandler
     handle(new OnKill());
   }
 
-  private static class OnKill extends BasicEvent
-  {
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (UNO.desktop != null)
-      {
-        UNO.desktop.terminate();
-      }
-      else
-      {
-        System.exit(0);
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3686,60 +1130,7 @@ public class WollMuxEventHandler
     handle(new OnSetFormValue(doc, id, value, unlockActionListener));
   }
 
-  private static class OnSetFormValue extends BasicEvent
-  {
-    private XTextDocument doc;
-
-    private String id;
-
-    private String value;
-
-    private final ActionListener listener;
-
-    public OnSetFormValue(XTextDocument doc, String id, String value,
-        ActionListener listener)
-    {
-      this.doc = doc;
-      this.id = id;
-      this.value = value;
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      TextDocumentController documentController =
-        DocumentManager.getTextDocumentController(doc);
-
-      FormModel formModel = DocumentManager.getDocumentManager().getFormModel(doc);
-      if (formModel != null)
-      {
-        // Werte über den FormController (den das FormModel kennt) setzen lassen
-        // (damit sind auch automatisch alle Abhängigkeiten richtig aufgelöst)
-        formModel.setValue(id, value, new ActionListener()
-        {
-          @Override
-          public void actionPerformed(ActionEvent arg0)
-          {
-            handleSetFormValueFinished(listener);
-          }
-        });
-      }
-      else
-      {
-        // Werte selber setzen:
-        documentController.addFormFieldValue(id, value);
-        if (listener != null) listener.actionPerformed(null);
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + doc.hashCode() + ", id='" + id
-        + "', value='" + value + "')";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3762,33 +1153,7 @@ public class WollMuxEventHandler
     handle(new OnCollectNonWollMuxFormFieldsViaPrintModel(documentController, listener));
   }
 
-  private static class OnCollectNonWollMuxFormFieldsViaPrintModel extends BasicEvent
-  {
-    private ActionListener listener;
-    private TextDocumentController documentController;
-
-    public OnCollectNonWollMuxFormFieldsViaPrintModel(TextDocumentController documentController,
-        ActionListener listener)
-    {
-      this.documentController = documentController;
-      this.listener = listener;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      documentController.collectNonWollMuxFormFields();
-
-      stabilize();
-      if (listener != null) listener.actionPerformed(null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3810,27 +1175,7 @@ public class WollMuxEventHandler
     handle(new OnSetFormValueFinished(unlockActionListener));
   }
 
-  private static class OnSetFormValueFinished extends BasicEvent
-  {
-    private ActionListener listener;
-
-    public OnSetFormValueFinished(ActionListener unlockActionListener)
-    {
-      this.listener = unlockActionListener;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      if (listener != null) listener.actionPerformed(null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3862,65 +1207,7 @@ public class WollMuxEventHandler
     handle(new OnSetInsertValues(doc, mapDbSpalteToValue, unlockActionListener));
   }
 
-  private static class OnSetInsertValues extends BasicEvent
-  {
-    private XTextDocument doc;
-
-    private Map<String, String> mapDbSpalteToValue;
-
-    private ActionListener listener;
-
-    public OnSetInsertValues(XTextDocument doc,
-        Map<String, String> mapDbSpalteToValue, ActionListener unlockActionListener)
-    {
-      this.doc = doc;
-      this.mapDbSpalteToValue = mapDbSpalteToValue;
-      this.listener = unlockActionListener;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      TextDocumentController documentController =
-        DocumentManager.getTextDocumentController(doc);
-
-      for (DocumentCommand cmd :documentController.getModel().getDocumentCommands())
-        // stellt sicher, dass listener am Schluss informiert wird
-        try
-        {
-          if (cmd instanceof DocumentCommand.InsertValue)
-          {
-            DocumentCommand.InsertValue insVal = (DocumentCommand.InsertValue) cmd;
-            String value = mapDbSpalteToValue.get(insVal.getDBSpalte());
-            if (value != null)
-            {
-              value = documentController.getTransformedValue(insVal.getTrafoName(), value);
-              if ("".equals(value))
-              {
-                cmd.setTextRangeString("");
-              }
-              else
-              {
-                cmd.setTextRangeString(insVal.getLeftSeparator() + value
-                  + insVal.getRightSeparator());
-              }
-            }
-          }
-        }
-        catch (java.lang.Exception e)
-        {
-          Logger.error(e);
-        }
-      if (listener != null) listener.actionPerformed(null);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + doc.hashCode()
-        + ", Nr.Values=" + mapDbSpalteToValue.size() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3940,42 +1227,7 @@ public class WollMuxEventHandler
     handle(new OnTextbausteinEinfuegen(documentController, reprocess));
   }
 
-  private static class OnTextbausteinEinfuegen extends BasicEvent
-  {
-    private boolean reprocess;
-    private TextDocumentController documentController;
-
-    public OnTextbausteinEinfuegen(TextDocumentController documentController, boolean reprocess)
-    {
-      this.documentController = documentController;
-      this.reprocess = reprocess;
-
-    }
-
-    @Override
-    protected void doit()
-    {
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-      try
-      {
-        TextModule.createInsertFragFromIdentifier(documentController.getModel().doc, viewCursor, reprocess);
-        if (reprocess) handleReprocessTextDocument(documentController);
-        if (!reprocess)
-          ModalDialogs.showInfoModal(L.m("WollMux"),
-            L.m("Der Textbausteinverweis wurde eingefügt."));
-      }
-      catch (WollMuxFehlerException e)
-      {
-        ModalDialogs.showInfoModal(L.m("WollMux-Fehler"), e.getMessage());
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ", " + reprocess + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -3991,38 +1243,7 @@ public class WollMuxEventHandler
     handle(new OnJumpToPlaceholder(documentController));
   }
 
-  private static class OnJumpToPlaceholder extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnJumpToPlaceholder(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-
-      try
-      {
-        TextModule.jumpPlaceholders(documentController.getModel().doc, viewCursor);
-      }
-      catch (java.lang.Exception e)
-      {
-        Logger.error(e);
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -4038,68 +1259,7 @@ public class WollMuxEventHandler
     handle(new OnJumpToMark(doc, msg));
   }
 
-  private static class OnJumpToMark extends BasicEvent
-  {
-    private XTextDocument doc;
-
-    private boolean msg;
-
-    public OnJumpToMark(XTextDocument doc, boolean msg)
-    {
-      this.doc = doc;
-      this.msg = msg;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-
-      TextDocumentController documentController =
-        DocumentManager.getTextDocumentController(doc);
-
-      XTextCursor viewCursor = documentController.getModel().getViewCursor();
-      if (viewCursor == null) return;
-
-      DocumentCommand cmd = documentController.getModel().getFirstJumpMark();
-
-      if (cmd != null)
-      {
-        try
-        {
-          XTextRange range = cmd.getTextCursor();
-          if (range != null) viewCursor.gotoRange(range.getStart(), false);
-        }
-        catch (java.lang.Exception e)
-        {
-          Logger.error(e);
-        }
-
-        boolean modified = documentController.getModel().isDocumentModified();
-        cmd.markDone(true);
-        documentController.getModel().setDocumentModified(modified);
-
-        documentController.getModel().getDocumentCommands().update();
-
-      }
-      else
-      {
-        if (msg)
-        {
-          ModalDialogs.showInfoModal(L.m("WollMux"),
-            L.m("Kein Platzhalter und keine Marke 'setJumpMark' vorhanden!"));
-        }
-      }
-
-      stabilize();
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(#" + doc.hashCode() + ", " + msg
-        + ")";
-    }
-  }
+  
 
 
   // *******************************************************************************************
@@ -4119,61 +1279,7 @@ public class WollMuxEventHandler
     handle(new OnPrint(documentController, origDisp, origUrl, origArgs));
   }
 
-  private static class OnPrint extends BasicEvent
-  {
-    private XDispatch origDisp;
-
-    private com.sun.star.util.URL origUrl;
-
-    private PropertyValue[] origArgs;
-
-    private TextDocumentController documentController;
-
-    public OnPrint(TextDocumentController documentController, XDispatch origDisp,
-        com.sun.star.util.URL origUrl, PropertyValue[] origArgs)
-    {
-      this.documentController = documentController;
-      this.origDisp = origDisp;
-      this.origUrl = origUrl;
-      this.origArgs = origArgs;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      boolean hasPrintFunction = documentController.getModel().getPrintFunctions().size() > 0;
-
-      if (Workarounds.applyWorkaroundForOOoIssue96281())
-      {
-        try
-        {
-          Object viewSettings =
-            UNO.XViewSettingsSupplier(documentController.getModel().doc.getCurrentController()).getViewSettings();
-          UNO.setProperty(viewSettings, "ZoomType", DocumentZoomType.BY_VALUE);
-          UNO.setProperty(viewSettings, "ZoomValue", Short.valueOf((short) 100));
-        }
-        catch (java.lang.Exception e)
-        {}
-      }
-
-      if (hasPrintFunction)
-      {
-        // Druckfunktion aufrufen
-        handleExecutePrintFunctions(documentController);
-      }
-      else
-      {
-        // Forward auf Standardfunktion
-        if (origDisp != null) origDisp.dispatch(origUrl, origArgs);
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -4199,189 +1305,7 @@ public class WollMuxEventHandler
     }
   }
   
-  private static class OnSaveAs extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    private DispatchHelper helper;
-
-    public OnSaveAs(TextDocumentController documentController, DispatchHelper helper)
-    {
-      this.documentController = documentController;
-      this.helper = helper;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // FilenameGeneratorFunction auslesen und parsen
-      FunctionLibrary lib = documentController.getFunctionLibrary();
-      ConfigThingy funcConf = documentController.getFilenameGeneratorFunc();
-      Function func = null;
-      if (funcConf != null) try
-      {
-        func = FunctionFactory.parse(funcConf, lib, null, null);
-      }
-      catch (ConfigurationErrorException e)
-      {
-        Logger.error(L.m("Kann FilenameGeneratorFunction nicht parsen!"), e);
-      }
-
-      // Original-Dispatch ausführen, wenn keine FilenameGeneratorFunction gesetzt
-      if (func == null)
-      {
-        helper.dispatchOriginal();
-        return;
-      }
-
-      boolean done = false;
-      File file = ensureFileHasODTSuffix(getDefaultFile(func));
-      JFileChooser fc = createODTFileChooser(file);
-      while (!done)
-      {
-        done = true;
-        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
-        {
-          boolean save = true;
-          File f = ensureFileHasODTSuffix(fc.getSelectedFile());
-
-          // Sicherheitsabfage vor Überschreiben
-          if (f.exists())
-          {
-            save = false;
-            int res =
-              JOptionPane.showConfirmDialog(
-                null,
-                L.m("Datei %1 existiert bereits. Soll sie überschrieben werden?",
-                  f.getName()), L.m("Überschreiben?"),
-                JOptionPane.YES_NO_CANCEL_OPTION);
-            if (res == JOptionPane.NO_OPTION)
-            {
-              done = false;
-            }
-            if (res == JOptionPane.OK_OPTION)
-            {
-              save = true;
-            }
-          }
-
-          if (save)
-          {
-            helper.dispatchFinished(saveAs(f));
-          }
-        }
-      }
-    }
-
-    private File getDefaultFile(Function func)
-    {
-      Map<String, String> fields = documentController.getModel().getFormFieldValuesMap();
-      Values.SimpleMap values = new Values.SimpleMap();
-      for (String par : func.parameters())
-      {
-        String value = fields.get(par);
-        if (value == null) value = "";
-        values.put(par, value);
-      }
-      String filename = func.getString(values);
-      File f = new File(filename);
-      if (f.isAbsolute()) return f;
-
-      try
-      {
-        Object ps = UNO.createUNOService("com.sun.star.util.PathSettings");
-        URL dir = new URL(AnyConverter.toString(UNO.getProperty(ps, "Work")));
-        return new File(dir.getPath(), filename);
-      }
-      catch (com.sun.star.lang.IllegalArgumentException e)
-      {
-        Logger.error(e);
-      }
-      catch (MalformedURLException e)
-      {
-        Logger.error(e);
-      }
-      return new File(filename);
-    }
-
-    private JFileChooser createODTFileChooser(File file)
-    {
-      JFileChooser fc = new JFileChooser()
-      {
-        private static final long serialVersionUID = 1560806929064954454L;
-
-        // Laut Didi kommt der JFileChooser unter Windows nicht im Vordergrund.
-        // Deshalb das Überschreiben der createDialog-Methode und Setzen von
-        // alwaysOnTop(true)
-        @Override
-        protected JDialog createDialog(Component parent) throws HeadlessException
-        {
-          JDialog dialog = super.createDialog(parent);
-          dialog.setAlwaysOnTop(true);
-          return dialog;
-        }
-      };
-      fc.setMultiSelectionEnabled(false);
-      fc.setFileFilter(new FileFilter()
-      {
-        @Override
-        public String getDescription()
-        {
-          return L.m("ODF Textdokument");
-        }
-
-        @Override
-        public boolean accept(File f)
-        {
-          return f.getName().toLowerCase().endsWith(".odt") || f.isDirectory();
-        }
-      });
-      fc.setSelectedFile(file);
-      return fc;
-    }
-
-    private boolean saveAs(File f)
-    {
-      documentController.flushPersistentData();
-      try
-      {
-        String url = UNO.getParsedUNOUrl(f.toURI().toURL().toString()).Complete;
-        if (UNO.XStorable(documentController.getModel().doc) != null)
-        {
-          UNO.XStorable(documentController.getModel().doc).storeAsURL(url, new PropertyValue[] {});
-        }
-        return true;
-      }
-      catch (MalformedURLException e)
-      {
-        Logger.error(L.m("das darf nicht passieren"), e);
-      }
-      catch (com.sun.star.io.IOException e)
-      {
-        Logger.error(e);
-        JOptionPane.showMessageDialog(null, L.m(
-          "Das Speichern der Datei %1 ist fehlgeschlagen!\n\n%2", f.toString(),
-          e.getLocalizedMessage()), L.m("Fehler beim Speichern"),
-          JOptionPane.ERROR_MESSAGE);
-      }
-      return false;
-    }
-
-    private static File ensureFileHasODTSuffix(File f)
-    {
-      if (f != null && !f.getName().toLowerCase().endsWith(".odt"))
-      {
-        return new File(f.getParent(), f.getName() + ".odt");
-      }
-      return f;
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -4400,42 +1324,7 @@ public class WollMuxEventHandler
     handle(new OnFormControllerInitCompleted(documentController));
   }
 
-  private static class OnFormControllerInitCompleted extends BasicEvent
-  {
-    private TextDocumentController documentController;
-
-    public OnFormControllerInitCompleted(TextDocumentController documentController)
-    {
-      this.documentController = documentController;
-    }
-
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Springt zum Dokumentenanfang
-      try
-      {
-        documentController.getModel().getViewCursor().gotoRange(documentController.getModel().doc.getText().getStart(), false);
-      }
-      catch (java.lang.Exception e)
-      {
-        Logger.debug(e);
-      }
-
-      // Beim Öffnen eines Formulars werden viele Änderungen am Dokument
-      // vorgenommen (z.B. das Setzen vieler Formularwerte), ohne dass jedoch
-      // eine entsprechende Benutzerinteraktion stattgefunden hat. Der
-      // Modified-Status des Dokuments wird daher zurückgesetzt, damit nur
-      // wirkliche Interaktionen durch den Benutzer modified=true setzen.
-      documentController.getModel().setDocumentModified(false);
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "(" + documentController.getModel() + ")";
-    }
-  }
+  
 
   // *******************************************************************************************
 
@@ -4452,245 +1341,12 @@ public class WollMuxEventHandler
     handle(new OnCheckInstallation());
   }
 
-  private static class OnCheckInstallation extends BasicEvent
-  {
-    @Override
-    protected void doit() throws WollMuxFehlerException
-    {
-      // Standardwerte für den Warndialog:
-      boolean showdialog = true;
-      String title = L.m("Mehrfachinstallation des WollMux");
-      String msg =
-        L.m("Es wurden eine systemweite und eine benutzerlokale Installation des WollMux\n(oder Überreste von einer unvollständigen Deinstallation) gefunden.\nDiese Konstellation kann obskure Fehler verursachen.\n\nEntfernen Sie eine der beiden Installationen.\n\nDie wollmux.log enthält nähere Informationen zu den betroffenen Pfaden.");
-      String logMsg = msg;
-
-      // Abschnitt Dialoge/MehrfachinstallationWarndialog auswerten
-      try
-      {
-        ConfigThingy warndialog =
-          WollMuxFiles.getWollmuxConf().query("Dialoge").query(
-            "MehrfachinstallationWarndialog").getLastChild();
-        try
-        {
-          msg = warndialog.get("MSG").toString();
-        }
-        catch (NodeNotFoundException e)
-        {
-          showdialog = false;
-        }
-        try
-        {
-          title = warndialog.get("TITLE").toString();
-        }
-        catch (NodeNotFoundException e)
-        {}
-      }
-      catch (NodeNotFoundException e)
-      {
-        // Ist der Abschnitt nicht vorhanden, so greifen Standardwerte.
-      }
-
-      // Infos der Installationen einlesen.
-      List<WollMuxInstallationDescriptor> wmInsts = getInstallations();
-
-      // Variablen recentInstPath / recentInstLastModified / shared / local bestimmen
-      String recentInstPath = "";
-      Date recentInstLastModified = null;
-      boolean shared = false;
-      boolean local = false;
-      for (WollMuxInstallationDescriptor desc : wmInsts)
-      {
-        shared = shared || desc.isShared;
-        local = local || !desc.isShared;
-        if (recentInstLastModified == null
-          || desc.date.compareTo(recentInstLastModified) > 0)
-        {
-          recentInstLastModified = desc.date;
-          recentInstPath = desc.path;
-        }
-      }
-
-      // Variable wrongInstList bestimmen:
-      String otherInstsList = "";
-      for (WollMuxInstallationDescriptor desc : wmInsts)
-      {
-        if (!desc.path.equals(recentInstPath))
-          otherInstsList += "- " + desc.path + "\n";
-      }
-
-      // Im Fehlerfall Dialog und Fehlermeldung bringen.
-      if (local && shared)
-      {
-
-        // Variablen in msg evaluieren:
-        DateFormat f = DateFormat.getDateInstance();
-        msg = msg.replaceAll("\\$\\{RECENT_INST_PATH\\}", recentInstPath);
-        msg =
-          msg.replaceAll("\\$\\{RECENT_INST_LAST_MODIFIED\\}",
-            f.format(recentInstLastModified));
-        msg = msg.replaceAll("\\$\\{OTHER_INSTS_LIST\\}", otherInstsList);
-
-        logMsg +=
-          "\n" + L.m("Die juengste WollMux-Installation liegt unter:") + "\n- "
-            + recentInstPath + "\n"
-            + L.m("Ausserdem wurden folgende WollMux-Installationen gefunden:")
-            + "\n" + otherInstsList;
-        Logger.error(logMsg);
-
-        if (showdialog) ModalDialogs.showInfoModal(title, msg, 0);
-      }
-    }
-
-    private static class WollMuxInstallationDescriptor
-    {
-      public String path;
-
-      public Date date;
-
-      public boolean isShared;
-
-      public WollMuxInstallationDescriptor(String path, Date date, boolean isShared)
-      {
-        this.path = path;
-        this.date = date;
-        this.isShared = isShared;
-      }
-
-      @Override
-      public String toString()
-      {
-        return path + " -- " + date + " shared:" + isShared;
-      }
-    }
-
-    /**
-     * Liefert eine {@link List} mit den aktuell auf dem System vorhandenen
-     * WollMux-Installationen.
-     * 
-     * @author Christoph Lutz, Matthias Benkmann (D-III-ITD-D101)
-     */
-    private List<WollMuxInstallationDescriptor> getInstallations()
-    {
-      List<WollMuxInstallationDescriptor> wmInstallations =
-        new ArrayList<WollMuxInstallationDescriptor>();
-
-      // Installationspfade der Pakete bestimmen:
-      String myPath = null; // user-Pfad
-      String oooPath = null; // shared-Pfad
-      String oooPathNew = null; // shared-Pfad (OOo 3.x)
-
-      try
-      {
-        XStringSubstitution xSS =
-          UNO.XStringSubstitution(UNO.createUNOService("com.sun.star.util.PathSubstitution"));
-
-        // Benutzerinstallationspfad LiMux =
-        // /home/<Benutzer>/.openoffice.org2/user
-        // Benutzerinstallationspfad Windows 2000 C:/Dokumente und
-        // Einstellungen/<Benutzer>/Anwendungsdaten/OpenOffice.org2/user
-        myPath =
-          xSS.substituteVariables("$(user)/uno_packages/cache/uno_packages/", true);
-        // Sharedinstallationspfad LiMux /opt/openoffice.org2.0/
-        // Sharedinstallationspfad Windows C:/Programme/OpenOffice.org<version>
-        oooPath =
-          xSS.substituteVariables("$(inst)/share/uno_packages/cache/uno_packages/",
-            true);
-        try
-        {
-          oooPathNew =
-            xSS.substituteVariables(
-              "$(brandbaseurl)/share/uno_packages/cache/uno_packages/", true);
-        }
-        catch (NoSuchElementException e)
-        {
-          // OOo 2.x does not have $(brandbaseurl)
-        }
-
-      }
-      catch (java.lang.Exception e)
-      {
-        Logger.error(e);
-        return wmInstallations;
-      }
-
-      if (myPath == null || oooPath == null)
-      {
-        Logger.error(L.m("Bestimmung der Installationspfade für das WollMux-Paket fehlgeschlagen."));
-        return wmInstallations;
-      }
-
-      findWollMuxInstallations(wmInstallations, myPath, false);
-      findWollMuxInstallations(wmInstallations, oooPath, true);
-      if (oooPathNew != null)
-        findWollMuxInstallations(wmInstallations, oooPathNew, true);
-
-      return wmInstallations;
-    }
-
-    /**
-     * Sucht im übergebenen Pfad path nach Verzeichnissen die WollMux.oxt enthalten
-     * und fügt die Information zu wmInstallations hinzu.
-     * 
-     * @author Bettina Bauer, Christoph Lutz, Matthias Benkmann (D-III-ITD-D101)
-     */
-    private static void findWollMuxInstallations(
-        List<WollMuxInstallationDescriptor> wmInstallations, String path,
-        boolean isShared)
-    {
-      URI uriPath;
-      uriPath = null;
-      try
-      {
-        uriPath = new URI(path);
-      }
-      catch (URISyntaxException e)
-      {
-        Logger.error(e);
-        return;
-      }
-
-      File[] installedPackages = new File(uriPath).listFiles();
-      if (installedPackages != null)
-      {
-        // iterieren über die Installationsverzeichnisse mit automatisch
-        // generierten Namen (z.B. 31GFBd_)
-        for (int i = 0; i < installedPackages.length; i++)
-        {
-          if (installedPackages[i].isDirectory())
-          {
-            File dir = installedPackages[i];
-            File[] dateien = dir.listFiles();
-            for (int j = 0; j < dateien.length; j++)
-            {
-              // Wenn das Verzeichnis WollMux.oxt enthält, speichern des
-              // Verzeichnisnames und des Verzeichnisdatum in einer HashMap
-              if (dateien[j].isDirectory()
-                && dateien[j].getName().startsWith("WollMux."))
-              {
-                // Name des Verzeichnis in dem sich WollMux.oxt befindet
-                String directoryName = dateien[j].getAbsolutePath();
-                // Datum des Verzeichnis in dem sich WollMux.oxt befindet
-                Date directoryDate = new Date(dateien[j].lastModified());
-                wmInstallations.add(new WollMuxInstallationDescriptor(directoryName,
-                  directoryDate, isShared));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    @Override
-    public String toString()
-    {
-      return this.getClass().getSimpleName() + "()";
-    }
-  }
+  
 
   // *******************************************************************************************
   // Globale Helper-Methoden
 
-  private static ConfigThingy requireLastSection(ConfigThingy cf, String sectionName)
+  public static ConfigThingy requireLastSection(ConfigThingy cf, String sectionName)
       throws ConfigurationErrorException
   {
     try
