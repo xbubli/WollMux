@@ -38,11 +38,7 @@
  */
 package de.muenchen.allg.itd51.wollmux.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -58,13 +54,13 @@ import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -79,7 +75,6 @@ import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
 import de.muenchen.allg.itd51.wollmux.core.db.QueryResults;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
-import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 
@@ -165,7 +160,7 @@ public class AbsenderAuswaehlen
   /**
    * Das JPanel der obersten Hierarchiestufe.
    */
-  private JPanel mainPanel;
+  private JComponent mainPanel;
 
   /**
    * Der DatasourceJoiner, den dieser Dialog anspricht.
@@ -251,16 +246,6 @@ public class AbsenderAuswaehlen
     this.dialogEndListener = dialogEndListener;
     this.palDisplayTemplate = DEFAULT_DISPLAYTEMPLATE;
 
-    ConfigThingy fensterDesc1 = conf.query("Fenster");
-    if (fensterDesc1.count() == 0)
-      throw new ConfigurationErrorException(L.m("Schlüssel 'Fenster' fehlt in %1",
-        conf.getName()));
-
-    final ConfigThingy fensterDesc = fensterDesc1.query("Auswaehlen");
-    if (fensterDesc.count() == 0)
-      throw new ConfigurationErrorException(L.m("Schlüssel 'Auswaehlen' fehlt in ",
-        conf.getName()));
-
     // GUI im Event-Dispatching Thread erzeugen wg. Thread-Safety.
     try
     {
@@ -270,7 +255,7 @@ public class AbsenderAuswaehlen
         {
           try
           {
-            createGUI(fensterDesc.getLastChild());
+            createGUI();
           }
           catch (Exception x)
           {}
@@ -291,27 +276,14 @@ public class AbsenderAuswaehlen
    *          die Spezifikation dieses Dialogs.
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private void createGUI(ConfigThingy fensterDesc)
+  private void createGUI()
   {
     Common.setLookAndFeelOnce();
 
     palJList = new JList<Object>(new DefaultListModel<Object>());
 
-    String title = L.m("TITLE fehlt für Fenster AbsenderAuswaehlen/Auswaehlen");
-    try
-    {
-      title = L.m(fensterDesc.get("TITLE").toString());
-    }
-    catch (Exception x)
-    {}
-    ;
-
-    try
-    {
-      closeAction = getAction(fensterDesc.get("CLOSEACTION").toString());
-    }
-    catch (Exception x)
-    {}
+    String title = L.m("Absender Auswählen (WollMux)");
+    closeAction = getAction("abort");
 
     // Create and set up the window.
     myFrame = new JFrame(title);
@@ -321,18 +293,11 @@ public class AbsenderAuswaehlen
     // WollMux-Icon für AbsenderAuswaehlen-Frame
     Common.setWollMuxIcon(myFrame);
 
-    mainPanel = new JPanel(new BorderLayout());
+    mainPanel = Box.createVerticalBox();
     mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     myFrame.getContentPane().add(mainPanel);
 
-    JPanel absenderliste = new JPanel(new GridBagLayout());
-    JPanel buttons = new JPanel(new GridBagLayout());
-
-    mainPanel.add(absenderliste, BorderLayout.CENTER);
-    mainPanel.add(buttons, BorderLayout.PAGE_END);
-
-    addUIElements(fensterDesc, "Absenderliste", absenderliste, 0, 1);
-    addUIElements(fensterDesc, "Buttons", buttons, 1, 0);
+    addUIElements();
 
     QueryResults palEntries = dj.getLOS();
     if (palEntries.isEmpty())
@@ -357,206 +322,61 @@ public class AbsenderAuswaehlen
       myFrame.requestFocus();
     }
   }
-
-  /**
-   * Fügt compo UI Elemente gemäss den Kindern von conf.query(key) hinzu. compo muss
-   * ein GridBagLayout haben. stepx und stepy geben an um wieviel mit jedem UI
-   * Element die x und die y Koordinate der Zelle erhöht werden soll. Wirklich
-   * sinnvoll sind hier nur (0,1) und (1,0).
-   */
-  private void addUIElements(ConfigThingy conf, String key, JComponent compo,
-      int stepx, int stepy)
+  
+  private void addUIElements()
   {
-    // int gridx, int gridy, int gridwidth, int gridheight, double weightx, double
-    // weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
-    // GridBagConstraints gbcTextfield = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-    // GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new
-    // Insets(TF_BORDER,TF_BORDER,TF_BORDER,TF_BORDER),0,0);
-    GridBagConstraints gbcLabel =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcGlue =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
-    GridBagConstraints gbcButton =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(BUTTON_BORDER, BUTTON_BORDER,
-          BUTTON_BORDER, BUTTON_BORDER), 0, 0);
-    GridBagConstraints gbcListBox =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
+    Box absenderliste = new Box(BoxLayout.PAGE_AXIS);
+    Box buttons = Box.createHorizontalBox();
 
-    ConfigThingy felderParent = conf.query(key);
-    int y = -stepy;
-    int x = -stepx;
+    mainPanel.add(absenderliste);
+    mainPanel.add(buttons);
 
-    Iterator<ConfigThingy> piter = felderParent.iterator();
-    while (piter.hasNext())
+    JLabel label = new JLabel(L.m("Welchen Absender möchten Sie für Ihre Briefköpfe verwenden ?"));
+    JList<Object> list = palJList;
+    palDisplayTemplate = "%{Nachname}, %{Vorname} (%{Rolle})";
+    
+    list.setVisibleRowCount(10);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setLayoutOrientation(JList.VERTICAL);
+    list.setPrototypeCellValue("Hello World!");
+
+    list.addListSelectionListener(myListSelectionListener);
+
+    JScrollPane scrollPane = new JScrollPane(list);
+    
+    ActionListener actionListener = getAction("back");
+    if (actionListener != null) 
     {
-      Iterator<ConfigThingy> iter = (piter.next()).iterator();
-      while (iter.hasNext())
-      {
-        y += stepy;
-        x += stepx;
-
-        ConfigThingy uiElementDesc = iter.next();
-        try
-        {
-          /*
-           * ACHTUNG! DER FOLGENDE CODE SOLLTE SO GESCHRIEBEN WERDEN, DASS DER
-           * ZUSTAND AUCH IM FALLE EINES GESCHEITERTEN GET() UND EINER EVTL. DARAUS
-           * RESULTIERENDEN NULLPOINTEREXCEPTION NOCH KONSISTENT IST!
-           */
-
-          // boolean readonly = false;
-          String id = "";
-          try
-          {
-            id = uiElementDesc.get("ID").toString();
-          }
-          catch (NodeNotFoundException e)
-          {}
-          // try{ if (uiElementDesc.get("READONLY").toString().equals("true"))
-          // readonly = true; }catch(NodeNotFoundException e){}
-          String type = uiElementDesc.get("TYPE").toString();
-
-          if (type.equals("label"))
-          {
-            JLabel uiElement = new JLabel();
-            gbcLabel.gridx = x;
-            gbcLabel.gridy = y;
-            compo.add(uiElement, gbcLabel);
-            uiElement.setText(L.m(uiElementDesc.get("LABEL").toString()));
-          }
-          else if (type.equals("glue"))
-          {
-            Box uiElement = Box.createHorizontalBox();
-            try
-            {
-              int minsize =
-                Integer.parseInt(uiElementDesc.get("MINSIZE").toString());
-              uiElement.add(Box.createHorizontalStrut(minsize));
-            }
-            catch (Exception e)
-            {}
-            uiElement.add(Box.createHorizontalGlue());
-
-            gbcGlue.gridx = x;
-            gbcGlue.gridy = y;
-            compo.add(uiElement, gbcGlue);
-          }
-          else if (type.equals("listbox"))
-          {
-            int lines = 10;
-            try
-            {
-              lines = Integer.parseInt(uiElementDesc.get("LINES").toString());
-            }
-            catch (Exception e)
-            {}
-
-            JList<Object> list;
-            if (id.equals("pal"))
-            {
-              list = palJList;
-              try
-              {
-                palDisplayTemplate = uiElementDesc.get("DISPLAY").toString();
-              }
-              catch (NodeNotFoundException e)
-              {
-                Logger.log(L.m(
-                  "Kein DISPLAY-Attribut für die listbox mit ID \"pal\" im AbsenderAuswaehlen-Dialog angegeben! Verwende Fallback: %1",
-                  DEFAULT_DISPLAYTEMPLATE));
-                // Das DISPLAY-ATTRIBUT sollte eigentlich verpflichtend sein und wir
-                // sollten an dieser Stelle einen echten Error loggen bzw. eine
-                // Meldung in der GUI ausgeben und evtl. sogar abbrechen. Wir tun
-                // dies allerdings nicht, da das DISPLAY-Attribut erst mit
-                // WollMux 6.4.0 eingeführt wurde und wir abwärtskompatibel zu alten
-                // WollMux-Konfigurationen bleiben müssen und Benutzer alter
-                // Konfigurationen nicht mit Error-Meldungen irritieren wollen.
-                // Dies ist allerdings nur eine Übergangslösung. Die obige Meldung
-                // sollte nach ausreichend Zeit genauso wie DEFAULT_DISPLAYTEMPLATE
-                // entfernt werden (bzw. wie oben gesagt überarbeitet).
-              }
-            }
-            else
-            {
-              list = new JList<Object>(new DefaultListModel<Object>());
-            }
-
-            list.setVisibleRowCount(lines);
-            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            list.setLayoutOrientation(JList.VERTICAL);
-            list.setPrototypeCellValue("Al-chman hemnal ulhillim el-WollMux(W-OLL-MUX-5.1)");
-
-            list.addListSelectionListener(myListSelectionListener);
-
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
-
-            ActionListener actionL = getAction(action);
-            if (actionL != null)
-              list.addMouseListener(new MyActionMouseListener(list, actionL));
-
-            JScrollPane scrollPane = new JScrollPane(list);
-            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-            gbcListBox.gridx = x;
-            gbcListBox.gridy = y;
-            compo.add(scrollPane, gbcListBox);
-          }
-          else if (type.equals("button"))
-          {
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
-
-            String label = L.m(uiElementDesc.get("LABEL").toString());
-
-            char hotkey = 0;
-            try
-            {
-              hotkey = uiElementDesc.get("HOTKEY").toString().charAt(0);
-            }
-            catch (Exception e)
-            {}
-
-            JButton button = new JButton(label);
-            button.setMnemonic(hotkey);
-
-            gbcButton.gridx = x;
-            gbcButton.gridy = y;
-            compo.add(button, gbcButton);
-
-            ActionListener actionL = getAction(action);
-            if (actionL != null) button.addActionListener(actionL);
-
-          }
-          else
-          {
-            Logger.error(L.m("Ununterstützter TYPE für User Interface Element: ",
-              type));
-          }
-        }
-        catch (NodeNotFoundException e)
-        {
-          Logger.error(e);
-        }
-      }
+      list.addMouseListener(new MyActionMouseListener(list, actionListener));
     }
+    
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    
+    absenderliste.add(label);
+    absenderliste.add(Box.createRigidArea(new Dimension(0,5)));
+    absenderliste.add(scrollPane);
+    
+    JButton editButton = new JButton(L.m("Bearbeiten..."));
+    editButton.setMnemonic('B');
+
+    actionListener = getAction("editList");
+    if (actionListener != null) editButton.addActionListener(actionListener);
+
+    buttons.add(editButton);
+    
+    Box glue = Box.createHorizontalBox();
+    glue.add(Box.createHorizontalGlue());
+
+    buttons.add(glue);
+
+    JButton closeButton = new JButton(L.m("Schließen"));
+    closeButton.setMnemonic('C');
+
+    actionListener = getAction("abort");
+    if (actionListener != null) closeButton.addActionListener(actionListener);
+
+    buttons.add(closeButton);
   }
 
   /**
