@@ -62,8 +62,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -108,15 +108,9 @@ import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 
 /**
- * Diese Klasse baut anhand einer als ConfigThingy übergebenen Dialogbeschreibung
- * einen (mehrseitigen) Dialog zur Bearbeitung eines
- * {@link de.muenchen.allg.itd51.wollmux.db.DJDataset}s. <b>ACHTUNG:</b> Die
- * private-Funktionen dürfen NUR aus dem Event-Dispatching Thread heraus aufgerufen
- * werden.
- * 
- * @author Matthias Benkmann (D-III-ITD 5.1)
+ * Dialog zum Bearbeiten von Einträgen in der Persönlichen-Absender-Liste.
  */
-public class DatensatzBearbeiten
+public class AbsenderdatenBearbeiten
 {
   /**
    * Standardbreite für Textfelder
@@ -180,7 +174,7 @@ public class DatensatzBearbeiten
    * Die mit MODIFY_MARKER_COLOR gesetzte Farbe.
    */
   private Color modColor;
-
+  
   /**
    * ActionListener für Buttons mit der ACTION "abort".
    */
@@ -276,7 +270,7 @@ public class DatensatzBearbeiten
    *           Dialog unmöglich macht, zu funktionieren (z.B. dass der "Fenster"
    *           Schlüssel fehlt.
    */
-  public DatensatzBearbeiten(ConfigThingy conf, DJDataset datensatz,
+  public AbsenderdatenBearbeiten(ConfigThingy conf, DJDataset datensatz,
       ActionListener dialogEndListener) throws ConfigurationErrorException
   {
     this.datensatz = datensatz;
@@ -324,14 +318,14 @@ public class DatensatzBearbeiten
   }
 
   /**
-   * Wie {@link #DatensatzBearbeiten(ConfigThingy, DJDataset, ActionListener)} mit
+   * Wie {@link #AbsenderDatenBearbeiten(ConfigThingy, DJDataset, ActionListener)} mit
    * null als dialogEndListener.
    * 
    * @param conf
    * @param datensatz
    * @throws ConfigurationErrorException
    */
-  public DatensatzBearbeiten(ConfigThingy conf, DJDataset datensatz)
+  public AbsenderdatenBearbeiten(ConfigThingy conf, DJDataset datensatz)
       throws ConfigurationErrorException
   {
     this(conf, datensatz, null);
@@ -480,33 +474,20 @@ public class DatensatzBearbeiten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private class MyWindowListener implements WindowListener
+  private class MyWindowListener extends WindowAdapter
   {
-    public MyWindowListener()
-    {}
-
-    public void windowActivated(WindowEvent e)
-    {}
-
-    public void windowClosed(WindowEvent e)
-    {}
-
     public void windowClosing(WindowEvent e)
     {
       closeAction.actionPerformed(null);
     }
+  }
+  
+  
 
-    public void windowDeactivated(WindowEvent e)
-    {}
-
-    public void windowDeiconified(WindowEvent e)
-    {}
-
-    public void windowIconified(WindowEvent e)
-    {}
-
-    public void windowOpened(WindowEvent e)
-    {}
+  @Override
+  protected void finalize() throws Throwable
+  {
+    dispose();
   }
 
   /**
@@ -901,7 +882,7 @@ public class DatensatzBearbeiten
     private String title;
 
     /**
-     * Der Name dieses Fensters (vergleiche {@link DatensatzBearbeiten#fenster}).
+     * Der Name dieses Fensters (vergleiche {@link AbsenderdatenBearbeiten#fenster}).
      */
     private String name;
 
@@ -943,7 +924,7 @@ public class DatensatzBearbeiten
 
     /**
      * Erzeugt ein neues DialogWindow, dessen Name name ist (vergleiche
-     * {@link DatensatzBearbeiten#fenster}) und das seinen Aufbau aus conf bezieht.
+     * {@link AbsenderdatenBearbeiten#fenster}) und das seinen Aufbau aus conf bezieht.
      * conf sollte ein Kind des Knotens "Fenster" aus der gesamten Dialogbeschreibung
      * sein.
      */
@@ -955,7 +936,7 @@ public class DatensatzBearbeiten
 
     /**
      * liefert den Namen zurück, der dem Konstruktor übergeben wurde (vergleiche
-     * {@link DatensatzBearbeiten#fenster}.
+     * {@link AbsenderdatenBearbeiten#fenster}.
      * 
      * @author Matthias Benkmann (D-III-ITD 5.1)
      */
@@ -1459,8 +1440,8 @@ public class DatensatzBearbeiten
     ConfigThingy conf =
       new ConfigThingy("", new URL(new File(System.getProperty("user.dir")).toURI().toURL(),
         confFile));
-    DatensatzBearbeiten ab =
-      new DatensatzBearbeiten(conf.get("AbsenderdatenBearbeiten"), datensatz);
+    AbsenderdatenBearbeiten ab =
+      new AbsenderdatenBearbeiten(conf.get("AbsenderdatenBearbeiten"), datensatz);
     Thread.sleep(60000);
     ab.dispose();
   }

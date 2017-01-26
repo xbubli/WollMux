@@ -975,7 +975,7 @@ public class PersoenlicheAbsenderlisteVerwalten
     abort();
     try
     {
-      new DatensatzBearbeiten(abConf, ds, del);
+      new AbsenderdatenBearbeiten(abConf, ds, del);
     }
     catch (ConfigurationErrorException x)
     {
