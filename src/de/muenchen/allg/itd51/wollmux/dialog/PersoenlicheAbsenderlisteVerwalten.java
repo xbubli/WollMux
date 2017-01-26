@@ -1,5 +1,4 @@
 /*
- * Dateiname: PersoenlicheAbsenderlisteVerwalten.java
  * Projekt  : WollMux
  * Funktion : Implementiert den Hinzufügen/Entfernen Dialog des BKS
  * 
@@ -52,12 +51,8 @@
  */
 package de.muenchen.allg.itd51.wollmux.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -67,8 +62,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -88,7 +83,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
@@ -113,7 +107,6 @@ import de.muenchen.allg.itd51.wollmux.core.db.SearchStrategy;
 import de.muenchen.allg.itd51.wollmux.core.db.TimeoutException;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
-import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 
@@ -165,21 +158,6 @@ public class PersoenlicheAbsenderlisteVerwalten
   private final static int TEXTFIELD_DEFAULT_WIDTH = 22;
 
   /**
-   * Rand um Textfelder (wird auch für ein paar andere Ränder verwendet) in Pixeln.
-   */
-  private final static int TF_BORDER = 4;
-
-  /**
-   * Rand um Buttons (in Pixeln).
-   */
-  private final static int BUTTON_BORDER = 2;
-
-  /**
-   * Standardanzahl an Zeilen in einer Listbox.
-   */
-  private static final int LISTBOX_DEFAULT_LINES = 10;
-
-  /**
    * ActionListener für Buttons mit der ACTION "abort".
    */
   private ActionListener actionListener_abort = new ActionListener()
@@ -187,17 +165,6 @@ public class PersoenlicheAbsenderlisteVerwalten
     public void actionPerformed(ActionEvent e)
     {
       abort();
-    }
-  };
-
-  /**
-   * ActionListener für Buttons mit der ACTION "back".
-   */
-  private ActionListener actionListener_back = new ActionListener()
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      back();
     }
   };
 
@@ -257,17 +224,6 @@ public class PersoenlicheAbsenderlisteVerwalten
   };
 
   /**
-   * ActionListener für Buttons mit der ACTION "newPALEntry".
-   */
-  private ActionListener actionListener_newPALEntry = new ActionListener()
-  {
-    public void actionPerformed(ActionEvent e)
-    {
-      newPALEntry();
-    }
-  };
-
-  /**
    * ActionListener für Buttons mit der ACTION "editNewPALEntry".
    */
   private ActionListener actionListener_editNewPALEntry = new ActionListener()
@@ -291,7 +247,7 @@ public class PersoenlicheAbsenderlisteVerwalten
   /**
    * Das JPanel der obersten Hierarchiestufe.
    */
-  private JPanel mainPanel;
+  private JComponent mainPanel;
 
   /**
    * Der DatasourceJoiner, den dieser Dialog anspricht.
@@ -511,22 +467,8 @@ public class PersoenlicheAbsenderlisteVerwalten
     palJList.setCellRenderer(myRenderer);
     query = new JTextField(TEXTFIELD_DEFAULT_WIDTH);
 
-    String title =
-      L.m("TITLE fehlt für Fenster PersoenlicheAbsenderListeVerwalten/Verwalten");
-    try
-    {
-      title = L.m(fensterDesc.get("TITLE").toString());
-    }
-    catch (Exception x)
-    {}
-    ;
-
-    try
-    {
-      closeAction = getAction(fensterDesc.get("CLOSEACTION").toString());
-    }
-    catch (Exception x)
-    {}
+    String title = L.m("Absenderliste Verwalten (WollMux)");
+    closeAction = actionListener_abort;
 
     // Create and set up the window.
     myFrame = new JFrame(title);
@@ -537,39 +479,12 @@ public class PersoenlicheAbsenderlisteVerwalten
     // WollMux-Icon für PAL-Frame
     Common.setWollMuxIcon(myFrame);
 
-    mainPanel = new JPanel(new BorderLayout());
+    mainPanel = Box.createVerticalBox();
     mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    mainPanel.setPreferredSize(new Dimension(831, 357));
     myFrame.getContentPane().add(mainPanel);
 
-    JPanel introSuche = new JPanel();
-    introSuche.setLayout(new BoxLayout(introSuche, BoxLayout.PAGE_AXIS));
-    JPanel suchergebnisHinUndHerAbsenderliste = new JPanel();
-    suchergebnisHinUndHerAbsenderliste.setLayout(new BoxLayout(
-      suchergebnisHinUndHerAbsenderliste, BoxLayout.LINE_AXIS));
-    JPanel fussbereich = new JPanel(new GridBagLayout());
-    JPanel intro = new JPanel(new GridBagLayout());
-    JPanel suche = new JPanel(new GridBagLayout());
-    JPanel suchergebnis = new JPanel(new GridBagLayout());
-    JPanel hinUndHer = new JPanel(new GridBagLayout());
-    JPanel absenderliste = new JPanel(new GridBagLayout());
-
-    mainPanel.add(introSuche, BorderLayout.PAGE_START);
-    mainPanel.add(suchergebnisHinUndHerAbsenderliste, BorderLayout.CENTER);
-    mainPanel.add(fussbereich, BorderLayout.PAGE_END);
-
-    introSuche.add(intro);
-    introSuche.add(suche);
-
-    suchergebnisHinUndHerAbsenderliste.add(suchergebnis);
-    suchergebnisHinUndHerAbsenderliste.add(hinUndHer);
-    suchergebnisHinUndHerAbsenderliste.add(absenderliste);
-
-    addUIElements(fensterDesc, "Intro", intro, 0, 1);
-    addUIElements(fensterDesc, "Suche", suche, 1, 0);
-    addUIElements(fensterDesc, "Suchergebnis", suchergebnis, 0, 1);
-    addUIElements(fensterDesc, "HinUndHer", hinUndHer, 0, 1);
-    addUIElements(fensterDesc, "Absenderliste", absenderliste, 0, 1);
-    addUIElements(fensterDesc, "Fussbereich", fussbereich, 1, 0);
+    addUIElements();
 
     Dataset dsToSelect = null;
     try
@@ -602,279 +517,146 @@ public class PersoenlicheAbsenderlisteVerwalten
     myFrame.requestFocus();
   }
 
-  /**
-   * Fügt compo UI Elemente gemäss den Kindern von conf.query(key) hinzu. compo muss
-   * ein GridBagLayout haben. stepx und stepy geben an um wieviel mit jedem UI
-   * Element die x und die y Koordinate der Zelle erhöht werden soll. Wirklich
-   * sinnvoll sind hier nur (0,1) und (1,0).
-   */
-  private void addUIElements(ConfigThingy conf, String key, JComponent compo,
-      int stepx, int stepy)
-  {
-    // int gridx, int gridy, int gridwidth, int gridheight, double weightx, double
-    // weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
-    GridBagConstraints gbcTextfield =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.HORIZONTAL, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcLabel =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcGlue =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
-    GridBagConstraints gbcButton =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(BUTTON_BORDER, BUTTON_BORDER,
-          BUTTON_BORDER, BUTTON_BORDER), 0, 0);
-    GridBagConstraints gbcListBox =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
+  
+  private void addUIElements() {
+    Box panelIntro = new Box(BoxLayout.X_AXIS);
 
-    ConfigThingy felderParent = conf.query(key);
-    int y = -stepy;
-    int x = -stepx;
+    JLabel label = new JLabel(L.m("Sie können nach Vorname, Nachname, Email und Orga-Einheit suchen"));
+    panelIntro.add(label);
 
-    Iterator<ConfigThingy> piter = felderParent.iterator();
-    while (piter.hasNext())
-    {
-      Iterator<ConfigThingy> iter = (piter.next()).iterator();
-      while (iter.hasNext())
-      {
-        y += stepy;
-        x += stepx;
+    Box glue = Box.createHorizontalBox();
+    glue.add(Box.createHorizontalGlue());
+    panelIntro.add(glue);
 
-        ConfigThingy uiElementDesc = iter.next();
-        try
-        {
-          /*
-           * ACHTUNG! DER FOLGENDE CODE SOLLTE SO GESCHRIEBEN WERDEN, DASS DER
-           * ZUSTAND AUCH IM FALLE EINES GESCHEITERTEN GET() UND EINER EVTL. DARAUS
-           * RESULTIERENDEN NULLPOINTEREXCEPTION NOCH KONSISTENT IST!
-           */
+    mainPanel.add(panelIntro);
+    mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-          boolean readonly = false;
-          String id = "";
-          try
-          {
-            id = uiElementDesc.get("ID").toString();
-          }
-          catch (NodeNotFoundException e)
-          {}
-          try
-          {
-            if (uiElementDesc.get("READONLY").toString().equals("true"))
-              readonly = true;
-          }
-          catch (NodeNotFoundException e)
-          {}
-          String type = uiElementDesc.get("TYPE").toString();
+    Box panelSuche = Box.createHorizontalBox();
+    panelSuche.setMaximumSize(new Dimension(900, 28));
+    
+    JTextField textField = new JTextField(22);
+    panelSuche.add(textField);
+    
+    panelSuche.add(Box.createRigidArea(new Dimension(5, 0)));
 
-          if (type.equals("textfield"))
-          {
-            JTextField tf;
-            if (id.equals("suchanfrage"))
-              tf = query;
-            else
-              tf = new JTextField(TEXTFIELD_DEFAULT_WIDTH);
+    JButton button = new JButton(L.m("Suchen"));
+    button.setMnemonic('S');
+    button.addActionListener(actionListener_search);
+    panelSuche.add(button);
 
-            tf.setEditable(!readonly);
-            gbcTextfield.gridx = x;
-            gbcTextfield.gridy = y;
-            compo.add(tf, gbcTextfield);
+    mainPanel.add(panelSuche);
+    mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+    
+    Box panelSelection = Box.createHorizontalBox();
+    mainPanel.add(panelSelection);
+    mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
+    Box panelSuchergebnis = new Box(BoxLayout.Y_AXIS);
 
-            ActionListener actionL = getAction(action);
-            if (actionL != null) tf.addActionListener(actionL);
-          }
-          else if (type.equals("label"))
-          {
-            JLabel uiElement = new JLabel();
-            gbcLabel.gridx = x;
-            gbcLabel.gridy = y;
-            compo.add(uiElement, gbcLabel);
-            uiElement.setText(L.m(uiElementDesc.get("LABEL").toString()));
-          }
-          else if (type.equals("glue"))
-          {
-            Box uiElement = Box.createHorizontalBox();
-            try
-            {
-              int minsize =
-                Integer.parseInt(uiElementDesc.get("MINSIZE").toString());
-              uiElement.add(Box.createHorizontalStrut(minsize));
-            }
-            catch (Exception e)
-            {}
-            uiElement.add(Box.createHorizontalGlue());
+    Box label1Box = Box.createHorizontalBox();
+    JLabel label1 = new JLabel(L.m("Suchergebnis"));
+    label1Box.add(label1);
+    label1Box.add(Box.createHorizontalGlue());
+    panelSuchergebnis.add(label1Box);
 
-            gbcGlue.gridx = x;
-            gbcGlue.gridy = y;
-            compo.add(uiElement, gbcGlue);
-          }
-          else if (type.equals("listbox"))
-          {
-            int lines = LISTBOX_DEFAULT_LINES;
-            try
-            {
-              lines = Integer.parseInt(uiElementDesc.get("LINES").toString());
-            }
-            catch (Exception e)
-            {}
+    JList<DJDatasetListElement> list = new JList<DJDatasetListElement>();
+    list.setModel(new DefaultListModel<DJDatasetListElement>());
+    list.setVisibleRowCount(10);
+    list.addMouseListener(new MyActionMouseListener(list, actionListener_addToPAL));
+    list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    list.setLayoutOrientation(JList.VERTICAL);
+    list.setFixedCellWidth((int) new JLabel(
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").getPreferredSize().getWidth());
+    list.addListSelectionListener(myListSelectionListener);
 
-            JList<DJDatasetListElement> list;
-            if (id.equals("suchergebnis"))
-            {
-              list = resultsJList;
-              try
-              {
-                resultsDisplayTemplate = uiElementDesc.get("DISPLAY").toString();
-              }
-              catch (NodeNotFoundException e)
-              {
-                Logger.log(L.m(
-                  "Kein DISPLAY-Attribut für die listbox mit ID \"suchergebnis\" im PersoenlicheAbsenderliste-Dialog angegeben! Verwende Fallback: %1",
-                  DEFAULT_DISPLAYTEMPLATE));
-                // Das DISPLAY-ATTRIBUT sollte eigentlich verpflichtend sein und wir
-                // sollten an dieser Stelle einen echten Error loggen bzw. eine
-                // Meldung in der GUI ausgeben und evtl. sogar abbrechen. Wir tun
-                // dies allerdings nicht, da das DISPLAY-Attribut erst mit
-                // WollMux 6.4.0 eingeführt wurde und wir abwärtskompatibel zu alten
-                // WollMux-Konfigurationen bleiben müssen und Benutzer alter
-                // Konfigurationen nicht mit Error-Meldungen irritieren wollen.
-                // Dies ist allerdings nur eine Übergangslösung. Die obige Meldung
-                // sollte nach ausreichend Zeit genauso wie DEFAULT_DISPLAYTEMPLATE
-                // entfernt werden (bzw. wie oben gesagt überarbeitet).
-              }
-            }
-            else if (id.equals("pal"))
-            {
-              list = palJList;
-              try
-              {
-                palDisplayTemplate = uiElementDesc.get("DISPLAY").toString();
-              }
-              catch (NodeNotFoundException e)
-              {
-                Logger.log(L.m(
-                  "Kein DISPLAY-Attribut für die listbox mit ID \"pal\" im PersoenlicheAbsenderliste-Dialog angegeben! Verwende Fallback: %1",
-                  DEFAULT_DISPLAYTEMPLATE));
-                // Das DISPLAY-ATTRIBUT sollte eigentlich verpflichtend sein und wir
-                // sollten an dieser Stelle einen echten Error loggen bzw. eine
-                // Meldung in der GUI ausgeben und evtl. sogar abbrechen. Wir tun
-                // dies allerdings nicht, da das DISPLAY-Attribut erst mit
-                // WollMux 6.4.0 eingeführt wurde und wir abwärtskompatibel zu alten
-                // WollMux-Konfigurationen bleiben müssen und Benutzer alter
-                // Konfigurationen nicht mit Error-Meldungen irritieren wollen.
-                // Dies ist allerdings nur eine Übergangslösung. Die obige Meldung
-                // sollte nach ausreichend Zeit genauso wie DEFAULT_DISPLAYTEMPLATE
-                // entfernt werden (bzw. wie oben gesagt überarbeitet).
-              }
-            }
-            else
-            {
-              list = new JList<DJDatasetListElement>(new DefaultListModel<DJDatasetListElement>());
-            }
+    resultsJList = list;
 
-            list.setVisibleRowCount(lines);
-            list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            list.setLayoutOrientation(JList.VERTICAL);
-            list.setFixedCellWidth((int) new JLabel(
-              "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").getPreferredSize().getWidth());
+    JScrollPane scrollPane = new JScrollPane(list);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-            list.addListSelectionListener(myListSelectionListener);
+    panelSuchergebnis.add(scrollPane);
 
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
+    panelSelection.add(panelSuchergebnis);
+    panelSelection.add(Box.createRigidArea(new Dimension(5, 0)));
 
-            ActionListener actionL = getAction(action);
-            if (actionL != null)
-              list.addMouseListener(new MyActionMouseListener(list, actionL));
+    Box panelHinUndHer = new Box(BoxLayout.Y_AXIS);
 
-            JScrollPane scrollPane = new JScrollPane(list);
-            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    JButton button1 = new JButton(L.m("→"));
+    button1.addActionListener(actionListener_addToPAL);
+    buttonsToGreyOutIfNothingSelected.add(button1);
 
-            gbcListBox.gridx = x;
-            gbcListBox.gridy = y;
-            compo.add(scrollPane, gbcListBox);
-          }
-          else if (type.equals("button"))
-          {
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
+    panelHinUndHer.add(button1);
+    panelHinUndHer.add(Box.createRigidArea(new Dimension(0, 5)));
 
-            String label = L.m(uiElementDesc.get("LABEL").toString());
+    JButton button2 = new JButton(L.m("←"));
+    button2.addActionListener(actionListener_removeFromPAL);
+    buttonsToGreyOutIfNothingSelected.add(button2);
+    panelHinUndHer.add(button2);
 
-            char hotkey = 0;
-            try
-            {
-              hotkey = uiElementDesc.get("HOTKEY").toString().charAt(0);
-            }
-            catch (Exception e)
-            {}
+    panelSelection.add(panelHinUndHer);
+    panelSelection.add(Box.createRigidArea(new Dimension(5, 0)));
 
-            JButton button = new JButton(label);
-            button.setMnemonic(hotkey);
+    Box panelAbsenderliste = new Box(BoxLayout.Y_AXIS);
 
-            gbcButton.gridx = x;
-            gbcButton.gridy = y;
-            compo.add(button, gbcButton);
+    JLabel label2 = new JLabel(L.m("Persönliche Absenderliste"));
+    
+    Box label2Box = Box.createHorizontalBox();
+    label2Box.add(label2);
+    label2Box.add(Box.createHorizontalGlue());
+    panelAbsenderliste.add(label2Box);
 
-            ActionListener actionL = getAction(action);
-            if (actionL != null)
-              button.addActionListener(actionL);
-            else
-              button.setEnabled(false);
 
-            if (action.equals("editEntry"))
-            {
-              buttonsToGreyOutIfNothingSelected.add(button);
-            }
-            if (action.equals("removeFromPAL"))
-            {
-              buttonsToGreyOutIfNothingSelected.add(button);
-            }
-            if (action.equals("addToPAL"))
-            {
-              buttonsToGreyOutIfNothingSelected.add(button);
-            }
-            else if (action.equals("copyEntry"))
-            {
-              buttonsToGreyOutIfNothingSelected.add(button);
-            }
-          }
-          else
-          {
-            Logger.error(L.m("Ununterstützter TYPE für User Interface Element: ",
-              type));
-          }
-        }
-        catch (NodeNotFoundException e)
-        {
-          Logger.error(e);
-        }
-      }
-    }
+    JList<DJDatasetListElement> list1 = new JList<DJDatasetListElement>();
+    list1.setModel(new DefaultListModel<DJDatasetListElement>());
+    list1.setVisibleRowCount(10);
+    list1.addMouseListener(new MyActionMouseListener(list, actionListener_editEntry));
+    list1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    list1.setLayoutOrientation(JList.VERTICAL);
+    list1.setFixedCellWidth((int) new JLabel(
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX").getPreferredSize().getWidth());
+    list1.addListSelectionListener(myListSelectionListener);
+    palJList = list1;
+    
+    JScrollPane scrollPane1 = new JScrollPane(list1);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+    panelAbsenderliste.add(scrollPane1);
+
+    panelSelection.add(panelAbsenderliste);
+
+    Box panelFussbereich = Box.createHorizontalBox();
+
+    JButton button3 = new JButton(L.m("Löschen"));
+    button3.setMnemonic('L');
+    button3.addActionListener(actionListener_removeFromPAL);
+    buttonsToGreyOutIfNothingSelected.add(button3);
+    panelFussbereich.add(button3);
+
+    JButton button4 = new JButton(L.m("Bearbeiten..."));
+    button4.setMnemonic('B');
+    button4.addActionListener(actionListener_editEntry);
+    buttonsToGreyOutIfNothingSelected.add(button4);
+    panelFussbereich.add(button4);
+
+    JButton button5 = new JButton(L.m("Kopieren"));
+    button5.setMnemonic('K');
+    button5.addActionListener(actionListener_copyEntry);
+    buttonsToGreyOutIfNothingSelected.add(button5);
+    panelFussbereich.add(button5);
+
+    JButton button6 = new JButton(L.m("Neu"));
+    button6.setMnemonic('N');
+    button6.addActionListener(actionListener_editNewPALEntry);
+    panelFussbereich.add(button6);
+
+    JButton button7 = new JButton(L.m("Schließen"));
+    button7.setMnemonic('C');
+    button7.addActionListener(actionListener_abort);
+    panelFussbereich.add(button7);
+
+    mainPanel.add(panelFussbereich);
   }
 
   /**
@@ -1095,16 +877,6 @@ public class PersoenlicheAbsenderlisteVerwalten
   private void abort()
   {
     dialogEnd("abort");
-  }
-
-  /**
-   * Implementiert die gleichnamige ACTION.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1)
-   */
-  private void back()
-  {
-    dialogEnd("back");
   }
 
   /**
@@ -1369,60 +1141,6 @@ public class PersoenlicheAbsenderlisteVerwalten
     updateButtonStates();
   }
 
-  /**
-   * Übersetzt den Namen einer ACTION in eine Referenz auf das passende
-   * actionListener_... Objekt.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1)
-   */
-  private ActionListener getAction(String action)
-  {
-    if (action.equals("abort"))
-    {
-      return actionListener_abort;
-    }
-    else if (action.equals("back"))
-    {
-      return actionListener_back;
-    }
-    else if (action.equals("search"))
-    {
-      return actionListener_search;
-    }
-    else if (action.equals("addToPAL"))
-    {
-      return actionListener_addToPAL;
-    }
-    else if (action.equals("removeFromPAL"))
-    {
-      return actionListener_removeFromPAL;
-    }
-    else if (action.equals("editEntry"))
-    {
-      return actionListener_editEntry;
-    }
-    else if (action.equals("copyEntry"))
-    {
-      return actionListener_copyEntry;
-    }
-    else if (action.equals("newPALEntry"))
-    {
-      return actionListener_newPALEntry;
-    }
-    else if (action.equals("editNewPALEntry"))
-    {
-      return actionListener_editNewPALEntry;
-    }
-    else if (action.equals(""))
-    {
-      return null;
-    }
-    else
-      Logger.error(L.m("Ununterstützte ACTION: %1", action));
-
-    return null;
-  }
-
   private static class MyDialogEndListener implements ActionListener
   {
     private ConfigThingy conf;
@@ -1488,33 +1206,12 @@ public class PersoenlicheAbsenderlisteVerwalten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private class MyWindowListener implements WindowListener
+  private class MyWindowListener extends WindowAdapter
   {
-    public MyWindowListener()
-    {}
-
-    public void windowActivated(WindowEvent e)
-    {}
-
-    public void windowClosed(WindowEvent e)
-    {}
-
     public void windowClosing(WindowEvent e)
     {
       closeAction.actionPerformed(null);
     }
-
-    public void windowDeactivated(WindowEvent e)
-    {}
-
-    public void windowDeiconified(WindowEvent e)
-    {}
-
-    public void windowIconified(WindowEvent e)
-    {}
-
-    public void windowOpened(WindowEvent e)
-    {}
   }
 
   /**
@@ -1525,7 +1222,8 @@ public class PersoenlicheAbsenderlisteVerwalten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  public void dispose()
+  @Override
+  protected void finalize() throws Throwable
   {
     // GUI im Event-Dispatching Thread zerstören wg. Thread-Safety.
     try
