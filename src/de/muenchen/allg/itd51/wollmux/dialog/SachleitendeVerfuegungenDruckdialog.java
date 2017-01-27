@@ -31,10 +31,6 @@ package de.muenchen.allg.itd51.wollmux.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,12 +39,13 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -72,7 +69,6 @@ import de.muenchen.allg.itd51.wollmux.WollMuxSingleton;
 import de.muenchen.allg.itd51.wollmux.core.db.DatasourceJoiner;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigThingy;
 import de.muenchen.allg.itd51.wollmux.core.parser.ConfigurationErrorException;
-import de.muenchen.allg.itd51.wollmux.core.parser.NodeNotFoundException;
 import de.muenchen.allg.itd51.wollmux.core.util.L;
 import de.muenchen.allg.itd51.wollmux.core.util.Logger;
 
@@ -96,21 +92,6 @@ public class SachleitendeVerfuegungenDruckdialog
    * über den Abbrechen oder "X"-Knopf geschlossen wird.
    */
   public static final String CMD_CANCEL = "cancel";
-
-  /**
-   * Rand um Textfelder (wird auch für ein paar andere Ränder verwendet) in Pixeln.
-   */
-  private final static int TF_BORDER = 4;
-
-  /**
-   * Rand über und unter einem horizontalen Separator (in Pixeln).
-   */
-  private final static int SEP_BORDER = 7;
-
-  /**
-   * Rand um Buttons (in Pixeln).
-   */
-  private final static int BUTTON_BORDER = 2;
 
   /**
    * Anzahl der Zeichen, nach der der Text der Verfügungspunkte abgeschnitten wird,
@@ -160,7 +141,7 @@ public class SachleitendeVerfuegungenDruckdialog
    */
   private ChangeListener spinnerChangeListener = new ChangeListener()
   {
-    public void stateChanged(ChangeEvent arg0)
+    public void stateChanged(ChangeEvent event)
     {
       allElementCountTextField.setText("" + getAllElementCount());
     }
@@ -172,9 +153,9 @@ public class SachleitendeVerfuegungenDruckdialog
    */
   private ItemListener cboxItemListener = new ItemListener()
   {
-    public void itemStateChanged(ItemEvent arg0)
+    public void itemStateChanged(ItemEvent event)
     {
-      Object source = arg0.getSource();
+      Object source = event.getSource();
       if (source != null && source instanceof JComboBox<?>)
       {
         @SuppressWarnings("unchecked")
@@ -202,18 +183,12 @@ public class SachleitendeVerfuegungenDruckdialog
   /**
    * Die Array mit allen comboBoxen, die elementCount beinhalten.
    */
-  private JSpinner[] elementCountSpinner;
-
-  /**
-   * Liste mit allen comboBoxen, die verfügungspunkte+zuleitungszeilen
-   * beinhalten.
-   */
-  private List<JComboBox<String>> elementComboBoxes;
+  private List<JSpinner> elementCountSpinner;
 
   /**
    * Die Array mit allen buttons auf printElement-Actions
    */
-  private JButton[] printElementButtons;
+  private List<JButton> printElementButtons;
 
   /**
    * Enthält das TextFeld, das die Summe aller Ausfertigungen anzeigt.
@@ -235,7 +210,7 @@ public class SachleitendeVerfuegungenDruckdialog
   /**
    * Vector of Verfuegungspunkt, der die Beschreibungen der Verfügungspunkte enthält.
    */
-  private Vector<Verfuegungspunkt> verfuegungspunkte;
+  private List<Verfuegungspunkt> verfuegungspunkte;
 
   /**
    * Nach jedem Aufruf von printAll oder printElement enthält diese Methode die
@@ -269,23 +244,13 @@ public class SachleitendeVerfuegungenDruckdialog
    *           Schlüssel fehlt.
    */
   public SachleitendeVerfuegungenDruckdialog(ConfigThingy conf,
-      Vector<Verfuegungspunkt> verfuegungspunkte, ActionListener dialogEndListener)
+      List<Verfuegungspunkt> verfuegungspunkte, ActionListener dialogEndListener)
       throws ConfigurationErrorException
   {
     this.verfuegungspunkte = verfuegungspunkte;
     this.dialogEndListener = dialogEndListener;
     this.currentSettings = new ArrayList<VerfuegungspunktInfo>();
     this.printOrder = new JCheckBox();
-
-    ConfigThingy fensterDesc1 = conf.query("Fenster");
-    if (fensterDesc1.count() == 0)
-      throw new ConfigurationErrorException(L.m("Schlüssel 'Fenster' fehlt in %1",
-        conf.getName()));
-
-    final ConfigThingy fensterDesc = fensterDesc1.query("Drucken");
-    if (fensterDesc.count() == 0)
-      throw new ConfigurationErrorException(L.m("Schlüssel 'Drucken' fehlt in %1",
-        conf.getName()));
 
     // GUI im Event-Dispatching Thread erzeugen wg. Thread-Safety.
     try
@@ -296,7 +261,7 @@ public class SachleitendeVerfuegungenDruckdialog
         {
           try
           {
-            createGUI(fensterDesc.getLastChild());
+            createGUI();
           }
           catch (Exception x)
           {}
@@ -370,58 +335,16 @@ public class SachleitendeVerfuegungenDruckdialog
    *          die Spezifikation dieses Dialogs.
    * @author Matthias Benkmann (D-III-ITD 5.1), Christoph Lutz (D-III-ITD 5.1)
    */
-  private void createGUI(ConfigThingy fensterDesc)
+  private void createGUI()
   {
     Common.setLookAndFeelOnce();
 
-    int size = verfuegungspunkte.size();
-
     // element
-    elementComboBoxes = new ArrayList<JComboBox<String>>();
-    elementCountSpinner = new JSpinner[size];
-    printElementButtons = new JButton[size];
+    elementCountSpinner = new ArrayList<JSpinner>();
+    printElementButtons = new ArrayList<JButton>();
 
-    for (int i = 0; i < size; ++i)
-    {
-      Verfuegungspunkt verfPunkt = verfuegungspunkte.get(i);
-      Vector<String> zuleitungszeilen = verfPunkt.getZuleitungszeilen();
-
-      // elementComboBoxes vorbelegen:
-      Vector<String> content = new Vector<String>();
-      content.add(cutContent(verfPunkt.getHeading()));
-      if (zuleitungszeilen.size() > 0)
-        content.add(cutContent(L.m("------- Zuleitung an --------")));
-      Iterator<String> iter = zuleitungszeilen.iterator();
-      while (iter.hasNext())
-      {
-        String zuleitung = iter.next();
-        content.add(cutContent(zuleitung));
-      }
-      elementComboBoxes.add(new JComboBox<String>(content));
-
-      // elementCountComboBoxes vorbelegen:
-      SpinnerNumberModel model =
-        new SpinnerNumberModel(verfPunkt.getNumberOfCopies(), 0, 50, 1);
-      elementCountSpinner[i] = new JSpinner(model);
-
-      // printElementButtons vorbelegen:
-      printElementButtons[i] = new JButton();
-    }
-
-    String title = L.m("TITLE fehlt für Fenster Drucken");
-    try
-    {
-      title = fensterDesc.get("TITLE").toString();
-    }
-    catch (Exception x)
-    {}
-
-    try
-    {
-      closeAction = getAction(fensterDesc.get("CLOSEACTION").toString());
-    }
-    catch (Exception x)
-    {}
+    String title = L.m("WollMux Komfortdruck");
+    closeAction = actionListener_abort;
 
     // Create and set up the window.
     myFrame = new JFrame(title);
@@ -434,37 +357,8 @@ public class SachleitendeVerfuegungenDruckdialog
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     myFrame.getContentPane().add(mainPanel);
-
-    JPanel verfPunktPanel = new JPanel(new GridBagLayout());
-    JPanel buttons = new JPanel(new GridBagLayout());
-
-    mainPanel.add(verfPunktPanel, BorderLayout.CENTER);
-    mainPanel.add(buttons, BorderLayout.PAGE_END);
-
-    addUIElements(fensterDesc, "Headers", 0, 0, verfPunktPanel, 1, 0);
-
-    for (int i = 0; i < size; i++)
-    {
-      addUIElements(fensterDesc, L.m("Verfuegungspunkt"), i, i + 1 /* Headers */,
-        verfPunktPanel, 1, 0);
-    }
-
-    // separator zwischen Verfügungspunkte und Summenzeile hinzufügen
-    GridBagConstraints gbcSeparator =
-      new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1.0, 0.0,
-        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0,
-          0, 0), 0, 0);
-    JPanel uiElement = new JPanel(new GridLayout(1, 1));
-    uiElement.add(new JSeparator(SwingConstants.HORIZONTAL));
-    uiElement.setBorder(BorderFactory.createEmptyBorder(SEP_BORDER, 0, SEP_BORDER, 0));
-    gbcSeparator.gridy = size + 1;
-    verfPunktPanel.add(uiElement, gbcSeparator);
-
-    addUIElements(fensterDesc, "AllElements", 0,
-      size + 2 /* Headers und Separator */, verfPunktPanel, 1, 0);
-    addUIElements(fensterDesc, "Reihenfolge", 0,
-      size + 4 /* Headers und Separator */, verfPunktPanel, 1, 0);
-    addUIElements(fensterDesc, "Buttons", 0, 0, buttons, 1, 0);
+    
+    mainPanel.add(addUIElements(), BorderLayout.CENTER);
 
     myFrame.pack();
     int frameWidth = myFrame.getWidth();
@@ -477,6 +371,133 @@ public class SachleitendeVerfuegungenDruckdialog
     myFrame.setVisible(true);
     myFrame.setAlwaysOnTop(true);
     myFrame.requestFocus();
+  }
+  
+  private JComponent addUIElements() 
+  {
+    Box panel = new Box(BoxLayout.PAGE_AXIS);
+    
+    Box panelHeaders = Box.createHorizontalBox();
+
+    JLabel label = new JLabel(L.m("Ausdrucke"));
+    label.setPreferredSize(new Dimension(243, 28));
+    panelHeaders.add(label);
+
+    panelHeaders.add(Box.createRigidArea(new Dimension(5, 0)));
+    
+    JLabel label1 = new JLabel(L.m("Kopien"));
+    panelHeaders.add(label1);
+
+    panelHeaders.add(Box.createHorizontalGlue());
+
+    panel.add(panelHeaders);
+    
+    for (Verfuegungspunkt vp : verfuegungspunkte)
+    {
+      List<String> zuleitungszeilen = vp.getZuleitungszeilen();
+
+      Box panelVerfuegungspunkt = Box.createHorizontalBox();
+
+      JComboBox<String> combo = new JComboBox<String>();
+      combo.addItemListener(cboxItemListener);
+      combo.setPreferredSize(new Dimension(243, 24));
+      combo.setMinimumSize(new Dimension(243, 24));
+      combo.setMaximumSize(new Dimension(243, 24));
+      
+      Vector<String> content = new Vector<String>();
+      content.add(cutContent(vp.getHeading()));
+      if (zuleitungszeilen.size() > 0)
+        content.add(cutContent(L.m("------- Zuleitung an --------")));
+      for (String zuleitung : zuleitungszeilen) 
+      {
+        content.add(cutContent(zuleitung));
+      }
+      
+      combo.setModel(new DefaultComboBoxModel<String>(content));
+
+      panelVerfuegungspunkt.add(combo);
+
+      panelVerfuegungspunkt.add(Box.createRigidArea(new Dimension(5, 0)));
+
+      JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 0));
+      spinner.setPreferredSize(new Dimension(45, 0));
+      spinner.setMaximumSize(new Dimension(45, 24));
+      SpinnerNumberModel model =
+          new SpinnerNumberModel(vp.getNumberOfCopies(), 0, 50, 1);
+      spinner.setModel(model);
+      spinner.addChangeListener(spinnerChangeListener);
+      elementCountSpinner.add(spinner);
+      panelVerfuegungspunkt.add(spinner);
+
+      panelVerfuegungspunkt.add(Box.createHorizontalGlue());
+
+      JButton button = new JButton(L.m("Drucken"));
+      button.addActionListener(actionListener_printElement);
+      printElementButtons.add(button);
+      panelVerfuegungspunkt.add(button);
+
+      panel.add(panelVerfuegungspunkt);
+      
+      panel.add(Box.createRigidArea(new Dimension(0, 5)));
+    }
+    
+    panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+    panel.add(Box.createRigidArea(new Dimension(0, 5)));
+    
+    Box panelAllElements = Box.createHorizontalBox();
+
+    JLabel label3 = new JLabel(L.m("Summe aller Ausdrucke"));
+    label3.setPreferredSize(new Dimension(243, 24));
+    label3.setMaximumSize(new Dimension(243, 24));
+    panelAllElements.add(label3);
+
+    panelAllElements.add(Box.createRigidArea(new Dimension(5, 0)));
+
+    JTextField textField = new JTextField("" + getAllElementCount());
+    textField.setPreferredSize(new Dimension(45, 24));
+    textField.setMinimumSize(new Dimension(45, 24));
+    textField.setMaximumSize(new Dimension(45, 24));
+    textField.setEditable(false);
+    textField.setHorizontalAlignment(JTextField.CENTER);
+    allElementCountTextField = textField;
+    panelAllElements.add(textField);
+
+    panelAllElements.add(Box.createHorizontalGlue());
+    
+    panel.add(panelAllElements);
+
+    panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+    Box panelReihenfolge = Box.createHorizontalBox();
+
+    JCheckBox checkBox = new JCheckBox();
+    checkBox.setText("Ausdruck in umgekehrter Reihenfolge");
+    printOrder = checkBox;
+    panelReihenfolge.add(checkBox);
+    
+    panelReihenfolge.add(Box.createHorizontalGlue());
+
+    panel.add(panelReihenfolge);
+
+    panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+    Box panelButtons = Box.createHorizontalBox();
+
+    JButton button1 = new JButton(L.m("Abbrechen"));
+    button1.setMnemonic('A');
+    button1.addActionListener(actionListener_abort);
+    panelButtons.add(button1);
+
+    panelButtons.add(Box.createHorizontalGlue());
+
+    JButton button2 = new JButton(L.m("Alle drucken"));
+    button2.setMnemonic('D');
+    button2.addActionListener(actionListener_printAll);
+    panelButtons.add(button2);
+
+    panel.add(panelButtons);
+
+    return panel;
   }
 
   /**
@@ -497,315 +518,16 @@ public class SachleitendeVerfuegungenDruckdialog
   }
 
   /**
-   * Fügt compo UI Elemente gemäss den Kindern von conf.query(key) hinzu. compo muss
-   * ein GridBagLayout haben. stepx und stepy geben an um wieviel mit jedem UI
-   * Element die x und die y Koordinate der Zelle erhöht werden soll. Wirklich
-   * sinnvoll sind hier nur (0,1) und (1,0).
-   */
-  private void addUIElements(ConfigThingy conf, String key, int verfPunktNr,
-      int yOffset, JComponent compo, int stepx, int stepy)
-  {
-    // int gridx, int gridy, int gridwidth, int gridheight, double weightx,
-    // double weighty, int anchor, int fill, Insets insets, int ipadx, int
-    // ipady)
-    // GridBagConstraints gbcTextfield = new GridBagConstraints(0, 0, 1, 1, 1.0,
-    // 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new
-    // Insets(TF_BORDER,TF_BORDER,TF_BORDER,TF_BORDER),0,0);
-    GridBagConstraints gbcLabel =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcGlue =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0);
-    GridBagConstraints gbcButton =
-      new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-        GridBagConstraints.NONE, new Insets(BUTTON_BORDER, BUTTON_BORDER,
-          BUTTON_BORDER, BUTTON_BORDER), 0, 0);
-    GridBagConstraints gbcComboBox =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcTextField =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcSpinner =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-    GridBagConstraints gbcCheckBox =
-      new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
-        GridBagConstraints.BOTH, new Insets(TF_BORDER, TF_BORDER, TF_BORDER,
-          TF_BORDER), 0, 0);
-
-    ConfigThingy felderParent = conf.query(key);
-    int y = -stepy + yOffset;
-    int x = -stepx;
-
-    Iterator<ConfigThingy> piter = felderParent.iterator();
-    while (piter.hasNext())
-    {
-      Iterator<ConfigThingy> iter = piter.next().iterator();
-      while (iter.hasNext())
-      {
-        y += stepy;
-        x += stepx;
-
-        ConfigThingy uiElementDesc = iter.next();
-        try
-        {
-          /*
-           * ACHTUNG! DER FOLGENDE CODE SOLLTE SO GESCHRIEBEN WERDEN, DASS DER
-           * ZUSTAND AUCH IM FALLE EINES GESCHEITERTEN GET() UND EINER EVTL. DARAUS
-           * RESULTIERENDEN NULLPOINTEREXCEPTION NOCH KONSISTENT IST!
-           */
-
-          // boolean readonly = false;
-          String id = "";
-          try
-          {
-            id = uiElementDesc.get("ID").toString();
-          }
-          catch (NodeNotFoundException e)
-          {}
-          // try{ if (uiElementDesc.get("READONLY").toString().equals("true"))
-          // readonly = true; }catch(NodeNotFoundException e){}
-          String type = uiElementDesc.get("TYPE").toString();
-
-          if (type.equals("label"))
-          {
-            JLabel uiElement = new JLabel();
-            gbcLabel.gridx = x;
-            gbcLabel.gridy = y;
-            String labelText = uiElementDesc.get("LABEL").toString();
-            uiElement.setText(labelText);
-            // FIXME: Hier werden alle Labels mit dem Text 'Seiten' rausgefiltert,
-            // damit auch bei einer nicht aktualisierten Standard-Config ein
-            // sinnvoller Dialog angezeigt wird. Früher konnte über diesen Dialog
-            // noch der Seitenbereich eingestellt werden konnte. Passend dazu
-            // existierte in alten Standard-Configs noch die Spaltenüberschrift
-            // "Seiten". Seit der Existent der Druckfunktion 'Gesamtdokument
-            // erstellen' gibt es jedoch keinen Sinn mehr, den Seitenbereich über
-            // diesen Dialog zu steuern. Die Möglichkeit zur Einstellung ist daher
-            // aus dem Dialog entfernt worden, die notwendigen Änderungen der
-            // Standardkonfig machen aber die Referate, worauf wir keine Einfluss
-            // haben. AUFGABE: ab März 2009 (ein Jahr nach der Änderung) sollten alle
-            // Referate die entsprechend angepasste Standard-Config installiert
-            // haben. Dann muss dieses 'if' wieder aus dem Code rausfliegen!!!
-            if (!"Seiten".equals(labelText)) compo.add(uiElement, gbcLabel);
-          }
-
-          else if (type.equals("glue"))
-          {
-            Box uiElement = Box.createHorizontalBox();
-            try
-            {
-              int minsize =
-                Integer.parseInt(uiElementDesc.get("MINSIZE").toString());
-              uiElement.add(Box.createHorizontalStrut(minsize));
-            }
-            catch (Exception e)
-            {}
-            uiElement.add(Box.createHorizontalGlue());
-
-            gbcGlue.gridx = x;
-            gbcGlue.gridy = y;
-            compo.add(uiElement, gbcGlue);
-          }
-
-          else if (type.equals("spinner"))
-          {
-            JSpinner spinner;
-            if (id.equals("elementCount")
-              && verfPunktNr < elementCountSpinner.length)
-              spinner = elementCountSpinner[verfPunktNr];
-            else
-              spinner = new JSpinner(new SpinnerNumberModel(0, 0, 0, 0));
-
-            spinner.addChangeListener(spinnerChangeListener);
-
-            gbcSpinner.gridx = x;
-            gbcSpinner.gridy = y;
-            compo.add(spinner, gbcSpinner);
-          }
-
-          else if (type.equals("combobox"))
-          {
-            JComboBox<String> comboBox;
-            if (id.equals("element") && verfPunktNr < elementComboBoxes.size())
-            {
-              comboBox = elementComboBoxes.get(verfPunktNr);
-              comboBox.addItemListener(cboxItemListener);
-            }
-
-            // Behandlung des nicht mehr unterstützten Elementtyps "pageRange"
-            else if (id.equals("pageRange"))
-            {
-              comboBox = null;
-            }
-
-            else
-              comboBox = new JComboBox<String>();
-
-            // comboBox.addListSelectionListener(myListSelectionListener);
-
-            gbcComboBox.gridx = x;
-            gbcComboBox.gridy = y;
-            if (comboBox != null) compo.add(comboBox, gbcComboBox);
-          }
-
-          else if (type.equals("checkbox"))
-          {
-            JCheckBox checkBox;
-            if (id.equals("printOrder"))
-            {
-              checkBox = printOrder;
-            }
-            else
-            {
-              checkBox = new JCheckBox();
-            }
-
-            gbcCheckBox.gridx = x;
-            gbcCheckBox.gridy = y;
-
-            String boxText = uiElementDesc.get("LABEL").toString();
-            checkBox.setText(boxText);
-            compo.add(checkBox, gbcCheckBox);
-          }
-
-
-          else if (type.equals("textfield"))
-          {
-            JTextField textField;
-            if (id.equals("allElementCount"))
-            {
-              textField = new JTextField("" + getAllElementCount());
-              textField.setEditable(false);
-              textField.setHorizontalAlignment(SwingConstants.CENTER);
-              allElementCountTextField = textField;
-            }
-            else
-              textField = new JTextField();
-
-            gbcTextField.gridx = x;
-            gbcTextField.gridy = y;
-            compo.add(textField, gbcTextField);
-          }
-
-          else if (type.equals("button"))
-          {
-            String action = "";
-            try
-            {
-              action = uiElementDesc.get("ACTION").toString();
-            }
-            catch (NodeNotFoundException e)
-            {}
-
-            String label = uiElementDesc.get("LABEL").toString();
-
-            char hotkey = 0;
-            try
-            {
-              hotkey = uiElementDesc.get("HOTKEY").toString().charAt(0);
-            }
-            catch (Exception e)
-            {}
-
-            // Bei printElement-Actions die vordefinierten Buttons verwenden,
-            // ansonsten einen neuen erzeugen.
-            JButton button = null;
-
-            if (action.equalsIgnoreCase("printElement") && verfPunktNr >= 0
-              && verfPunktNr < printElementButtons.length)
-            {
-              button = printElementButtons[verfPunktNr];
-              button.setText(label);
-            }
-            else
-              button = new JButton(label);
-
-            button.setMnemonic(hotkey);
-
-            gbcButton.gridx = x;
-            gbcButton.gridy = y;
-            compo.add(button, gbcButton);
-
-            ActionListener actionL = getAction(action);
-            if (actionL != null) button.addActionListener(actionL);
-
-          }
-          else
-          {
-            Logger.error(L.m("Ununterstützter TYPE für User Interface Element: %1",
-              type));
-          }
-        }
-        catch (NodeNotFoundException e)
-        {
-          Logger.error(e);
-        }
-      }
-    }
-  }
-
-  /**
    * Berechnet die Summe aller Ausfertigungen aller elementCountSpinner.
    */
   private int getAllElementCount()
   {
     int count = 0;
-    for (int i = 0; i < elementCountSpinner.length; i++)
+    for (int i = 0; i < elementCountSpinner.size(); i++)
     {
-      count += new Integer(elementCountSpinner[i].getValue().toString()).intValue();
+      count += new Integer(elementCountSpinner.get(i).getValue().toString()).intValue();
     }
     return count;
-  }
-
-  /**
-   * Übersetzt den Namen einer ACTION in eine Referenz auf das passende
-   * actionListener_... Objekt.
-   * 
-   * @author Matthias Benkmann (D-III-ITD 5.1), Christoph Lutz (D-III-ITD 5.1)
-   */
-  private ActionListener getAction(String action)
-  {
-    if (action.equals("abort"))
-    {
-      return actionListener_abort;
-    }
-    if (action.equals("back"))
-    {
-      // diese Aktion wird nicht mehr unterstützt, verhält sich aber aus Gründen der
-      // Abwärtskompatibilität wie abort.
-      return actionListener_abort;
-    }
-    else if (action.equals("printElement"))
-    {
-      return actionListener_printElement;
-    }
-    else if (action.equals("printAll"))
-    {
-      return actionListener_printAll;
-    }
-    else if (action.equals("printSettings"))
-    {
-      // FIXME: diese Aktion wird nicht mehr unterstützt, darf aber aus Gründen der
-      // Abwärtskompatibilität nicht zu einem Fehler führen. Diese Aktion kann aber
-      // nach einem Jahr, also ab März 2009 ebenfalls entfernt werden, da bis dahin
-      // die entsprechende Standard-config hoffentlich überall im Einsatz ist.
-      return null;
-    }
-    else if (action.equals(""))
-    {
-      return null;
-    }
-    else
-      Logger.error(L.m("Ununterstützte ACTION: %1", action));
-
-    return null;
   }
 
   /**
@@ -855,9 +577,9 @@ public class SachleitendeVerfuegungenDruckdialog
   private void getCurrentSettingsForElement(JButton button)
   {
     currentSettings.clear();
-    for (int i = 0; i < printElementButtons.length; i++)
+    for (int i = 0; i < printElementButtons.size(); i++)
     {
-      if (printElementButtons[i] == button)
+      if (printElementButtons.get(i) == button)
       {
         currentSettings.add(getVerfuegungspunktInfo(i + 1));
       }
@@ -878,7 +600,7 @@ public class SachleitendeVerfuegungenDruckdialog
     try
     {
       numberOfCopies =
-        new Short(elementCountSpinner[verfPunkt - 1].getValue().toString()).shortValue();
+        new Short(elementCountSpinner.get(verfPunkt - 1).getValue().toString()).shortValue();
     }
     catch (Exception e)
     {
