@@ -66,6 +66,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -180,6 +181,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_abort = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       abort();
@@ -191,6 +193,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_back = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       back();
@@ -202,6 +205,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_restoreStandard = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       restoreStandard();
@@ -213,6 +217,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_save = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       save();
@@ -224,6 +229,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_saveAndExit = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       saveAndExit();
@@ -235,6 +241,7 @@ public class AbsenderdatenBearbeiten
    */
   private ActionListener actionListener_saveAndBack = new ActionListener()
   {
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       saveAndBack();
@@ -299,7 +306,8 @@ public class AbsenderdatenBearbeiten
     {
       javax.swing.SwingUtilities.invokeLater(new Runnable()
       {
-        public void run()
+        @Override
+	public void run()
         {
           try
           {
@@ -348,10 +356,8 @@ public class AbsenderdatenBearbeiten
     cardPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     myFrame.getContentPane().add(cardPanel);
 
-    Iterator<ConfigThingy> iter = fensterDesc.iterator();
-    while (iter.hasNext())
+    for (ConfigThingy neuesFenster : fensterDesc) 
     {
-      ConfigThingy neuesFenster = iter.next();
       String fensterName = neuesFenster.getName();
       DialogWindow newWindow = new DialogWindow(fensterName, neuesFenster);
       if (firstWindow == null) firstWindow = fensterName;
@@ -476,14 +482,13 @@ public class AbsenderdatenBearbeiten
    */
   private class MyWindowListener extends WindowAdapter
   {
+    @Override
     public void windowClosing(WindowEvent e)
     {
       closeAction.actionPerformed(null);
     }
   }
   
-  
-
   @Override
   protected void finalize() throws Throwable
   {
@@ -505,7 +510,8 @@ public class AbsenderdatenBearbeiten
     {
       javax.swing.SwingUtilities.invokeLater(new Runnable()
       {
-        public void run()
+        @Override
+	public void run()
         {
           abort();
         }
@@ -567,7 +573,7 @@ public class AbsenderdatenBearbeiten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private abstract class DataControl
+  private abstract class DataControl<T extends JComponent>
   {
     /**
      * der Text des Datenbankfeldes dieses Controls. Wenn startText nicht mit dem
@@ -601,7 +607,7 @@ public class AbsenderdatenBearbeiten
     /**
      * Das Control.
      */
-    protected JComponent myComponent;
+    protected T myComponent;
 
     /**
      * true, falls der Hintegrund des Controls aktuell in normalColor eingefärbt ist.
@@ -610,7 +616,7 @@ public class AbsenderdatenBearbeiten
 
     List<ColorChangeListener> listeners = new Vector<ColorChangeListener>();
 
-    public void initCompo(String colName, JComponent compo, Color localColor)
+    public void initCompo(String colName, T compo, Color localColor)
     {
       this.localColor = localColor;
       columnName = colName;
@@ -699,7 +705,9 @@ public class AbsenderdatenBearbeiten
           myDatasetIsLocal = datensatz.hasLocalOverride(columnName);
         }
         catch (ColumnNotFoundException x)
-        {}
+        {
+          Logger.debug2(L.m("Spalte %1 wurde nicht gefunden.", columnName));
+        }
         updateBackground();
       }
     }
@@ -718,7 +726,9 @@ public class AbsenderdatenBearbeiten
         initText();
       }
       catch (ColumnNotFoundException x)
-      {}
+      {
+	Logger.debug2(L.m("Spalte %1 wurde nicht gefunden.", columnName));
+      }
       catch (NoBackingStoreException x)
       {
         Logger.error(L.m("Es hätte nie passieren dürfen, aber restoreStandard() wurde für einen Datensatz ohne Backing Store aufgerufen!"));
@@ -733,7 +743,7 @@ public class AbsenderdatenBearbeiten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private class TextComponentDataControl extends DataControl implements
+  private class TextComponentDataControl extends DataControl<JTextComponent> implements
       DocumentListener
   {
     public TextComponentDataControl(String colName, JTextComponent compo,
@@ -744,26 +754,31 @@ public class AbsenderdatenBearbeiten
       compo.getDocument().addDocumentListener(this);
     }
 
+    @Override
     public String getTextFromControl()
     {
-      return ((JTextComponent) myComponent).getText();
+      return myComponent.getText();
     }
 
+    @Override
     public void setTextInControl(String text)
     {
-      ((JTextComponent) myComponent).setText(text);
+      myComponent.setText(text);
     }
 
+    @Override
     public void changedUpdate(DocumentEvent e)
     {
       updateBackground();
     }
 
+    @Override
     public void insertUpdate(DocumentEvent e)
     {
       updateBackground();
     }
 
+    @Override
     public void removeUpdate(DocumentEvent e)
     {
       updateBackground();
@@ -776,7 +791,7 @@ public class AbsenderdatenBearbeiten
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private class ComboBoxDataControl extends DataControl implements ActionListener,
+  private class ComboBoxDataControl extends DataControl<JComboBox<String>> implements ActionListener,
       ItemListener
   {
     public ComboBoxDataControl(String colName, JComboBox<String> compo, Color localColor)
@@ -790,28 +805,27 @@ public class AbsenderdatenBearbeiten
       compo.addItemListener(this);
     }
 
-    @SuppressWarnings("unchecked") // constructor ensures correct type    
+    @Override
     public void setBackground(Color c)
     {
       super.setBackground(c);
-      ((JComboBox<String>) myComponent).getEditor().getEditorComponent().setBackground(c);
+      myComponent.getEditor().getEditorComponent().setBackground(c);
     }
 
-    @SuppressWarnings("unchecked") // constructor ensures correct type    
     public void addItem(String text)
     {
       if (text == null) text = "";
-      for (int i = ((JComboBox<String>) myComponent).getItemCount() - 1; i >= 0; --i)
+      for (int i = myComponent.getItemCount() - 1; i >= 0; --i)
       {
-        if (((JComboBox<String>) myComponent).getItemAt(i).equals(text)) return;
+        if (myComponent.getItemAt(i).equals(text)) return;
       }
-      ((JComboBox<String>) myComponent).addItem(text);
+      myComponent.addItem(text);
     }
 
-    @SuppressWarnings("unchecked") // constructor ensures correct type
+    @Override
     public String getTextFromControl()
     {
-      JComboBox<String> combo = (JComboBox<String>) myComponent;
+      JComboBox<String> combo = myComponent;
       if (combo.isEditable())
       {
         Document comboDoc =
@@ -833,21 +847,23 @@ public class AbsenderdatenBearbeiten
       }
     }
 
-    @SuppressWarnings("unchecked") // constructor ensures correct type    
+    @Override
     public void setTextInControl(String text)
     {
-      JComboBox<String> myBox = (JComboBox<String>) myComponent;
+      JComboBox<String> myBox = myComponent;
       boolean edit = myBox.isEditable();
       myBox.setEditable(true);
       myBox.setSelectedItem(text);
       myBox.setEditable(edit);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e)
     {
       updateBackground();
     }
 
+    @Override
     public void itemStateChanged(ItemEvent e)
     {
       updateBackground();
@@ -891,7 +907,7 @@ public class AbsenderdatenBearbeiten
      * des Dialogs fehlerhaft sind kann es sein, dass nicht zu jedem Control ein
      * DataControl existiert.
      */
-    private List<DataControl> dataControls = new Vector<DataControl>();
+    private List<DataControl<?>> dataControls = new ArrayList<DataControl<?>>();
 
     /**
      * Liste aller JButtons, die ausgegraut werden müssen, wenn keines der
@@ -952,43 +968,47 @@ public class AbsenderdatenBearbeiten
 
     public void save()
     {
-      Iterator<DataControl> iter = dataControls.iterator();
-      while (iter.hasNext())
-        iter.next().save();
+      for (DataControl<?> dc : dataControls)
+      {
+        dc.save();
+      }
     }
 
     public boolean hasChanges()
     {
-      Iterator<DataControl> iter = dataControls.iterator();
-      while (iter.hasNext())
-        if (iter.next().hasBeenModified()) return true;
+      for (DataControl<?> dc : dataControls)
+      {
+	if (dc.hasBeenModified()) return true;
+      }
       return false;
     }
 
     public boolean hasLocalValues()
     {
-      Iterator<DataControl> iter = dataControls.iterator();
-      while (iter.hasNext())
+      for (DataControl<?> dc : dataControls)
       {
-        DataControl ctrl = iter.next();
-        if (ctrl.datasetIsLocal() || ctrl.hasBeenModified()) return true;
+	if (dc.datasetIsLocal() || dc.hasBeenModified())
+	  return true;
       }
       return false;
     }
 
+    @Override
     public void colorChanged()
     {
       boolean enabled = hasLocalValues() && datensatz.hasBackingStore();
-      Iterator<JButton> iter = buttonsToGreyOutIfNoChanges.iterator();
-      while (iter.hasNext())
-        iter.next().setEnabled(enabled);
+      for (JButton button : buttonsToGreyOutIfNoChanges)
+      {
+	button.setEnabled(enabled);
+      }
     }
 
     public void restoreStandard()
     {
-      Iterator<DataControl> iter = dataControls.iterator();
-      while (iter.hasNext())
-        iter.next().restoreStandard();
+      for (DataControl<?> dc : dataControls)
+      {
+	dc.restoreStandard();
+      }
     }
 
     /**
@@ -1121,7 +1141,7 @@ public class AbsenderdatenBearbeiten
               {
                 label.setText(L.m(uiElementDesc.get("LABEL").toString()));
               }
-              catch (Exception x)
+              catch (NodeNotFoundException x)
               {}
 
               JPanel uiElement = new JPanel(new GridLayout(1, 1));
@@ -1138,9 +1158,6 @@ public class AbsenderdatenBearbeiten
                 Logger.error(x);
               }
 
-              // Font fnt = tf.getFont();
-              // tf.setFont(fnt.deriveFont((float)14.0));
-              // tf.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
               uiElement.add(tf);
               uiElement.setBorder(BorderFactory.createEmptyBorder(TF_BORDER, 0,
                 TF_BORDER, 0));
@@ -1183,9 +1200,8 @@ public class AbsenderdatenBearbeiten
               }
 
               JPanel uiElement = new JPanel(new GridLayout(1, 1));
-              JScrollPane scrollPane = new JScrollPane(textarea);// ,
-              // JScrollPane.HORIZONTAL_SCROLLBAR_NEVER,
-              // JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+              JScrollPane scrollPane = new JScrollPane(textarea);
+              
               scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
               scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
               uiElement.add(scrollPane);
@@ -1276,8 +1292,7 @@ public class AbsenderdatenBearbeiten
         }
       }
 
-      ++y;
-      gbcBottomglue.gridy = y;
+      gbcBottomglue.gridy = y++;
       myInputPanel.add(Box.createGlue(), gbcBottomglue);
 
       ConfigThingy buttonParents = conf.query("Buttons");
@@ -1349,7 +1364,8 @@ public class AbsenderdatenBearbeiten
                 final String window = uiElementDesc.get("WINDOW").toString();
                 button.addActionListener(new ActionListener()
                 {
-                  public void actionPerformed(ActionEvent e)
+                  @Override
+		  public void actionPerformed(ActionEvent e)
                   {
                     showWindow(window);
                   }
@@ -1379,9 +1395,10 @@ public class AbsenderdatenBearbeiten
         }
       }
 
-      Iterator<DataControl> iter = dataControls.iterator();
-      while (iter.hasNext())
-        iter.next().addColorChangeListener(this);
+      for (DataControl<?> dc : dataControls)
+      {
+	dc.addColorChangeListener(this);
+      }
       colorChanged();
 
     }
